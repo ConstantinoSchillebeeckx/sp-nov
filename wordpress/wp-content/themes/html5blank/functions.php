@@ -436,3 +436,49 @@ function html5_shortcode_demo_2($atts, $content = null) // Demo Heading H2 short
 {
     return '<h2>' . $content . '</h2>';
 }
+
+
+
+/*------------------------------------*\
+	Custom Post Types
+\*------------------------------------*/
+
+// Create custom post type for tasks
+// https://premium.wpmudev.org/blog/creating-content-custom-post-types/
+function spnov_create_post_type()
+{
+    register_post_type('specimen', // Register Custom Post Type
+        array(
+        'labels' => array(
+            'name' => __('Specimen', 'spnov'), // Rename these to suit
+            'singular_name' => __('Specimen', 'spnov'),
+            'add_new' => __('Add New', 'spnov'),
+            'add_new_item' => __('Add New Specimen', 'spnov'),
+            'edit' => __('Edit', 'spnov'),
+            'edit_item' => __('Edit Specimen', 'spnov'),
+            'new_item' => __('New Specimen', 'spnov'),
+            'view' => __('View Specimen', 'spnov'),
+            'view_item' => __('View Specimen', 'spnov'),
+            'search_items' => __('Search Specimen', 'spnov'),
+            'not_found' => __('No Specimens found', 'spnov'),
+            'not_found_in_trash' => __('No Specimen found in Trash', 'spnov')
+        ),
+        'public' => true,
+        'hierarchical' => false, // Allows your posts to behave like Hierarchy Pages
+        'has_archive' => true,
+        'supports' => array(
+			'title',
+			'editor',
+            'author',
+			'custom-fields',
+			'page-attributes',
+			'revisions',
+		),
+		'exclude_from_search' => false,
+        'can_export' => true, // Allows export in Tools > Expor
+		'capability_type' => 'post',
+		'rewrite' => array( 'slug' => 'specimen' )
+    ));
+	flush_rewrite_rules();
+}
+add_action('init', 'spnov_create_post_type'); // Add our Task Type
