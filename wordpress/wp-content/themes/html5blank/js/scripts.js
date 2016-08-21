@@ -1,8 +1,9 @@
-(function( root, $, undefined ) {
-	"use strict";
+function nextSpecimen() {
 
-	$(function () {
-		// DOM ready, take it away
-	});
+}
 
-} ( this, jQuery ));
+
+
+function prevSpecimen() {
+
+}

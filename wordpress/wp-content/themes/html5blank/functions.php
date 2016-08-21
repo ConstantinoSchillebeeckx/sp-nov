@@ -111,28 +111,21 @@ function html5blank_header_scripts()
     wp_register_script('conditionizr', get_template_directory_uri() . '/js/lib/conditionizr-4.3.0.min.js', array(), '4.3.0');
     wp_enqueue_script('conditionizr');
 
-    // Custom scripts
-    wp_register_script(
-        'html5blankscripts',
-        get_template_directory_uri() . '/js/scripts.js',
-        array(
-            'conditionizr',
-            'modernizr',
-            'jquery'),
-        '1.0.0');
-
-    // Enqueue Scripts
-    wp_enqueue_script('html5blankscripts');
 
 }
 
 // Load HTML5 Blank conditional scripts
 function html5blank_conditional_scripts()
 {
-    if (is_page('pagenamehere')) {
-        // Conditional script(s)
-        wp_register_script('scriptname', get_template_directory_uri() . '/js/scriptname.js', array('jquery'), '1.0.0');
-        wp_enqueue_script('scriptname');
+    if (is_page('classify')) {
+        // Custom scripts
+        wp_register_script('html5blankscripts', get_template_directory_uri() . '/js/scripts.js', array('jquery'), '1.0.0');
+        wp_enqueue_script('html5blankscripts');
+
+        wp_register_script('autocomplete', get_template_directory_uri() . '/js/lib/jquery.autocomplete.min.js', array('jquery'), '1.2.26');
+        wp_enqueue_script('autocomplete');
+
+        wp_enqueue_style('autocomplete_css', get_template_directory_uri() . '/css/jquery.autocomplete.css', array(), '1.2.26');
     }
 }
 

@@ -13,7 +13,7 @@
 
                 <div class="row">
                     <div class="col-sm-8"> <!-- div for images -->
-                        <p>Images</p>
+                        <div class="well">imgs here</div>
                     </div>
                     
                     <div class="col-sm-4"> <!-- div for form -->
@@ -66,14 +66,27 @@
                                     <input type="text" class="form-control" id="inputLon" placeholder="">
                                 </div>
                             </div>
-                            <i class="fa fa-chevron-circle-left fa-4x" aria-hidden="true"></i>
-                            <i class="fa fa-chevron-circle-right pull-right fa-4x" aria-hidden="true"></i>
+                            <i class="fa fa-chevron-circle-left fa-4x text-primary navSpecimen" aria-hidden="true" onclick="prevSpecimen()"></i>
+                            <i class="fa fa-chevron-circle-right pull-right fa-4x text-primary navSpecimen" aria-hidden="true" onclick="nextSpecimen()"></i>
                         </form>
                     </div>
                 </div>
 
 			</article>
 			<!-- /article -->
+
+            <!-- autocomplete script -->
+            <script>
+                var countries = [
+                    { value: 'Andorra', data: 'AD' },
+                    { value: 'Zimbabwe', data: 'ZZ' }
+                ];
+
+                jQuery('#inputLon').devbridgeAutocomplete({
+                    lookup: countries,
+                });
+
+            </script>
 
 		<?php endwhile; ?>
 
