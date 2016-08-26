@@ -114,13 +114,20 @@ function html5blank_header_scripts()
 
 }
 
+
+
+
+
+
+
+
 // Load HTML5 Blank conditional scripts
 function html5blank_conditional_scripts()
 {
     if (is_page('classify') || is_page('upload') ) {
         // Custom scripts
-        wp_register_script('html5blankscripts', get_template_directory_uri() . '/js/scripts.js', array('jquery'), '1.0.0');
-        wp_enqueue_script('html5blankscripts');
+        wp_enqueue_script('spnov_scripts', get_template_directory_uri() . '/js/scripts.js', array('jquery'), '1.0.0');
+        wp_localize_script( 'spnov_scripts', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) ); // required to do AJAX!
 
         wp_register_script('autocomplete', get_template_directory_uri() . '/js/lib/jquery.autocomplete.min.js', array('jquery'), '1.2.26');
         wp_enqueue_script('autocomplete');
@@ -570,37 +577,43 @@ function process_file_upload($dat) {
 
 
 
-/**
-  * Updates post meta for a post. It also automatically deletes or adds the value to field_name if specified
-  *
-  * @access     protected
-  * @param      integer     The post ID for the post we're updating
-  * @param      string      The field we're updating/adding/deleting
-  * @param      string      [Optional] The value to update/add for field_name. If left blank, data will be deleted.
-  * @return     update wp_err
-  */
-function spnov_update_post_meta( $post_id, $field_name, $value = '' )
-{
-    if ( empty( $value ) OR ! $value )
-    {
-        $status = delete_post_meta( $post_id, $field_name );
+
+
+
+
+
+/* Function called by AJAX to load speciment data from DB
+
+Parameters:
+-----------
+- $_GET['id'] : int
+                WP defined ID for specimen
+
+Returns:
+--------
+json encoded array of metadata associated with speciment (if
+it exists) otherwise returns false
+
+*/
+add_action( 'wp_ajax_loadSpecimen', 'loadSpecimen_callback' );
+function loadSpecimen_callback() {
+
+    $dat = get_post_meta( $_GET['id'] );
+
+    if ( count($dat) ){
+
+        // reformat data a bit before sending
+        $tmp = [];
+        foreach($dat as $key => $val) {
+            $tmp[$key] = unserialize($val[0]);
+        }
+
+        echo json_encode( $tmp );
+    } else {
+        echo json_encode( false );
     }
-    elseif ( ! get_post_meta( $post_id, $field_name ) )
-    {
-        $status = add_post_meta( $post_id, $field_name, $value );
-    }
-    else
-    {
-        $status = update_post_meta( $post_id, $field_name, $value );
-    }
-    return $status;
+
+    wp_die(); // this is required to terminate immediately and return a proper response
 }
-
-
-
-
-
-
-
 
 

@@ -6,20 +6,22 @@
 
 			<h1><?php the_title(); ?></h1>
 
-        <?php // only show form if a user is logged in
-        if ( !is_user_logged_in() ) {
-            echo sprintf('<p class="lead login-link">You must <a href="%s">sign in</a> to view this page.</p>', wp_login_url( get_permalink() ) );
-            return;
-        };
+            <?php // only show form if a user is logged in
+            if ( !is_user_logged_in() ) {
+                echo sprintf('<p class="lead login-link">You must <a href="%s">sign in</a> to view this page.</p>', wp_login_url( get_permalink() ) );
+                return;
+            };
+            ?>
 
-		if (have_posts()): while (have_posts()) : the_post(); ?>
 
 			<!-- article -->
 			<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 
                 <div class="row">
                     <div class="col-sm-8"> <!-- div for images -->
-                        <div class="well">imgs here</div>
+                        <div class="well">
+                            <!-- content dynamically filled with AJAX -->
+                        </div>
                     </div>
                     
                     <div class="col-sm-4"> <!-- div for form -->
@@ -93,6 +95,12 @@
 			</article>
 			<!-- /article -->
 
+            <script>
+                var id = <?php echo isset($_GET['id']) ? $_GET['id']: 0;  ?>;
+                loadSpecimen(id);
+            </script>
+
+
             <!-- autocomplete script -->
             <script>
                 var countries = [
@@ -105,20 +113,6 @@
                 });
 
             </script>
-
-		<?php endwhile; ?>
-
-		<?php else: ?>
-
-			<!-- article -->
-			<article>
-
-				<h2><?php _e( 'Sorry, nothing to display.', 'html5blank' ); ?></h2>
-
-			</article>
-			<!-- /article -->
-
-		<?php endif; ?>
 
 		</section>
 		<!-- /section -->
