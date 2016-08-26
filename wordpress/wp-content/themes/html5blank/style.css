@@ -82,10 +82,13 @@ img {
 
 a {
   color: #444444;
-  text-decoration: none;
+  text-decoration: underline;
 }
 a:focus, a:hover {
   text-decoration: underline;
+}
+nav a {
+  text-decoration: none;
 }
 
 input[type="text"],

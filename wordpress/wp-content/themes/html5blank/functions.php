@@ -117,7 +117,7 @@ function html5blank_header_scripts()
 // Load HTML5 Blank conditional scripts
 function html5blank_conditional_scripts()
 {
-    if (is_page('classify')) {
+    if (is_page('classify') || is_page('upload') ) {
         // Custom scripts
         wp_register_script('html5blankscripts', get_template_directory_uri() . '/js/scripts.js', array('jquery'), '1.0.0');
         wp_enqueue_script('html5blankscripts');
@@ -486,32 +486,121 @@ add_action('init', 'spnov_create_post_type'); // Add our Task Type
 
 /* Add a custome post type Specimen to db
 
+Parameters:
+----------
+- $dat : assoc array
+         output from the process_file_upload() function which is
+         the parsed JSON file where each key is a specimen ID
+         (which we don't actually care about) and the value is
+         an array of image names associated with the specimen
+
+
 */
 function spnov_add_specimen( $dat ) {
 
     $current_user = wp_get_current_user();
 
-    $dat = array('img' => array(), 'thumb' => array(), 'status' => 0);
+    // create a new custom post type (Specimen) for each specimen in JSON
+    foreach ($dat as $id => $imgs) {
 
-     // Create post object
-     // contains the following data https://codex.wordpress.org/Class_Reference/WP_Post
-     // all other data stored as meta data
-    $my_post = array(
-        'post_type'     => 'specimen',
-        'post_author'   => sanitize_user($current_user->ID),
-    );
+         // Create post object
+         // contains the following data https://codex.wordpress.org/Class_Reference/WP_Post
+         // all other data stored as meta data
+        $my_post = array(
+            'post_type'     => 'specimen',
+            'post_author'   => sanitize_user($current_user->ID),
+            'post_title'    => implode(', ', $imgs),
+            'post_status'   => 'publish',
+        );
 
-    // Insert the post into the database
-    $post_id = wp_insert_post( $my_post );
-    if ($post_id != 0) { // if successfully added task, update the metadata
+        // Insert the post into the database
+        $post_id = wp_insert_post( $my_post );
+        if ($post_id != 0) { // if successfully added specimen, update the metadata
 
-        $error = false;
+            // add array of associated images to specimen
+            if (!add_post_meta( $post_id, 'imgs', $imgs )) {
+                return false; // if error
+            }
 
-        // add each remaining key in $_POST as post meta
-        foreach ($dat as $key => $val) {
-            yti_update_post_meta( $post_id, sanitize_text_field($key), sanitize_text_field($val) );
+        } else {
+            return false;
         }
 
     }
 
+    return true;
+
 }
+
+
+
+
+
+
+/* function called from Upload template everytime
+ a file is submitted
+
+Parameters:
+-----------
+- $dat : assoc array
+         $_FILES from the upload submit form
+         will have keys: name, type, tmp_name, error, size
+
+*/
+function process_file_upload($dat) {
+
+    // ensure file was json and there was no error
+    if ($dat['type'] == 'application/json' && $dat['error'] == 0) {
+        $json = json_decode(file_get_contents($dat['tmp_name']), true);
+        if (spnov_add_specimen($json)) {
+            echo sprintf('<p class="lead">Great! %s speciments were properly uploaded.', count($json) );
+        } else {
+            echo '<p class="lead">Some sort of error occurred when adding a specimen to the databse...</p>';
+        }
+    } else {
+        echo '<p class="lead">Something went wrong, please make sure file is JSON formatted and try again.</p>';
+    }
+
+}
+
+
+
+
+
+
+
+
+/**
+  * Updates post meta for a post. It also automatically deletes or adds the value to field_name if specified
+  *
+  * @access     protected
+  * @param      integer     The post ID for the post we're updating
+  * @param      string      The field we're updating/adding/deleting
+  * @param      string      [Optional] The value to update/add for field_name. If left blank, data will be deleted.
+  * @return     update wp_err
+  */
+function spnov_update_post_meta( $post_id, $field_name, $value = '' )
+{
+    if ( empty( $value ) OR ! $value )
+    {
+        $status = delete_post_meta( $post_id, $field_name );
+    }
+    elseif ( ! get_post_meta( $post_id, $field_name ) )
+    {
+        $status = add_post_meta( $post_id, $field_name, $value );
+    }
+    else
+    {
+        $status = update_post_meta( $post_id, $field_name, $value );
+    }
+    return $status;
+}
+
+
+
+
+
+
+
+
+

@@ -187,7 +187,7 @@ def check_specimen_pairs(dat):
 def write_output_json(dat, out='result.json'):
     convert = dict()
     for i,j in dat.groupby('specimen'):
-        convert[i] = j.index.tolist()
+        convert[i] = [l.split('/')[-1] for l in j.index.tolist()] # store just img name
 
     print 'File written to', out
     with open(out, 'w') as fp:
