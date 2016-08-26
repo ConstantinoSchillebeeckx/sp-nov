@@ -287,3 +287,12 @@ body {
 .navSpecimen {
     cursor: pointer;
 }
+
+.fa-lg {
+    margin-right: 10px;
+}
+
+.login-link a {
+    text-decoration: underline;
+    color: #337ab7;
+}

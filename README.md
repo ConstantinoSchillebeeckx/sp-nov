@@ -20,7 +20,8 @@ A custom post type for specimen (named Specimen) is used to store data.  It can 
 - Species
 - Collector
 - Number
-- Namer (TODO)
+- Determiner
+- Herbarium
 - Location info
 - Latitude
 - Longitude

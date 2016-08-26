@@ -482,3 +482,36 @@ function spnov_create_post_type()
 	flush_rewrite_rules();
 }
 add_action('init', 'spnov_create_post_type'); // Add our Task Type
+
+
+/* Add a custome post type Specimen to db
+
+*/
+function spnov_add_specimen( $dat ) {
+
+    $current_user = wp_get_current_user();
+
+    $dat = array('img' => array(), 'thumb' => array(), 'status' => 0);
+
+     // Create post object
+     // contains the following data https://codex.wordpress.org/Class_Reference/WP_Post
+     // all other data stored as meta data
+    $my_post = array(
+        'post_type'     => 'specimen',
+        'post_author'   => sanitize_user($current_user->ID),
+    );
+
+    // Insert the post into the database
+    $post_id = wp_insert_post( $my_post );
+    if ($post_id != 0) { // if successfully added task, update the metadata
+
+        $error = false;
+
+        // add each remaining key in $_POST as post meta
+        foreach ($dat as $key => $val) {
+            yti_update_post_meta( $post_id, sanitize_text_field($key), sanitize_text_field($val) );
+        }
+
+    }
+
+}

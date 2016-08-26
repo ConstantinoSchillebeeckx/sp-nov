@@ -6,7 +6,13 @@
 
 			<h1><?php the_title(); ?></h1>
 
-		<?php if (have_posts()): while (have_posts()) : the_post(); ?>
+        <?php // only show form if a user is logged in
+        if ( !is_user_logged_in() ) {
+            echo sprintf('<p class="lead login-link">You must <a href="%s">sign in</a> to view this page.</p>', wp_login_url( get_permalink() ) );
+            return;
+        };
+
+		if (have_posts()): while (have_posts()) : the_post(); ?>
 
 			<!-- article -->
 			<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
@@ -19,50 +25,62 @@
                     <div class="col-sm-4"> <!-- div for form -->
                         <form class="form-horizontal" onsubmit="return false">
                             <div class="form-group">
-                                <label class="col-sm-2 control-label">Genus</label>
-                                <div class="col-sm-10">
+                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Genus</label>
+                                <div class="col-sm-9">
                                     <input type="text" class="form-control" id="inputGenus" placeholder="Anthurium">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-2 control-label">Species</label>
-                                <div class="col-sm-10">
+                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Species</label>
+                                <div class="col-sm-9">
                                     <input type="text" class="form-control" id="inputSpecies" placeholder="longipoda">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-2 control-label">Number</label>
-                                <div class="col-sm-10">
+                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Authority</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="inputAuthor" placeholder="Schott">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Number</label>
+                                <div class="col-sm-9">
                                     <input type="text" class="form-control" id="inputNumber" placeholder="436">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-2 control-label">Collector</label>
-                                <div class="col-sm-10">
+                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Collector</label>
+                                <div class="col-sm-9">
                                     <input type="text" class="form-control" id="inputCollector" placeholder="Betancur">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-2 control-label">???</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="inputXXX" placeholder="Croat">
+                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Determiner</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="inputDeterminer" placeholder="Croat">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-2 control-label">Location</label>
-                                <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="inputLocation" placeholder=" el Taladro finca la Esperanza">
+                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Herbarium</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="inputHerbarium" placeholder="COL">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-2 control-label">Lat.</label>
-                                <div class="col-sm-10">
+                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Location</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="inputLocation" placeholder="el Taladro finca la Esperanza">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Latitude</label>
+                                <div class="col-sm-9">
                                     <input type="text" class="form-control" id="inputLat" placeholder="">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-2 control-label">Long.</label>
-                                <div class="col-sm-10">
+                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Longitude</label>
+                                <div class="col-sm-9">
                                     <input type="text" class="form-control" id="inputLon" placeholder="">
                                 </div>
                             </div>
@@ -108,3 +126,7 @@
 
 
 <?php get_footer(); ?>
+
+<script>
+    jQuery('label').popover({placement:'bottom', container: 'body'})
+</script>
