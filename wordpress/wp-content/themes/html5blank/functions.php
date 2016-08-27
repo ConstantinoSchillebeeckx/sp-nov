@@ -588,7 +588,10 @@ Parameters:
 -----------
 - $_GET['id'] : int
                 WP defined ID for specimen
-
+- $_GET['nav'] : str
+                 one of 'current', 'next' or 'previous'
+- $_GET['dat'] : obj
+                 form data (could be null)
 Returns:
 --------
 json encoded array of metadata associated with speciment (if
@@ -598,14 +601,50 @@ it exists) otherwise returns false
 add_action( 'wp_ajax_loadSpecimen', 'loadSpecimen_callback' );
 function loadSpecimen_callback() {
 
-    $dat = get_post_meta( $_GET['id'] );
+    global $wpdb;
+    $id = $_GET['id'];
+    $nav = $_GET['nav'];
+    $dat_set = $_GET['dat'];
+
+    if ($dat_set) spnov_update_specimen($id, $dat_set);
+
+    // check max/min specimen ID
+    $row = $wpdb->get_row( "SELECT ID, min(ID) as min, max(ID) as max FROM $wpdb->posts WHERE post_type = 'specimen' AND post_status = 'publish' ORDER BY ID LIMIT 1" );
+    $min = $row->min; // min specimen ID
+    $max = $row->max; // max specimen ID
+
+    // if ID is 0, the first specimen is loaded
+    if (!$id) {
+        $id = $row->ID;
+    }
+
+    // look up next/previous ID if needed
+    if ($nav == 'previous') {
+        if ($id == $min) { // wrap to last ID
+            $id = $max;
+        } else {
+            $id = $wpdb->get_var( "SELECT ID FROM $wpdb->posts where post_type = 'specimen' and post_status = 'publish' and ID < $id ORDER BY ID DESC LIMIT 1" );
+        }
+    } elseif ($nav == 'next') {
+        if ($id == $max) { // wrap to first ID
+            $id = $min;
+        } else {
+            $id = $wpdb->get_var( "SELECT ID FROM $wpdb->posts where post_type = 'specimen' and post_status = 'publish' and ID > $id ORDER BY ID LIMIT 1" );
+        }
+    }
+
+    $dat = get_post_meta( $id );
 
     if ( count($dat) ){
 
         // reformat data a bit before sending
-        $tmp = [];
+        $tmp = array('id' => $id, 'dat'=>$dat_set);
         foreach($dat as $key => $val) {
-            $tmp[$key] = unserialize($val[0]);
+            if (!unserialize($val[0])) {
+                $tmp[$key] = $val[0]; // just pass regular string if unserialize fails
+            } else {
+                $tmp[$key] = unserialize($val[0]);
+            }
         }
 
         echo json_encode( $tmp );
@@ -615,5 +654,43 @@ function loadSpecimen_callback() {
 
     wp_die(); // this is required to terminate immediately and return a proper response
 }
+
+
+
+
+
+/**
+  * Updates post meta for a post. It also automatically deletes or adds the value to field_name if specified
+  *
+  * @access     protected
+  * @param      integer     The post ID for the post we're updating
+  * @param      string      The field we're updating/adding/deleting
+  * @param      string      [Optional] The value to update/add for field_name. If left blank, data will be deleted.
+  * @return     update wp_err
+  */
+function spnov_update_specimen( $post_id, $dat ) {
+
+    foreach($dat as $field_name => $value) {
+        if ( empty( $value ) OR ! $value )
+        {
+            $status = delete_post_meta( $post_id, $field_name );
+        }
+        elseif ( ! get_post_meta( $post_id, $field_name ) )
+        {
+            $status = add_post_meta( $post_id, $field_name, $value );
+        }
+        else
+        {
+            $status = update_post_meta( $post_id, $field_name, $value );
+        }
+    }
+    return $status;
+}
+
+
+
+
+
+
 
 

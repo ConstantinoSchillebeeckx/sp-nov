@@ -39,7 +39,7 @@ if (session_status() == PHP_SESSION_NONE) {
 	<body <?php body_class('container-fluid'); ?>>
 
 		<!-- wrapper -->
-		<div class="container wrapper">
+		<div class="wrapper">
 
             <!-- header -->
             <header class="header clear" role="banner">
