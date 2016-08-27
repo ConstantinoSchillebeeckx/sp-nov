@@ -15,16 +15,18 @@ Simple web-app for adding label metadata to a herbarium specimen.
 
 ## Specimen class
 
-A custom post type for specimen (named Specimen) is used to store data.  It can be considered a class with the following attributes:
-- Genus
-- Species
-- Collector
-- Number
-- Determiner
-- Herbarium
-- Location info
-- Latitude
-- Longitude
-- Images (array of IMG url)
-- Thumbnails (array of IMG thumbnail url)
-- Status (e.g. finished, being edited, new, error, etc)
+A custom post type for specimen (named Specimen) is used to store data.  It can be considered a class with the following attributes (shown are the key values of the WP database):
+- inputGenus
+- inputSpecies
+- inputAuthority
+- inputCollector
+- inputNumber
+- inputDeterminer
+- inputHerbarium
+- inputLocation (location information)
+- inputLat (latitude)
+- inputLon (longitude)
+- imgs (array of images associated with specimen)
+- finished (0 for unfinished, 1 for finished)
+- inputIssue (string for issue associated with specimen, e.g. not enough images)
+- history (assoc array with timestamp as key and user id as value)

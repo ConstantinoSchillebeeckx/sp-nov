@@ -17,7 +17,7 @@
 			<!-- article -->
 			<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 
-                <div class="row">
+                <div class="row" style="padding-top:10px;">
                     <div class="col-sm-8"> <!-- div for images -->
                         <div class="well">
                             <!-- content dynamically filled with AJAX -->
@@ -35,7 +35,7 @@
                                     <input type="radio" name="inputView" id="inlineRadio2" value="completed"> Completed
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="inputView" id="inlineRadio3" value="unfinished"> Unfinished
+                                    <input type="radio" name="inputView" id="inlineRadio3" value="unfinished" checked> Unfinished
                                 </label>
                             </div>
                             <hr>

@@ -591,7 +591,7 @@ Parameters:
 - $_GET['nav'] : str
                  one of 'current', 'next' or 'previous'
 - $_GET['dat'] : obj
-                 form data (could be null)
+                 form data (will be null if on first load of page)
 Returns:
 --------
 json encoded array of metadata associated with speciment (if
@@ -638,7 +638,7 @@ function loadSpecimen_callback() {
     if ( count($dat) ){
 
         // reformat data a bit before sending
-        $tmp = array('id' => $id, 'dat'=>$dat_set);
+        $tmp = array('id' => $id);
         foreach($dat as $key => $val) {
             if (!unserialize($val[0])) {
                 $tmp[$key] = $val[0]; // just pass regular string if unserialize fails
@@ -670,6 +670,8 @@ function loadSpecimen_callback() {
   */
 function spnov_update_specimen( $post_id, $dat ) {
 
+    spnov_update_history($post_id);
+
     foreach($dat as $field_name => $value) {
         if ( empty( $value ) OR ! $value )
         {
@@ -688,6 +690,30 @@ function spnov_update_specimen( $post_id, $dat ) {
 }
 
 
+
+
+/* Update history meta_key for specimen
+
+Will add a timestamp and the user id to the
+history array of the specimen
+
+Parameters:
+----------
+- $id : int
+        WP id associated with specimen
+
+*/
+function spnov_update_history( $id ) {
+
+    $history = get_post_meta( $post_id, 'history' );
+    if ( !$history ) {
+        $history = array( time() => get_current_user_id() );
+    } else {
+        $history[time()] = get_current_user_id();
+    }
+
+    update_post_meta( $id, 'history', $history );
+}
 
 
 

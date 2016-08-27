@@ -12,7 +12,7 @@ setting it to blank
 */
 function getFormDat() {
 
-    var tmp = jQuery("form").serializeArray();
+    var tmp = jQuery("form").find("[name!='inputView']").serializeArray(); // ignore the radio button
 
     var dat = {};
     for (var i = 0; i < tmp.length; i++) {
@@ -67,6 +67,7 @@ function loadSpecimen(id, nav, dat) {
             "id": id, // var set by build_table() in EL.php
             "nav": nav,
             "dat": dat,
+            "view": jQuery("input[name=inputView]:checked").val(),
     }
 
     // send data to server
@@ -92,7 +93,7 @@ Paramters:
 */
 function doAJAX(data) {
 
-    console.log(data);
+    //console.log(data);
 
     // send via AJAX to process with PHP
     jQuery.ajax({
@@ -103,12 +104,20 @@ function doAJAX(data) {
             success: function(response) {
 
                 if (response) { // response will be false if specimen ID doesn't exist
-                    console.log(response);
-                    var imgs = response.imgs;
 
+                    //console.log(response);
+
+                    var imgs = response.imgs;
                     currentID = response.id; // update global
 
-                    jQuery('h1').html('<h1>Specimen #' + currentID + '</h1>'); // update title
+                    // update title
+                    jQuery('h1').html('Specimen #' + currentID + ' '); 
+                    if (response.inputIssue) {
+                        jQuery('h1').append('<span class="label label-warning">issue</span>')
+                    }
+                    //if (response.inputIssue != '') { jQuery('h1').append('<span class="label label-warning">issue</span>') }
+
+
                     jQuery('.well').html(''); // clear contents
                     window.history.pushState(currentID, 'Title', '?id=' + currentID); // update URL so things can be bookmarked
 
