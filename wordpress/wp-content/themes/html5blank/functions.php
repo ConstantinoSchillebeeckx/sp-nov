@@ -572,8 +572,35 @@ function process_file_upload($dat) {
 
 
 
+/* Function called by AJAX auto_complete library
 
+Parameters:
+-----------
+- $_GET['key'] : str
+                 specimen data key being looked up
+                 e.g. inputGenus
+- $_GET['query'] : str
+                   string being typed in the input box
 
+Returns:
+--------
+json encoded string in the format ['suggestions': [str, str, str,]]
+
+*/
+add_action( 'wp_ajax_autoComplete', 'autoComplete_callback' );
+function autoComplete_callback() {
+
+    global $wpdb;
+    $key = $_GET['key'];
+    $query = $_GET['query'];
+
+    $vals = $wpdb->get_col( "SELECT DISTINCT(meta_value) FROM $wpdb->postmeta WHERE meta_key = '$key' AND meta_value like '%$query%'" );
+
+    echo json_encode( array('suggestions' => $vals ) );
+
+    wp_die(); // this is required to terminate immediately and return a proper response
+
+}
 
 
 

@@ -42,61 +42,55 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Genus</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="inputGenus" placeholder="Anthurium">
+                                    <input type="text" class="form-control" name="inputGenus" placeholder="Anthurium" pattern="[a-zA-Z]+" title="Only letters are allowed">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Species</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="inputSpecies" placeholder="longipoda">
+                                    <input type="text" class="form-control" name="inputSpecies" placeholder="longipoda" pattern="[a-zA-Z]+" title="Only letters are allowed">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Authority</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="inputAuthor" placeholder="Schott">
+                                    <input type="text" class="form-control" name="inputAuthor" placeholder="Schott" pattern="[a-zA-Z]+" title="Only letters are allowed">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Number</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="inputNumber" placeholder="436">
+                                    <input type="text" class="form-control" name="inputNumber" placeholder="436" pattern="[a-zA-Z0-9]+" title="Only letters and numbers are allowed">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Collector</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="inputCollector" placeholder="Betancur">
+                                    <input type="text" class="form-control" name="inputCollector" placeholder="Betancur" pattern="[a-zA-Z ]+" title="Only letters and spaces are allowed">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Determiner</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="inputDeterminer" placeholder="Croat">
+                                    <input type="text" class="form-control" name="inputDeterminer" placeholder="Croat" pattern="[a-zA-Z]+" title="Only letters are allowed">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Herbarium</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="inputHerbarium" placeholder="COL">
+                                    <input type="text" class="form-control" name="inputHerbarium" placeholder="COL" pattern="[a-zA-Z]+" title="Only letters are allowed">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Location</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="inputLocation" placeholder="el Taladro finca la Esperanza">
+                                    <input type="text" class="form-control" name="inputLocation" placeholder="el Taladro finca la Esperanza" pattern="[a-zA-Z0-9 ]+" title="Only letters, spaces and numbers are allowed">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Latitude</label>
+                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Lat/Lon</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="inputLat" placeholder="">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Longitude</label>
-                                <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="inputLon" placeholder="">
+                                    <input type="text" class="form-control" name="inputLatLon" placeholder="10 59N 74 04W" pattern="[0-9NW\. ]+" title="Only numbers, spaces and the characters 'N', 'W' or '.' are allowed.">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -112,6 +106,7 @@
                             </div>
                             <i class="fa fa-chevron-circle-left fa-4x text-primary navSpecimen" aria-hidden="true" onclick="prevSpecimen()"></i>
                             <i class="fa fa-chevron-circle-right pull-right fa-4x text-primary navSpecimen" aria-hidden="true" onclick="nextSpecimen()"></i>
+                            <input id="submit_handle" type="submit" style="display: none"> <!-- needed for validating form -->
                         </form>
                     </div>
                 </div>
@@ -127,15 +122,41 @@
 
             <!-- autocomplete script -->
             <script>
-                var countries = [
-                    { value: 'Andorra', data: 'AD' },
-                    { value: 'Zimbabwe', data: 'ZZ' }
-                ];
-
-                jQuery('#inputLon').devbridgeAutocomplete({
-                    lookup: countries,
+                jQuery('input[name="inputGenus"]').devbridgeAutocomplete({
+                    serviceUrl: ajax_object.ajax_url, 
+                    deferRequestBy: 200,
+                    params:{'action':'autoComplete','key':'inputGenus'}
                 });
 
+                jQuery('input[name="inputSpecies"]').devbridgeAutocomplete({
+                    serviceUrl: ajax_object.ajax_url, 
+                    deferRequestBy: 200,
+                    params:{'action':'autoComplete','key':'inputSpecies'}
+                });
+
+                jQuery('input[name="inputAuthority"]').devbridgeAutocomplete({
+                    serviceUrl: ajax_object.ajax_url, 
+                    deferRequestBy: 200,
+                    params:{'action':'autoComplete','key':'inputAuthority'}
+                });
+
+                jQuery('input[name="inputCollector"]').devbridgeAutocomplete({
+                    serviceUrl: ajax_object.ajax_url, 
+                    deferRequestBy: 200,
+                    params:{'action':'autoComplete','key':'inputCollector'}
+                });
+
+                jQuery('input[name="inputDeterminer"]').devbridgeAutocomplete({
+                    serviceUrl: ajax_object.ajax_url, 
+                    deferRequestBy: 200,
+                    params:{'action':'autoComplete','key':'inputDeterminer'}
+                });
+
+                jQuery('input[name="inputHerbarium"]').devbridgeAutocomplete({
+                    serviceUrl: ajax_object.ajax_url, 
+                    deferRequestBy: 200,
+                    params:{'action':'autoComplete','key':'inputHerbarium'}
+                });
             </script>
 
 		</section>

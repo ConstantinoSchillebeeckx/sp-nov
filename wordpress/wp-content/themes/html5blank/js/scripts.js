@@ -25,16 +25,38 @@ function getFormDat() {
 
 }
 
+/* Navigate to next specimen and grab data
 
+Will validate the form and if valide, pull
+up that data for the next specimen.  If at
+the last specimen, will wrap around
+
+*/
 function nextSpecimen() {
-    loadSpecimen(currentID, 'next', getFormDat());
+
+    event.preventDefault();
+    jQuery('#submit_handle').click(); // needed to validate form
+
+    if (jQuery('form')[0].checkValidity()) { // if valid, load
+        loadSpecimen(currentID, 'next', getFormDat());
+    }
 }
 
+/* Like nextSpecimen() but in other direction
 
-
+*/
 function prevSpecimen() {
-    loadSpecimen(currentID, 'previous', getFormDat());
+
+    event.preventDefault();
+    jQuery('#submit_handle').click(); // needed to validate form
+
+    if (jQuery('form')[0].checkValidity()) { // if valid, load
+        loadSpecimen(currentID, 'previous', getFormDat());
+    }
 }
+
+
+
 
 
 /* 
@@ -55,7 +77,6 @@ Parameters:
 */
 function loadSpecimen(id, nav, dat) {
 
-    if (event) event.preventDefault(); // cancel form submission
 
     // id 0 will call the first specimen
     if (id == null) id = 0;
