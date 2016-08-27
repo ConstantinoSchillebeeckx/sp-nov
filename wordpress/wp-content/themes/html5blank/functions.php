@@ -515,8 +515,8 @@ function spnov_add_specimen( $dat ) {
          // all other data stored as meta data
         $my_post = array(
             'post_type'     => 'specimen',
-            'post_author'   => sanitize_user($current_user->ID),
-            'post_title'    => implode(', ', $imgs),
+            'post_author'   => sanitize_user( $current_user->ID ),
+            'post_title'    => sanitize_title( implode(', ', $imgs) ),
             'post_status'   => 'publish',
         );
 
@@ -591,8 +591,8 @@ add_action( 'wp_ajax_autoComplete', 'autoComplete_callback' );
 function autoComplete_callback() {
 
     global $wpdb;
-    $key = $_GET['key'];
-    $query = $_GET['query'];
+    $key = sanitize_text_field( $_GET['key'] );
+    $query = sanitize_text_field( $_GET['query'] );
 
     $vals = $wpdb->get_col( "SELECT DISTINCT(meta_value) FROM $wpdb->postmeta WHERE meta_key = '$key' AND meta_value like '%$query%'" );
 
@@ -629,9 +629,11 @@ add_action( 'wp_ajax_loadSpecimen', 'loadSpecimen_callback' );
 function loadSpecimen_callback() {
 
     global $wpdb;
-    $id = $_GET['id'];
+    $id = intval($_GET['id']);
     $nav = $_GET['nav'];
     $dat_set = $_GET['dat'];
+
+    if ( !in_array( $nav, array('next','previous','current') ) ) return;
 
     if ($dat_set) spnov_update_specimen($id, $dat_set);
 
@@ -700,6 +702,9 @@ function spnov_update_specimen( $post_id, $dat ) {
     spnov_update_history($post_id);
 
     foreach($dat as $field_name => $value) {
+
+        $value = sanitize_text_field($value); // sanitize
+
         if ( empty( $value ) OR ! $value )
         {
             $status = delete_post_meta( $post_id, $field_name );
