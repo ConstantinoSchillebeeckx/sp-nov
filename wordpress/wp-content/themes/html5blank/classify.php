@@ -42,7 +42,7 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Genus</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="inputGenus" placeholder="Anthurium" pattern="[a-zA-Z]+" title="Only letters are allowed">
+                                    <input type="text" class="form-control" name="inputGenus" placeholder="Anthurium" pattern="[a-zA-Z]+" title="Only letters are allowed" autofocus>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -88,7 +88,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Lat. & Lon.</label>
+                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Lat. Lon.</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" name="inputLatLon" placeholder="10 59N 74 04W" pattern="[0-9NW\. ]+" title="Only numbers, spaces and the characters 'N', 'W' or '.' are allowed.">
                                 </div>
@@ -104,6 +104,7 @@
                                     </select>
                                 </div>
                             </div>
+                            <hr>
                             <i class="fa fa-chevron-circle-left fa-4x text-primary navSpecimen" aria-hidden="true" onclick="prevSpecimen()"></i>
                             <i class="fa fa-chevron-circle-right pull-right fa-4x text-primary navSpecimen" aria-hidden="true" onclick="nextSpecimen()"></i>
                             <input id="submit_handle" type="submit" style="display: none"> <!-- needed for validating form -->
