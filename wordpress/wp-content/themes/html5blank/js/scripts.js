@@ -12,7 +12,7 @@ setting it to blank
 */
 function getFormDat() {
 
-    var tmp = jQuery("form").find("[name!='inputView']").serializeArray(); // ignore the radio button
+    var tmp = jQuery("form").find("[name!='inputView']").serializeArray(); // ignore the view dropdown
 
     var dat = {};
     for (var i = 0; i < tmp.length; i++) {
@@ -73,7 +73,13 @@ Parameters:
        if 'current': the given ID will be loaded [default]
        if 'next': the next chronological ID will be loaded
        if 'previous': the previous ID will be loaded
-
+- dat : obj
+        data to be sent to server which represents the data
+        for the current specimen.  any data here will be set
+        for the specimen
+- view : str
+         specimen status to view, must be one of 'all', 
+         'completed','unfinished','issue'
 */
 function loadSpecimen(id, nav, dat) {
 
@@ -146,7 +152,7 @@ function doAJAX(data) {
                     for (var i = 0; i < imgs.length; i++) {
                         var src = 'http://' + window.location.host + '/wordpress/wp-content/uploads/' + imgs[i].replace('JPG','jpg');
                         var src_thumb = 'http://' + window.location.host + '/wordpress/wp-content/uploads/' + imgs[i].replace('JPG','jpg').replace('.jpg','-150x150.jpg');
-                        jQuery('.well').append('<a href="' + src + '"><img src="' + src_thumb + '" style="margin-left:10px; margin-right:10px;"></a>');
+                        jQuery('.well').append('<a href="' + src + '"><img src="' + src_thumb + '" style="margin:10 10 10 10;"></a>');
                     }
 
                     // clear form

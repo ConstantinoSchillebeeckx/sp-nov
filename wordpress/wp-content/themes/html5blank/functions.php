@@ -619,6 +619,9 @@ Parameters:
                  one of 'current', 'next' or 'previous'
 - $_GET['dat'] : obj
                  form data (will be null if on first load of page)
+- $_GET['view'] : str
+                  specimen status to view, must be one of 'all', 
+                  'completed','unfinished','issue'
 Returns:
 --------
 json encoded array of metadata associated with speciment (if
@@ -635,7 +638,24 @@ function loadSpecimen_callback() {
 
     if ( !in_array( $nav, array('next','previous','current') ) ) return;
 
+    // not sure why i have to update imgs manually
+    // instead of using the function spnov_update_specimen
+    if (array_key_exists('imgs', $dat_set)) {
+        $imgs = explode(',', $dat_set['imgs']);
+        update_post_meta($id, 'imgs', $imgs);
+        unset($dat_set['imgs']);
+    }
     if ($dat_set) spnov_update_specimen($id, $dat_set);
+
+
+    // filter specimens
+    $filter = '';
+    if ($_GET['view'] == 'completed') {
+    } elseif ($_GET['view'] == 'issue') {
+    } elseif ($_GET['view'] == 'unfinished') {
+    }
+
+
 
     // check max/min specimen ID
     $row = $wpdb->get_row( "SELECT ID, min(ID) as min, max(ID) as max FROM $wpdb->posts WHERE post_type = 'specimen' AND post_status = 'publish' ORDER BY ID LIMIT 1" );

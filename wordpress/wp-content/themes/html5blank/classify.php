@@ -28,15 +28,14 @@
                         <form class="form-horizontal" onsubmit="return false">
                             <div class="form-group">
                                 <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">View</label>
-                                <label class="radio-inline">
-                                    <input type="radio" name="inputView" id="inlineRadio1" value="all"> All
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" name="inputView" id="inlineRadio2" value="completed"> Completed
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" name="inputView" id="inlineRadio3" value="unfinished" checked> Unfinished
-                                </label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" name="inputView">
+                                        <option selected value="all">All specimens</option>
+                                        <option value="completed">Completed specimens</option>
+                                        <option value="unfinished">Unfinished specimens</option>
+                                        <option value="issue">Specimen with issue</option>
+                                    </select>
+                                </div>
                             </div>
                             <hr>
                             <div class="form-group">
@@ -99,11 +98,19 @@
                                     <select class="form-control" name="inputIssue">
                                         <option selected value>None</option>
                                         <option value="no_label">No label present</option>
-                                        <option value="multiple_specimens">Multiple speciments shown</option>
+                                        <option value="multiple_specimens">Multiple specimens shown</option>
                                         <option value="problem_label">Problematic label</option>
                                     </select>
                                 </div>
                             </div>
+                            <?php if (in_array('administrator',  wp_get_current_user()->roles)) { ?>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Images" data-content="Comma-separated (no spaces or quotes) list of filenames for JPG images associated with a specimen.  Example: DSC09272.JPG,DSC09273.JPG" aria-hidden="true">Imgs</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="imgs">
+                                    </div>
+                                </div>
+                            <?php } ?>
                             <hr>
                             <i class="fa fa-chevron-circle-left fa-4x text-primary navSpecimen" aria-hidden="true" onclick="prevSpecimen()"></i>
                             <i class="fa fa-chevron-circle-right pull-right fa-4x text-primary navSpecimen" aria-hidden="true" onclick="nextSpecimen()"></i>
@@ -163,6 +170,7 @@
 		</section>
 		<!-- /section -->
 	</main>
+
 
 
 <?php get_footer(); ?>
