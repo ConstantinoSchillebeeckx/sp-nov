@@ -30,3 +30,23 @@ A custom post type for specimen (named Specimen) is used to store data.  It can 
 - finished (0 for unfinished, 1 for finished)
 - inputIssue (string for issue associated with specimen, e.g. not enough images)
 - history (assoc array with timestamp as key and user id as value)
+- finished (if key is present, specimen is considered finished, otherwise specimen is not finished)
+
+## User roles
+
+Subscriber
+- can view only non-issue specimens
+- read only access to data
+
+Editor
+- can view all specimens
+- has access to 'View' dropdown
+- can edit all data except for 'imgs' meta key
+
+Administrator
+- like editor but with added priveledge of editing the 'imgs' key
+
+
+## Notes:
+
+- a specimen is considered 'finished' if ...  An unfinished specimen will not have the key 'finished' specified

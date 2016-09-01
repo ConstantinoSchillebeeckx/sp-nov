@@ -638,6 +638,14 @@ function loadSpecimen_callback() {
 
     if ( !in_array( $nav, array('next','previous','current') ) ) return;
 
+
+    // check if this 'finishes' the specimen
+    $dat_set['finished'] = false;
+    if ( $dat_set['inputGenus'] != '' && $dat_set['inputSpecies'] != '' && $dat_set['inputAuthor'] != '' && $dat_set['inputNumber'] != '' && $dat_set['inputCollector'] != '' && $dat_set['inputDeterminer'] != '' && $dat_set['inputHerbarium'] != '' && $dat_set['inputLocation'] != '' && $dat_set['inputIssue'] == '' ) {
+        $dat_set['finished'] = true;
+    }
+
+
     // not sure why i have to update imgs manually
     // instead of using the function spnov_update_specimen
     if (array_key_exists('imgs', $dat_set)) {
@@ -651,14 +659,17 @@ function loadSpecimen_callback() {
     // filter specimens
     $filter = '';
     if ($_GET['view'] == 'completed') {
+        $filter = " AND meta_key = 'finished' and meta_value = 1";
     } elseif ($_GET['view'] == 'issue') {
+        $filter = " AND meta_key = 'inputIssue'";
     } elseif ($_GET['view'] == 'unfinished') {
+        // XXX
     }
 
 
 
     // check max/min specimen ID
-    $row = $wpdb->get_row( "SELECT ID, min(ID) as min, max(ID) as max FROM $wpdb->posts WHERE post_type = 'specimen' AND post_status = 'publish' ORDER BY ID LIMIT 1" );
+    $row = $wpdb->get_row( "SELECT ID, min(ID) as min, max(ID) as max FROM $wpdb->posts a LEFT JOIN $wpdb->postmeta b on a.ID = b.post_id WHERE post_type = 'specimen' AND post_status = 'publish' $filter ORDER BY ID LIMIT 1" );
     $min = $row->min; // min specimen ID
     $max = $row->max; // max specimen ID
 
@@ -669,16 +680,16 @@ function loadSpecimen_callback() {
 
     // look up next/previous ID if needed
     if ($nav == 'previous') {
-        if ($id == $min) { // wrap to last ID
+        if ($id == $min || $min == $max) { // wrap to last ID
             $id = $max;
         } else {
-            $id = $wpdb->get_var( "SELECT ID FROM $wpdb->posts where post_type = 'specimen' and post_status = 'publish' and ID < $id ORDER BY ID DESC LIMIT 1" );
+            $id = $wpdb->get_var( "SELECT ID FROM $wpdb->posts a LEFT JOIN $wpdb->postmeta b on a.ID = b.post_id WHERE post_type = 'specimen' and post_status = 'publish' and ID < $id $filter ORDER BY ID DESC LIMIT 1" );
         }
     } elseif ($nav == 'next') {
-        if ($id == $max) { // wrap to first ID
+        if ($id == $max || $min == $max) { // wrap to first ID
             $id = $min;
         } else {
-            $id = $wpdb->get_var( "SELECT ID FROM $wpdb->posts where post_type = 'specimen' and post_status = 'publish' and ID > $id ORDER BY ID LIMIT 1" );
+            $id = $wpdb->get_var( "SELECT ID FROM $wpdb->posts a LEFT JOIN $wpdb->postmeta b on a.ID = b.post_id WHERE post_type = 'specimen' and post_status = 'publish' and ID > $id $filter ORDER BY ID LIMIT 1" );
         }
     }
 
@@ -687,7 +698,7 @@ function loadSpecimen_callback() {
     if ( count($dat) ){
 
         // reformat data a bit before sending
-        $tmp = array('id' => $id);
+        $tmp = array('id' => $id, 'dat_set' => $dat_set);
         foreach($dat as $key => $val) {
             if (!unserialize($val[0])) {
                 $tmp[$key] = $val[0]; // just pass regular string if unserialize fails

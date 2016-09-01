@@ -94,7 +94,7 @@ function loadSpecimen(id, nav, dat) {
             "id": id, // var set by build_table() in EL.php
             "nav": nav,
             "dat": dat,
-            "view": jQuery("input[name=inputView]:checked").val(),
+            "view": jQuery("select[name=inputView]").val(),
     }
 
     // send data to server
@@ -120,7 +120,7 @@ Paramters:
 */
 function doAJAX(data) {
 
-    //console.log(data);
+    console.log(data);
 
     // send via AJAX to process with PHP
     jQuery.ajax({
@@ -132,7 +132,7 @@ function doAJAX(data) {
 
                 if (response) { // response will be false if specimen ID doesn't exist
 
-                    //console.log(response);
+                    console.log(response);
 
                     var imgs = response.imgs;
                     currentID = response.id; // update global
@@ -141,6 +141,8 @@ function doAJAX(data) {
                     jQuery('h1').html('Specimen #' + currentID + ' '); 
                     if (response.inputIssue) {
                         jQuery('h1').append('<span class="label label-warning">issue</span>')
+                    } else if (response.finished) {
+                        jQuery('h1').append('<span class="label label-success">finished</span>')
                     }
                     //if (response.inputIssue != '') { jQuery('h1').append('<span class="label label-warning">issue</span>') }
 
