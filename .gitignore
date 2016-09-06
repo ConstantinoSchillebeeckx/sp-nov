@@ -1,5 +1,5 @@
 .htaccess
-index.php
+/index.php
 plugin
 theme
 uploads
