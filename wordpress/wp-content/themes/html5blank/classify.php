@@ -57,15 +57,15 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Number</label>
-                                <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="inputNumber" placeholder="436" pattern="[a-zA-Z0-9]+" title="Only letters and numbers are allowed">
-                                </div>
-                            </div>
-                            <div class="form-group">
                                 <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Collector</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" name="inputCollector" placeholder="Betancur" pattern="[a-zA-Z ]+" title="Only letters and spaces are allowed">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Number</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="inputNumber" placeholder="436" pattern="[a-zA-Z0-9]+" title="Only letters and numbers are allowed">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -112,8 +112,17 @@
                                 </div>
                             <?php } ?>
                             <hr>
-                            <i class="fa fa-chevron-circle-left fa-4x text-primary navSpecimen" aria-hidden="true" onclick="prevSpecimen()"></i>
-                            <i class="fa fa-chevron-circle-right pull-right fa-4x text-primary navSpecimen" aria-hidden="true" onclick="nextSpecimen()"></i>
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <i class="fa fa-chevron-circle-left fa-4x text-primary navSpecimen" aria-hidden="true" onclick="prevSpecimen()"></i>
+                                </div>
+                                <div class="col-sm-8 text-muted">
+                                    <small>Changes to the specimen are only saved once one of these two navigation buttons is clicked.</small>
+                                </div>
+                                <div class="col-sm-2">
+                                    <i class="fa fa-chevron-circle-right pull-right fa-4x text-primary navSpecimen" aria-hidden="true" onclick="nextSpecimen()"></i>
+                                </div>
+                            </div>
                             <input id="submit_handle" type="submit" style="display: none"> <!-- needed for validating form -->
                         </form>
                     </div>

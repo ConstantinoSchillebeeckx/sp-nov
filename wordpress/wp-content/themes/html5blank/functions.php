@@ -768,8 +768,8 @@ Parameters:
 */
 function spnov_update_history( $id ) {
 
-    $history = get_post_meta( $post_id, 'history' );
-    if ( !$history ) {
+    $history = unserialize(get_post_meta( $id, 'history' ));
+    if ( !is_array($history) ) {
         $history = array( time() => get_current_user_id() );
     } else {
         $history[time()] = get_current_user_id();
