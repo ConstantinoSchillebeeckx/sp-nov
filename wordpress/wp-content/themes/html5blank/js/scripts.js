@@ -126,7 +126,13 @@ function doAJAX(data) {
 
     console.log(data);
 
+    // clear things out before doing any AJAX in case connection is slow
     jQuery('h1').html('<i class="fa fa-spinner fa-spin fa-fw"></i> loading...');
+    jQuery('.img-container').attr('style','display: none;'); // hide 
+    jQuery("input[type=text]").val(""); 
+    jQuery("select[name='inputIssue']").val(jQuery("select[name='inputIssue'] option:first").val()); // reset dropdown
+    jQuery('.label').remove();
+    jQuery('.well').html('');
 
     // send via AJAX to process with PHP
     jQuery.ajax({
@@ -150,7 +156,6 @@ function doAJAX(data) {
                         jQuery('h1').html('Specimen '); 
                     }
 
-                    jQuery('.label').remove();
                     if (response.inputIssue) {
                         jQuery('.icon').html('<span class="label label-warning">issue</span>')
                     } else if (response.status == 'finished') {
@@ -168,11 +173,6 @@ function doAJAX(data) {
                         jQuery('.well').append('<a href="#" onclick="loadIMG(\'' + src + '\');return false;"><img src="' + src_thumb + '" style="margin:10 10 10 10;"></a>');
                     }
 
-                    // clear form
-                    jQuery("input[type=text]").val(""); 
-                    jQuery("select[name='inputIssue']").val(jQuery("select[name='inputIssue'] option:first").val()); // reset dropdown
-
-
                     // fill inputs
                     jQuery.each(response, function(name, val) {
                         var el = jQuery('[name="'+name+'"]');
@@ -181,10 +181,6 @@ function doAJAX(data) {
                     })
 
                 } else {
-                    // clear form
-                    jQuery("input[type=text]").val(""); 
-                    jQuery("select[name='inputIssue']").val(jQuery("select[name='inputIssue'] option:first").val()); // reset dropdown
-
                     jQuery('h1').html('Specimen');
                     jQuery('.well').html('<span class="lead">No data available</span>');
                 }

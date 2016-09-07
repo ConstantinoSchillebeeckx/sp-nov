@@ -168,39 +168,40 @@
 
             <!-- autocomplete script -->
             <script>
+                var deferRequestBy = 75;
                 jQuery('input[name="inputGenus"]').devbridgeAutocomplete({
                     serviceUrl: ajax_object.ajax_url, 
-                    deferRequestBy: 75,
+                    deferRequestBy: deferRequestBy,
                     params:{'action':'autoComplete','key':'inputGenus'}
                 });
 
                 jQuery('input[name="inputSpecies"]').devbridgeAutocomplete({
                     serviceUrl: ajax_object.ajax_url, 
-                    deferRequestBy: 75,
+                    deferRequestBy: deferRequestBy,
                     params:{'action':'autoComplete','key':'inputSpecies'}
                 });
 
                 jQuery('input[name="inputAuthority"]').devbridgeAutocomplete({
                     serviceUrl: ajax_object.ajax_url, 
-                    deferRequestBy: 75,
+                    deferRequestBy: deferRequestBy,
                     params:{'action':'autoComplete','key':'inputAuthority'}
                 });
 
                 jQuery('input[name="inputCollector"]').devbridgeAutocomplete({
                     serviceUrl: ajax_object.ajax_url, 
-                    deferRequestBy: 75,
+                    deferRequestBy: deferRequestBy,
                     params:{'action':'autoComplete','key':'inputCollector'}
                 });
 
                 jQuery('input[name="inputDeterminer"]').devbridgeAutocomplete({
                     serviceUrl: ajax_object.ajax_url, 
-                    deferRequestBy: 75,
+                    deferRequestBy: deferRequestBy,
                     params:{'action':'autoComplete','key':'inputDeterminer'}
                 });
 
                 jQuery('input[name="inputHerbarium"]').devbridgeAutocomplete({
                     serviceUrl: ajax_object.ajax_url, 
-                    deferRequestBy: 75,
+                    deferRequestBy: deferRequestBy,
                     params:{'action':'autoComplete','key':'inputHerbarium'}
                 });
             </script>
