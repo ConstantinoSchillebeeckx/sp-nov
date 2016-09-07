@@ -299,3 +299,10 @@ body {
     text-decoration: underline;
     color: #337ab7;
 }
+
+.title {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-weight: 500;
+    font-size: 36px;
+}

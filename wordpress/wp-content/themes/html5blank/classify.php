@@ -29,9 +29,9 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">View</label>
                                 <div class="col-sm-9">
-                                    <select class="form-control" name="inputView">
+                                    <select class="form-control" name="inputView" onchange="nextSpecimen()">
                                         <option selected value="all">All specimens</option>
-                                        <option value="completed">Completed specimens</option>
+                                        <option value="finished">Finished specimens</option>
                                         <option value="unfinished">Unfinished specimens</option>
                                         <option value="issue">Specimen with issue</option>
                                     </select>
@@ -45,17 +45,23 @@
                                 </div>
                             </div>
                             <div class="form-group">
+                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Section</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="inputSection" placeholder="Belolonchium" pattern="[a-zA-Z]+" title="Only letters are allowed" autofocus>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Species</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" name="inputSpecies" placeholder="longipoda" pattern="[a-zA-Z]+" title="Only letters are allowed">
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Authority</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" name="inputAuthor" placeholder="Schott" pattern="[a-zA-Z]+" title="Only letters are allowed">
                                 </div>
-                            </div>
+                            </div>-->
                             <div class="form-group">
                                 <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Collector</label>
                                 <div class="col-sm-9">
@@ -81,17 +87,35 @@
                                 </div>
                             </div>
                             <div class="form-group">
+                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Country</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="inputCountry" placeholder="Colombia" pattern="[a-zA-Z]+" title="Only letters are allowed">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Dept.</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="inputDepartment" placeholder="Tolima" pattern="[a-zA-Z]+" title="Only letters are allowed">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Mun.</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="inputMunicipality" placeholder="Icononzo" pattern="[a-zA-Z]+" title="Only letters are allowed">
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Location</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" name="inputLocation" placeholder="el Taladro finca la Esperanza" pattern="[a-zA-Z0-9 ]+" title="Only letters, spaces and numbers are allowed">
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <!--<div class="form-group">
                                 <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Lat./Lon.</label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" name="inputLatLon" placeholder="10 59N 74 04W" pattern="[0-9NW\. ]+" title="Only numbers, spaces and the characters 'N', 'W' or '.' are allowed.">
                                 </div>
-                            </div>
+                            </div>-->
                             <div class="form-group">
                                 <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Title" data-content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc." aria-hidden="true">Issue</label>
                                 <div class="col-sm-9">
@@ -185,5 +209,5 @@
 <?php get_footer(); ?>
 
 <script>
-    jQuery('label').popover({placement:'bottom', container: 'body'})
+    jQuery('label').popover({placement:'auto left', container: 'body'})
 </script>

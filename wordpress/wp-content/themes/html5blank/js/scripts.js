@@ -111,6 +111,10 @@ Will send an AJAX request to the server and properly show/log
 the response as either a message to the user or an error
 message in the console.
 
+Requests are used to send updated specimen data to the DB as
+well as requesting the next/previous specimen along with the
+data for that specimen.
+
 Paramters:
 ----------
 - data : obj
@@ -122,6 +126,8 @@ function doAJAX(data) {
 
     console.log(data);
 
+    jQuery('h1').html('<i class="fa fa-spinner fa-spin fa-fw"></i> loading...');
+
     // send via AJAX to process with PHP
     jQuery.ajax({
             url: ajax_object.ajax_url, 
@@ -130,7 +136,7 @@ function doAJAX(data) {
             dataType: 'json',
             success: function(response) {
 
-                if (response) { // response will be false if specimen ID doesn't exist
+                if (response && response.id) { // response will be false if specimen ID doesn't exist
 
                     console.log(response);
 
@@ -138,13 +144,18 @@ function doAJAX(data) {
                     currentID = response.id; // update global
 
                     // update title
-                    jQuery('h1').html('Specimen #' + currentID + ' '); 
-                    if (response.inputIssue) {
-                        jQuery('h1').append('<span class="label label-warning">issue</span>')
-                    } else if (response.finished) {
-                        jQuery('h1').append('<span class="label label-success">finished</span>')
+                    if (response.inputNumber) {
+                        jQuery('h1').html('Specimen #' + response.inputNumber + ' '); 
+                    } else {
+                        jQuery('h1').html('Specimen '); 
                     }
-                    //if (response.inputIssue != '') { jQuery('h1').append('<span class="label label-warning">issue</span>') }
+
+                    jQuery('.label').remove();
+                    if (response.inputIssue) {
+                        jQuery('h1').after('<span class="label label-warning">issue</span>')
+                    } else if (response.status == 'finished') {
+                        jQuery('h1').after('<span class="label label-success">finished</span>')
+                    }
 
 
                     jQuery('.well').html(''); // clear contents
@@ -170,7 +181,12 @@ function doAJAX(data) {
                     })
 
                 } else {
-                    jQuery('.well').html('<span class="lead">Specimen ID ' + data.id + ' doesn\'t exist in the database!</span>');
+                    // clear form
+                    jQuery("input[type=text]").val(""); 
+                    jQuery("select[name='inputIssue']").val(jQuery("select[name='inputIssue'] option:first").val()); // reset dropdown
+
+                    jQuery('h1').html('Specimen');
+                    jQuery('.well').html('<span class="lead">No data available</span>');
                 }
 
             },

@@ -516,7 +516,6 @@ function spnov_add_specimen( $dat ) {
         $my_post = array(
             'post_type'     => 'specimen',
             'post_author'   => sanitize_user( $current_user->ID ),
-            'post_title'    => sanitize_title( implode(', ', $imgs) ),
             'post_status'   => 'publish',
         );
 
@@ -526,6 +525,16 @@ function spnov_add_specimen( $dat ) {
 
             // add array of associated images to specimen
             if (!add_post_meta( $post_id, 'imgs', $imgs )) {
+                return false; // if error
+            }
+
+            // set post title as the post ID
+            if (!add_post_meta( $post_id, 'post_title', $post_id )) {
+                return false; // if error
+            }
+
+            // set post title as the post ID
+            if (!add_post_meta( $post_id, 'status', 'unfinished' )) {
                 return false; // if error
             }
 
@@ -611,17 +620,24 @@ function autoComplete_callback() {
 
 /* Function called by AJAX to load speciment data from DB
 
+If data is provided with function call, supplied data will
+also be used to update the current specimen (the one defined
+by the passed value 'id')
+
 Parameters:
 -----------
 - $_GET['id'] : int
-                WP defined ID for specimen
+                WP defined ID for current specimen; if 'dat'
+                is provided, this will be used to update the 
+                given specimen with this ID.
 - $_GET['nav'] : str
                  one of 'current', 'next' or 'previous'
 - $_GET['dat'] : obj
                  form data (will be null if on first load of page)
+                 used to update specimen defined by 'id'
 - $_GET['view'] : str
                   specimen status to view, must be one of 'all', 
-                  'completed','unfinished','issue'
+                  'finished','unfinished','issue'
 Returns:
 --------
 json encoded array of metadata associated with speciment (if
@@ -640,9 +656,10 @@ function loadSpecimen_callback() {
 
 
     // check if this 'finishes' the specimen
-    $dat_set['finished'] = false;
-    if ( $dat_set['inputGenus'] != '' && $dat_set['inputSpecies'] != '' && $dat_set['inputAuthor'] != '' && $dat_set['inputNumber'] != '' && $dat_set['inputCollector'] != '' && $dat_set['inputDeterminer'] != '' && $dat_set['inputHerbarium'] != '' && $dat_set['inputLocation'] != '' && $dat_set['inputIssue'] == '' ) {
-        $dat_set['finished'] = true;
+    if ( $dat_set['inputCollector'] != '' && $dat_set['inputNumber'] != '' && (!isset($dat_set['inputIssue']) || $dat_set['inputIssue'] == '' ) ) {
+        $dat_set['status'] = 'finished';
+    } else {
+        $dat_set['status'] = 'unfinished';
     }
 
 
@@ -658,12 +675,12 @@ function loadSpecimen_callback() {
 
     // filter specimens
     $filter = '';
-    if ($_GET['view'] == 'completed') {
-        $filter = " AND meta_key = 'finished' and meta_value = 1";
+    if ($_GET['view'] == 'finished') {
+        $filter = " AND meta_key = 'status' and meta_value = 'finished'";
     } elseif ($_GET['view'] == 'issue') {
         $filter = " AND meta_key = 'inputIssue'";
     } elseif ($_GET['view'] == 'unfinished') {
-        // XXX
+        $filter = " AND meta_key = 'status' and meta_value = 'unfinished'";
     }
 
 

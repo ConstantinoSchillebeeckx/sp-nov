@@ -17,20 +17,21 @@ Simple web-app for adding label metadata to a herbarium specimen.
 
 A custom post type for specimen (named Specimen) is used to store data.  It can be considered a class with the following attributes (shown are the key values of the WP database):
 - inputGenus
+- inputSection
 - inputSpecies
-- inputAuthority
 - inputCollector
 - inputNumber
 - inputDeterminer
 - inputHerbarium
+- inputCountry
+- inputDepartment
+- inputMunicipality
 - inputLocation (location information)
-- inputLat (latitude)
-- inputLon (longitude)
 - imgs (array of images associated with specimen)
 - finished (0 for unfinished, 1 for finished)
 - inputIssue (string for issue associated with specimen, e.g. not enough images)
 - history (assoc array with timestamp as key and user id as value)
-- finished (if key is present, specimen is considered finished, otherwise specimen is not finished)
+- status (either 'finished' or 'unfinished')
 
 ## User roles
 
@@ -49,4 +50,5 @@ Administrator
 
 ## Notes:
 
-- a specimen is considered 'finished' if ...  An unfinished specimen will not have the key 'finished' specified
+- a specimen is considered 'finished' if the specimen has data for both Collector and Number; in this case, the key 'status' will be set to 'finished'
+- by default, any newly added specimen will have the status 'unfinished'
