@@ -2,15 +2,16 @@
 
 Simple web-app for adding label metadata to a herbarium specimen.
 
-## Algorithm
+## Pipeline
 
-1. Upload images
-2. Categorize images by specimen
-  * manually
-  * machine learning
-  * embedded metadata (e.g. time photo taken)
-3. Generate custom post type (Specimen) for each specimen
-4. Web interface to update each specimen's data
+1. Upload images through WP backend (must be either Admin or Author role)
+2. Categorize images by use of python script (this generates a .json)
+3. [Upload .json](http://spnov.com/upload/) file which will generate custom post type (Specimen) for each specimen
+4. [Classify](http://spnov.com/classify/) to update each specimen's data
+
+## Transfer to tropicos
+
+TODO
 
 
 ## Specimen class
@@ -39,16 +40,19 @@ Subscriber
 - can view only non-issue specimens
 - read only access to data
 
-Editor
+Contributor
 - can view all specimens
 - has access to 'View' dropdown
 - can edit all data except for 'imgs' meta key
 
+Author
+- same priviledges as Contributor but can upload images
+
 Administrator
-- like editor but with added priveledge of editing the 'imgs' key
+- like Author but with added priveledge of editing the 'imgs' key
 
 
 ## Notes:
-
 - a specimen is considered 'finished' if the specimen has data for both Collector and Number; in this case, the key 'status' will be set to 'finished'
 - by default, any newly added specimen will have the status 'unfinished'
+- an internal wordpress only ID is associated with each uploaded specimen; this ID is independent of the number associated with the specimen (that which is defined on the label)
