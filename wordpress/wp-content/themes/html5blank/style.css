@@ -300,9 +300,18 @@ body {
     color: #337ab7;
 }
 
-.title {
-    margin-top: 20px;
+
+.img-container {
+    overflow: scroll; 
+    height: 600px;
+}
+
+.img-container img {
+    max-width: 200%;
+    position: absolute;
+}
+
+.icon {
+    margin-top: 10px;
     margin-bottom: 10px;
-    font-weight: 500;
-    font-size: 36px;
 }

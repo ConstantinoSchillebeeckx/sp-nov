@@ -152,20 +152,20 @@ function doAJAX(data) {
 
                     jQuery('.label').remove();
                     if (response.inputIssue) {
-                        jQuery('h1').after('<span class="label label-warning">issue</span>')
+                        jQuery('.icon').html('<span class="label label-warning">issue</span>')
                     } else if (response.status == 'finished') {
-                        jQuery('h1').after('<span class="label label-success">finished</span>')
+                        jQuery('.icon').html('<span class="label label-success">finished</span>')
                     }
 
 
-                    jQuery('.well').html(''); // clear contents
+                    jQuery('.well').html('<small>Click a thumbnail to see a larger version.</small><br>'); // clear contents
                     window.history.pushState(currentID, 'Title', '?id=' + currentID); // update URL so things can be bookmarked
 
                     // generate thumbnails of IMGS
                     for (var i = 0; i < imgs.length; i++) {
                         var src = 'http://' + window.location.host + '/wordpress/wp-content/uploads/' + imgs[i].replace('JPG','jpg');
                         var src_thumb = 'http://' + window.location.host + '/wordpress/wp-content/uploads/' + imgs[i].replace('JPG','jpg').replace('.jpg','-150x150.jpg');
-                        jQuery('.well').append('<a href="' + src + '"><img src="' + src_thumb + '" style="margin:10 10 10 10;"></a>');
+                        jQuery('.well').append('<a href="#" onclick="loadIMG(\'' + src + '\');return false;"><img src="' + src_thumb + '" style="margin:10 10 10 10;"></a>');
                     }
 
                     // clear form
@@ -194,4 +194,18 @@ function doAJAX(data) {
                 console.log(xhr.responseText);
             },
     });
+}
+
+
+/* onclick handler for thumbnail
+
+Function called each time user clicks on image
+thumbnail; will load full sized image into div
+placed below the well
+
+*/
+
+function loadIMG(src) {
+    jQuery('.img-container').attr('style',''); // previously hidden
+    jQuery('.img-container').html('<img src="' + src + '" />');
 }

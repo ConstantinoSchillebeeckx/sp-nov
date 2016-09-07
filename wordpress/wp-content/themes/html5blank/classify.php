@@ -5,6 +5,7 @@
 		<section>
 
 			<h1><?php the_title(); ?></h1>
+            <div class="icon"></div>
 
             <?php // only show form if a user is logged in
             if ( !is_user_logged_in() ) {
@@ -19,8 +20,11 @@
 
                 <div class="row" style="padding-top:10px;">
                     <div class="col-sm-8"> <!-- div for images -->
-                        <div class="well">
+                        <div class="well text-muted">
                             <!-- content dynamically filled with AJAX -->
+                        </div>
+                        <div class="col-sm-12 img-container" style="display: none;">
+                            <!-- content dynamically filled with function loadIMG() -->
                         </div>
                     </div>
                     
@@ -137,13 +141,13 @@
                             <?php } ?>
                             <hr>
                             <div class="row">
-                                <div class="col-sm-2">
+                                <div class="col-sm-3">
                                     <i class="fa fa-chevron-circle-left fa-4x text-primary navSpecimen" aria-hidden="true" onclick="prevSpecimen()"></i>
                                 </div>
-                                <div class="col-sm-8 text-muted">
-                                    <small>Changes to the specimen are only saved once one of these two navigation buttons is clicked.</small>
+                                <div class="col-sm-6 text-muted" style="padding: 0;">
+                                    <small>Changes saved once either nav button is clicked.</small>
                                 </div>
-                                <div class="col-sm-2">
+                                <div class="col-sm-3">
                                     <i class="fa fa-chevron-circle-right pull-right fa-4x text-primary navSpecimen" aria-hidden="true" onclick="nextSpecimen()"></i>
                                 </div>
                             </div>
@@ -151,6 +155,7 @@
                         </form>
                     </div>
                 </div>
+
 
 			</article>
 			<!-- /article -->

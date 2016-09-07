@@ -656,9 +656,9 @@ function loadSpecimen_callback() {
 
 
     // check if this 'finishes' the specimen
-    if ( $dat_set['inputCollector'] != '' && $dat_set['inputNumber'] != '' && (!isset($dat_set['inputIssue']) || $dat_set['inputIssue'] == '' ) ) {
+    if ( $dat_set['inputCollector'] != '' && $dat_set['inputNumber'] != '' && $dat_set['inputIssue'] == '' ) {
         $dat_set['status'] = 'finished';
-    } else {
+    } else if ( $nav != 'current' ) {
         $dat_set['status'] = 'unfinished';
     }
 
