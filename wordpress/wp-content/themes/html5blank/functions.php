@@ -524,18 +524,34 @@ function spnov_add_specimen( $dat ) {
         if ($post_id != 0) { // if successfully added specimen, update the metadata
 
             // add array of associated images to specimen
-            if (!add_post_meta( $post_id, 'imgs', $imgs )) {
+            // this will be stored as a comma separated string
+            // so that it is visible in the backend as a custom field
+            if (!add_post_meta( $post_id, 'imgs', implode(',',$imgs) )) {
                 return false; // if error
             }
 
             // set post title as the post ID
-            if (!add_post_meta( $post_id, 'post_title', $post_id )) {
+            if (!wp_update_post( array('ID' => $post_id, 'post_title' => $post_id) )) {
                 return false; // if error
             }
 
-            // set post title as the post ID
+            // set status
             if (!add_post_meta( $post_id, 'status', 'unfinished' )) {
                 return false; // if error
+            }
+
+            // set download status
+            if (!add_post_meta( $post_id, 'downloaded', false )) {
+                return false; // if error
+            }
+
+            // set post parent (image "attached to")
+            // use title (_wp_attached_file) and postmeta to find post_id
+            foreach ($imgs as $img_name) {
+                $tmp_id = get_post_id_from_meta('_wp_attached_file',$img_name);
+                if (!$tmp_id || !wp_update_post( array('ID' => $tmp_id, 'post_parent' => $post_id) ) ) {
+                    return false;
+                }
             }
 
         } else {
@@ -547,6 +563,33 @@ function spnov_add_specimen( $dat ) {
     return true;
 
 }
+
+
+/*
+
+Used to lookup the post_id when only
+the a postmeta key & value are known
+
+Parameters:
+-----------
+- $key : str
+         postmeta key
+- $val : str
+         postmeta value
+
+Returns:
+--------
+- post_id associated with postmeta key/value
+
+
+*/
+function get_post_id_from_meta($key, $val) {
+    global $wpdb;
+    $query = "SELECT post_id FROM $wpdb->postmeta where meta_key = '$key' and meta_value = '$val'";
+
+    return $wpdb->get_var( $query );
+}
+
 
 
 
