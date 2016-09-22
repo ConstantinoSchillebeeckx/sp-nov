@@ -134,6 +134,11 @@ function html5blank_conditional_scripts()
 
         wp_enqueue_style('autocomplete_css', get_template_directory_uri() . '/css/jquery.autocomplete.css', array(), '1.2.26');
     }
+
+    if (is_page('search')) {
+        wp_enqueue_script('query_builder', get_template_directory_uri() . '/js/query-builder.js', array('jquery'));
+        wp_enqueue_style('query_builder_css', get_template_directory_uri() . '/css/query-builder.css');
+    }
 }
 
 // Load HTML5 Blank styles
@@ -661,7 +666,7 @@ function autoComplete_callback() {
 
 
 
-/* Function called by AJAX to load speciment data from DB
+/* Function called by AJAX to load/update specimen data
 
 If data is provided with function call, supplied data will
 also be used to update the current specimen (the one defined
@@ -705,14 +710,7 @@ function loadSpecimen_callback() {
         $dat_set['status'] = 'unfinished';
     }
 
-
-    // not sure why i have to update imgs manually
-    // instead of using the function spnov_update_specimen
-    if (array_key_exists('imgs', $dat_set)) {
-        $imgs = explode(',', $dat_set['imgs']);
-        update_post_meta($id, 'imgs', $imgs);
-        unset($dat_set['imgs']);
-    }
+    // update specimen with incoming data
     if ($dat_set) spnov_update_specimen($id, $dat_set);
 
 
@@ -760,11 +758,7 @@ function loadSpecimen_callback() {
         // reformat data a bit before sending
         $tmp = array('id' => $id, 'dat_set' => $dat_set);
         foreach($dat as $key => $val) {
-            if (!unserialize($val[0])) {
-                $tmp[$key] = $val[0]; // just pass regular string if unserialize fails
-            } else {
-                $tmp[$key] = unserialize($val[0]);
-            }
+            $tmp[$key] = $val[0];
         }
 
         echo json_encode( $tmp );

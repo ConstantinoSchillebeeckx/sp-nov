@@ -67,7 +67,7 @@ data for the specified specimen ID
 Parameters:
 -----------
 - id : int
-       WP ID for speciment to load, if none provided or ID is 0
+       WP ID for specimen to load, if none provided or ID is 0
        the first specimen will be loaded
 - nav: str
        if 'current': the given ID will be loaded [default]
@@ -146,7 +146,7 @@ function doAJAX(data) {
 
                     console.log(response);
 
-                    var imgs = response.imgs;
+                    var imgs = response.imgs.split(',');
                     currentID = response.id; // update global
 
                     // update title
