@@ -241,6 +241,58 @@ function searchSpecimen() {
 
 
 
+/* Used to create input form for labeling specimen
+*/
+function populateForm(data, callback) {
+
+    console.log(data)
+
+    for (var i=0; i<data.length; i++) {
+
+        var dat = data[i];
+
+        var fg = jQuery('<div class="form-group">').appendTo('#formInputs');
+
+        // add label
+        var label = jQuery('<label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" >').text(dat.id).appendTo(fg);
+        if ('label' in dat) {
+            label.attr("title",dat.label.title)
+            label.attr("data-content", dat.label["data-content"])
+        }
+
+        // add input
+        var col = jQuery('<div class="col-sm-9">').appendTo(fg);
+        if (dat.type == 'string') {
+            if (dat.input == 'select') {
+                var sel = jQuery('<select class="form-control">').appendTo(col);
+                sel.attr("name", dat.name)
+                sel.attr("onchange", dat.onchange)
+                jQuery.each(dat.values, function(k, v) {
+                    sel.append(jQuery("<option>").attr('value',k).text(v));
+                });
+            } else {
+                var input = jQuery('<dat type="text" class="form-control">').appendTo(col);    
+                input.attr('name', dat.name)
+                input.attr('title', dat.title)
+            }
+        } else if (dat.type == 'integer') {
+            var input = jQuery('<input type="number" class="form-control">').appendTo(col);    
+            input.attr('name', dat.name)
+            input.attr('title', dat.title)
+        }
+
+        if('extraHTML' in dat) {
+            fg.after(dat.extraHTML);
+        }
+    }
+
+    if (callback) callback();
+
+}
+
+
+
+
 
 
 
