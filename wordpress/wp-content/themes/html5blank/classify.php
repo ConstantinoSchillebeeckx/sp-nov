@@ -29,9 +29,9 @@
                     </div>
                     
                     <div class="col-sm-4"> <!-- div for form -->
-                        <form class="form-horizontal" onsubmit="return false">
+                        <form class="form-horizontal" onsubmit="return false" automplete="off">
 
-                            <div id="formInputs"></div> <!-- content dynamically rendered by loadSpecimen() function -->
+                            <div id="formInputs"></div> <!-- content dynamically rendered by populateForm() function -->
 
                             <?php if (in_array('administrator',  wp_get_current_user()->roles)) { // if admin, show IMG input ?>
                                 <div class="form-group">

@@ -146,7 +146,7 @@ var builderOptions = {
         {
             id: 'Deparment',
             type: 'string',
-            placeholder: 'Betancur',
+            placeholder: 'Tolima',
             validation: {
                 format: /^[a-zA-Z]+$/
             },

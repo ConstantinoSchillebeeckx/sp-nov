@@ -214,14 +214,31 @@ AJAX call to query the DB for specimens that meet user
 defined criteria.  Will send "rules" and get back a 
 list of specimens that match those rules 
 
+Parameters:
+-----------
+assumes the var builderOptions.filters exists
+(which is defined in js/formInputs.js) as well
+as the 'rules' from the query builder form
+
+Returns:
+--------
+response.dat is an object where each key is
+a specimen, the value is an obj with key/val
+pairs for its associated data
+
+
 */
 function searchSpecimen() {
     var rules = jQuery('#builder').queryBuilder('getRules');
     console.log("sent to server:", rules);
 
+    var cols = [];
+    builderOptions.filters.forEach( function(d) { cols.push(d.field); } )
+
     var data = {
         "action": "findSpecimen", 
-        "dat": rules
+        "dat": rules,
+        "cols": cols,
     }
 
     // send via AJAX to process with PHP
@@ -232,8 +249,7 @@ function searchSpecimen() {
         dataType: 'json',
         success: function(response) {
             console.log("received from server:", response);
-            var dat = response.ids;
-            jQuery("#searchResults").html(dat);
+            generateSearchResultsTable(response.dat, '#searchResults', cols);
         },
         error: function(error) { console.log(error) }
     });
@@ -241,7 +257,63 @@ function searchSpecimen() {
 
 
 
+
+/* Generate HTML table with search results
+
+Parameters:
+-----------
+- dat : obj
+        response.dat is an object where each key is
+        a specimen, the value is an obj with key/val
+        pairs for its associated data
+
+*/
+function generateSearchResultsTable(dat, sel, cols) {
+
+    jQuery('table').remove();
+
+    var table = jQuery('<table class="table table-striped table-responsive" style="font-size:8px">').appendTo(sel);
+    var thead = jQuery('<thead>').appendTo(table);
+    var tbody = jQuery('<tbody>').appendTo(table);
+
+
+    var theadr = jQuery('<tr class="info"/>');
+    jQuery.each(cols, function(i, col) {
+        theadr.append('<td>' + col + '</td>');
+    })
+    thead.append(theadr);
+
+    jQuery.each(dat, function(i, row) {
+        var tr = jQuery('<tr/>');
+        jQuery.each(cols, function(j, col) {
+            var val = ''
+            if (row[col]) {
+                val = row[col];
+                if (j == 0) {
+                    val = '<a href="/classify/?id=' + i + '">' + val + '</a>';
+                }
+            }
+            tr.append('<td>' + val + '</td>');
+        })
+        tbody.append(tr);
+    })
+
+}
+
+
+
+
+
+
+
+
 /* Used to create input form for labeling specimen
+
+Will automatically populate the input form for
+classifying/labeling the specimen based
+onthe var builderOptions.filters
+(which is defined in js/formInputs.js)
+
 */
 function populateForm(data, callback) {
 
@@ -271,14 +343,16 @@ function populateForm(data, callback) {
                     sel.append(jQuery("<option>").attr('value',k).text(v));
                 });
             } else {
-                var input = jQuery('<dat type="text" class="form-control">').appendTo(col);    
-                input.attr('name', dat.label)
+                var input = jQuery('<input type="text" class="form-control">').appendTo(col);    
+                input.attr('name', dat.field)
                 input.attr('title', dat.title)
+                input.attr('placeholder', dat.placeholder)
             }
         } else if (dat.type == 'integer') {
             var input = jQuery('<input type="number" class="form-control">').appendTo(col);    
-            input.attr('name', dat.label)
+            input.attr('name', dat.field)
             input.attr('title', dat.title)
+            input.attr('placeholder', dat.placeholder)
         }
 
         if('extraHTML' in dat) {
