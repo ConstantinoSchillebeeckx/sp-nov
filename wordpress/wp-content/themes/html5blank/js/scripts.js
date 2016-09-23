@@ -233,7 +233,7 @@ function searchSpecimen() {
         success: function(response) {
             console.log("received from server:", response);
             var dat = response.ids;
-            jQuery("#searchResults").html();
+            jQuery("#searchResults").html(dat);
         },
         error: function(error) { console.log(error) }
     });
@@ -255,9 +255,9 @@ function populateForm(data, callback) {
 
         // add label
         var label = jQuery('<label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" >').text(dat.id).appendTo(fg);
-        if ('label' in dat) {
-            label.attr("title",dat.label.title)
-            label.attr("data-content", dat.label["data-content"])
+        if ('labelTag' in dat) {
+            label.attr("title",dat.labelTag.title)
+            label.attr("data-content", dat.labelTag["data-content"])
         }
 
         // add input
@@ -272,12 +272,12 @@ function populateForm(data, callback) {
                 });
             } else {
                 var input = jQuery('<dat type="text" class="form-control">').appendTo(col);    
-                input.attr('name', dat.name)
+                input.attr('name', dat.label)
                 input.attr('title', dat.title)
             }
         } else if (dat.type == 'integer') {
             var input = jQuery('<input type="number" class="form-control">').appendTo(col);    
-            input.attr('name', dat.name)
+            input.attr('name', dat.label)
             input.attr('title', dat.title)
         }
 

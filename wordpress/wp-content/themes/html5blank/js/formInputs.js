@@ -3,7 +3,7 @@
 /* var used to define inputs for specimen
 
 Defined inputs are used both on the classification
-(where users label the specimen) page as well as 
+(where users field the specimen) page as well as 
 the search page.
 
 */
@@ -22,11 +22,12 @@ var builderOptions = {
                 "issue":"Specimen with issue"
             },
             operators: ['equal', 'not_equal'],
-            label: {
+            labelTag: {
                 "title": "Title",
                 "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
             },
-            name: "inputView",
+            field: "status",
+            label: "View",
             onchange: "nextSpecimen()",
             extraHTML: "<hr>"
         },
@@ -37,9 +38,9 @@ var builderOptions = {
             validation: {
                 format: /^[a-zA-Z]+$/
             },
-            name: 'inputGenus',
+            field: 'inputGenus',
             title: "Only letters are allowed" ,
-            label: {
+            labelTag: {
                 "title": "Title",
                 "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
             },
@@ -51,9 +52,9 @@ var builderOptions = {
             validation: {
                 format: /^[a-zA-Z]+$/
             },
-            name: 'inputSection',
+            field: 'inputSection',
             title: "Only letters are allowed" ,
-            label: {
+            labelTag: {
                 "title": "Title",
                 "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
             },
@@ -65,9 +66,9 @@ var builderOptions = {
             validation: {
                 format: /^[a-zA-Z]+$/
             },
-            name: 'inputSpecies',
+            field: 'inputSpecies',
             title: "Only letters are allowed" ,
-            label: {
+            labelTag: {
                 "title": "Title",
                 "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
             },
@@ -79,9 +80,9 @@ var builderOptions = {
             validation: {
                 format: /^[a-zA-Z]+$/
             },
-            name: 'inputCollector',
+            field: 'inputCollector',
             title: "Only letters are allowed" ,
-            label: {
+            labelTag: {
                 "title": "Title",
                 "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
             },
@@ -93,9 +94,9 @@ var builderOptions = {
             validation: {
                 format: /^[1-9]+$/
             },
-            name: 'inputNumber',
+            field: 'inputNumber',
             title: "Only numbers are allowed" ,
-            label: {
+            labelTag: {
                 "title": "Title",
                 "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
             },
@@ -107,9 +108,9 @@ var builderOptions = {
             validation: {
                 format: /^[a-zA-Z]+$/
             },
-            name: 'inputDeterminer',
+            field: 'inputDeterminer',
             title: "Only letters are allowed" ,
-            label: {
+            labelTag: {
                 "title": "Title",
                 "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
             },
@@ -121,9 +122,9 @@ var builderOptions = {
             validation: {
                 format: /^[a-zA-Z]+$/
             },
-            name: 'inputHerbarium',
+            field: 'inputHerbarium',
             title: "Only letters are allowed" ,
-            label: {
+            labelTag: {
                 "title": "Title",
                 "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
             },
@@ -135,9 +136,9 @@ var builderOptions = {
             validation: {
                 format: /^[a-zA-Z]+$/
             },
-            name: 'inputCountry',
+            field: 'inputCountry',
             title: "Only letters are allowed" ,
-            label: {
+            labelTag: {
                 "title": "Title",
                 "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
             },
@@ -149,9 +150,9 @@ var builderOptions = {
             validation: {
                 format: /^[a-zA-Z]+$/
             },
-            name: 'inputDepartment',
+            field: 'inputDepartment',
             title: "Only letters are allowed" ,
-            label: {
+            labelTag: {
                 "title": "Title",
                 "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
             },
@@ -163,9 +164,9 @@ var builderOptions = {
             validation: {
                 format: /^[a-zA-Z]+$/
             },
-            name: 'inputMunicipality',
+            field: 'inputMunicipality',
             title: "Only letters are allowed" ,
-            label: {
+            labelTag: {
                 "title": "Title",
                 "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
             },
@@ -177,9 +178,9 @@ var builderOptions = {
             validation: {
                 format: /^[a-zA-Z0-9]+$/
             },
-            name: 'inputLocation',
+            field: 'inputLocation',
             title: "Only letters and numbers are allowed" ,
-            label: {
+            labelTag: {
                 "title": "Title",
                 "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
             },
@@ -190,12 +191,12 @@ var builderOptions = {
             input: 'select',
             values: {
                 "":"None",
-                "no_label":"No label present",
+                "no_field":"No field present",
                 "multiple_specimens":"Multiple specimens shown",
-                "problem_label":"Problematic label"
+                "problem_field":"Problematic field"
             },
-            name: 'inputIssue',
-            label: {
+            field: 'inputIssue',
+            labelTag: {
                 "title": "Title",
                 "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
             },

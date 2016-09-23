@@ -686,16 +686,18 @@ function findSpecimen_callback() {
     global $wpdb;
     $dat = $_GET['dat'];
 
-
     # generate prepare statement
-    $query = "SELECT post_id FROM $wpdb->postmeta WHERE" . build_prep_statement($dat);
+    $query = "SELECT ID, meta_key, meta_value FROM $wpdb->posts a LEFT JOIN $wpdb->postmeta b on a.ID = b.post_id WHERE post_type = 'specimen' AND post_status = 'publish' ";
+    $rules = build_prep_statement($dat);
+    if (count($rules) && $rules != '') $query .= "AND " . $rules . "GROUP BY ID";
     $args = build_prep_values($dat);
     $prep = $wpdb->prepare($query, $args);
 
     # run query
-    $ids = $wpdb->get_col( $prep );
+    # will have multiple rows per ID (one for each meta_key)
+    $ids = $wpdb->get_results( $prep, ARRAY_A );
 
-    echo json_encode( array('ids' => $ids, 'log' => $wpdb ) );
+    echo json_encode( array('ids' => $ids, 'log' => array($wpdb,$rules) ) );
 
 
     wp_die();
@@ -735,10 +737,12 @@ function build_prep_statement($rules) {
         if ( isset($tmp['condition'] )) {
             $rule .= " " . $cond . " (" . build_prep_statement($tmp) . ")";
         } else {
-            if ($count) {
-                $rule .= " " . $cond . " (meta_key = '%s' and meta_value = '%s')"; 
-            } else {
-                $rule .= " (meta_key = '%s' and meta_value = '%s')"; 
+            if ($tmp['id'] != 'View' && $tmp['value'] != 'all') { 
+                if ($count) {
+                    $rule .= " " . $cond . " (meta_key = '%s' and meta_value = '%s')"; 
+                } else {
+                    $rule .= " (meta_key = '%s' and meta_value = '%s')"; 
+                }
             }
         }
         $count += 1;
@@ -781,7 +785,9 @@ function build_prep_values($rules) {
         if ( isset($tmp['condition'] )) {
             $rule = array_merge($rule, build_prep_values($tmp) );
         } else {
-            array_push($rule, $tmp['id'], $tmp['value']);
+            if ($tmp['id'] != 'View' && $tmp['value'] != 'all') { 
+                array_push($rule, $tmp['field'], $tmp['value']);
+            }
         }
         $count += 1;
     }
@@ -842,11 +848,11 @@ function loadSpecimen_callback() {
 
     // filter specimens
     $filter = '';
-    if ($_GET['view'] == 'finished') {
+    if ($_GET['status'] == 'finished') {
         $filter = " AND meta_key = 'status' and meta_value = 'finished'";
-    } elseif ($_GET['view'] == 'issue') {
+    } elseif ($_GET['status'] == 'issue') {
         $filter = " AND meta_key = 'inputIssue'";
-    } elseif ($_GET['view'] == 'unfinished') {
+    } elseif ($_GET['status'] == 'unfinished') {
         $filter = " AND meta_key = 'status' and meta_value = 'unfinished'";
     }
 
