@@ -205,3 +205,42 @@ function loadIMG(src) {
     jQuery('.img-container').attr('style',''); // previously hidden
     jQuery('.img-container').html('<img src="' + src + '" />');
 }
+
+
+
+/* Called from search page, used to query specimens that match query
+
+AJAX call to query the DB for specimens that meet user
+defined criteria.  Will send "rules" and get back a 
+list of specimens that match those rules 
+
+*/
+function searchSpecimen() {
+    var rules = jQuery('#builder').queryBuilder('getRules');
+    console.log("sent to server:", rules);
+
+    var data = {
+        "action": "findSpecimen", 
+        "dat": rules
+    }
+
+    // send via AJAX to process with PHP
+    jQuery.ajax({
+        url: ajax_object.ajax_url, 
+        type: "GET",
+        data: data, 
+        dataType: 'json',
+        success: function(response) {
+            console.log("received from server:", response);
+            var dat = response.ids;
+            jQuery("#searchResults").html();
+        },
+        error: function(error) { console.log(error) }
+    });
+}
+
+
+
+
+
+

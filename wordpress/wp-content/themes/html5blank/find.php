@@ -43,30 +43,18 @@ get_header(); ?>
                 </div>
 
                 <script>
-                    var options = {
-                        allow_empty: true,
-                        filters: [
-                          {
-                            id: 'Genus',
-                            type: 'string',
-                            //optgroup: 'core',
-                            default_value: 'Anthurium',
-                            size: 30,
-                            unique: true
-                          }
-                        ]
-                    };
+                    jQuery('#builder').queryBuilder(builderOptions);
 
-
-                    jQuery('#builder').queryBuilder(options);
-
-                    function searchSpecimen() {
-                        var rules = jQuery('#builder').queryBuilder('getSQL');
-                        console.log(rules);
-                    }
-
-                    jQuery('#builder').on('validationError.queryBuilder', function(e, rule, error, value) {
-                        console.log(rule, error, value);
+                    // https://github.com/mistic100/jQuery-QueryBuilder/issues/362#issuecomment-249010070
+                    jQuery('#builder').on('validationError.queryBuilder', function(e, node, error, value) {
+                        console.log(error);
+                        if (error[1] == '/^[a-zA-Z]+$/') {
+                            error[0] = "Please enter only letters.";
+                        } else if (error[1] == '/^[a-zA-Z1-9]+$/') {
+                            error[0] = "Please enter only letters or numbers.";
+                        } else if (error[1] == '/^[1-9]+$/') {
+                            error[0] = "Please enter only numbers.";
+                        }
                     });
                 </script>
 

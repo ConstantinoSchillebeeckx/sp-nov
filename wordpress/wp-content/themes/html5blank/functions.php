@@ -124,10 +124,12 @@ function html5blank_header_scripts()
 // Load HTML5 Blank conditional scripts
 function html5blank_conditional_scripts()
 {
-    if (is_page('classify') || is_page('upload') ) {
+    if (is_page('classify') || is_page('upload') || is_page('search')) {
         // Custom scripts
         wp_enqueue_script('spnov_scripts', get_template_directory_uri() . '/js/scripts.js', array('jquery'), '1.0.0');
         wp_localize_script( 'spnov_scripts', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) ); // required to do AJAX!
+
+        wp_enqueue_script('formInputs', get_template_directory_uri() . '/js/formInputs.js', array('jquery'), '1.0.0');
 
         wp_register_script('autocomplete', get_template_directory_uri() . '/js/lib/jquery.autocomplete.min.js', array('jquery'), '1.2.26');
         wp_enqueue_script('autocomplete');
@@ -629,6 +631,9 @@ function process_file_upload($dat) {
 
 
 
+
+
+
 /* Function called by AJAX auto_complete library
 
 Parameters:
@@ -663,6 +668,127 @@ function autoComplete_callback() {
 
 
 
+/* Function called by AJAX to search for specimens
+
+
+Parameters:
+-----------
+- $_GET['dat'] : assoc array
+                 see: http://querybuilder.js.org/demo.html
+
+Returns:
+--------
+
+*/
+add_action( 'wp_ajax_findSpecimen', 'findSpecimen_callback' );
+function findSpecimen_callback() {
+
+    global $wpdb;
+    $dat = $_GET['dat'];
+
+
+    # generate prepare statement
+    $query = "SELECT post_id FROM $wpdb->postmeta WHERE" . build_prep_statement($dat);
+    $args = build_prep_values($dat);
+    $prep = $wpdb->prepare($query, $args);
+
+    # run query
+    $ids = $wpdb->get_col( $prep );
+
+    echo json_encode( array('ids' => $ids, 'log' => $wpdb ) );
+
+
+    wp_die();
+
+}
+
+
+/* Recrusive function to generate WHERE clause
+
+The jQuery QueryBuilder script generates
+a JSON of rules (http://querybuilder.js.org/demo.html),
+this must be parsed in a recursive manner.
+
+This function will recursively generate
+the SQL part of the prepared statment
+see https://developer.wordpress.org/reference/classes/wpdb/prepare/
+
+Should be used in conjuction with build_prep_values
+
+Parameters:
+-----------
+- $rules : obj
+           JSON of rules, http://querybuilder.js.org/demo.html
+
+Returns:
+--------
+string formatted for prepared statement
+*/
+function build_prep_statement($rules) {
+
+    $cond = $rules['condition'];
+    $rule_arr = $rules['rules'];
+
+    $rule = '';
+    $count = 0;
+    foreach ($rule_arr as $tmp) {
+        if ( isset($tmp['condition'] )) {
+            $rule .= " " . $cond . " (" . build_prep_statement($tmp) . ")";
+        } else {
+            if ($count) {
+                $rule .= " " . $cond . " (meta_key = '%s' and meta_value = '%s')"; 
+            } else {
+                $rule .= " (meta_key = '%s' and meta_value = '%s')"; 
+            }
+        }
+        $count += 1;
+    }
+
+    return $rule;
+
+}
+
+
+/* Recrusive function to generate WHERE clause
+
+The jQuery QueryBuilder script generates
+a JSON of rules (http://querybuilder.js.org/demo.html),
+this must be parsed in a recursive manner.
+
+This function will recursively generate
+the $args part of the prepared statment
+see https://developer.wordpress.org/reference/classes/wpdb/prepare/
+
+Should be used in conjuction with build_prep_statement
+
+Parameters:
+-----------
+- $rules : obj
+           JSON of rules, http://querybuilder.js.org/demo.html
+
+Returns:
+--------
+array of values for the prepared statement
+*/
+function build_prep_values($rules) {
+
+    $cond = $rules['condition'];
+    $rule_arr = $rules['rules'];
+
+    $rule = [];
+    $count = 0;
+    foreach ($rule_arr as $tmp) {
+        if ( isset($tmp['condition'] )) {
+            $rule = array_merge($rule, build_prep_values($tmp) );
+        } else {
+            array_push($rule, $tmp['id'], $tmp['value']);
+        }
+        $count += 1;
+    }
+
+    return $rule;
+
+}
 
 
 
