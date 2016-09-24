@@ -271,33 +271,39 @@ Parameters:
 */
 function generateSearchResultsTable(dat, sel, cols) {
 
-    jQuery('table').remove();
+    jQuery(sel).empty();
 
-    var table = jQuery('<table class="table table-striped table-responsive" style="font-size:8px">').appendTo(sel);
-    var thead = jQuery('<thead>').appendTo(table);
-    var tbody = jQuery('<tbody>').appendTo(table);
+    if (dat) {
+
+        var table = jQuery('<table class="table table-striped table-responsive" style="font-size:8px">').appendTo(sel);
+        var thead = jQuery('<thead>').appendTo(table);
+        var tbody = jQuery('<tbody>').appendTo(table);
 
 
-    var theadr = jQuery('<tr class="info"/>');
-    jQuery.each(cols, function(i, col) {
-        theadr.append('<td>' + col + '</td>');
-    })
-    thead.append(theadr);
-
-    jQuery.each(dat, function(i, row) {
-        var tr = jQuery('<tr/>');
-        jQuery.each(cols, function(j, col) {
-            var val = ''
-            if (row[col]) {
-                val = row[col];
-                if (j == 0) {
-                    val = '<a href="/classify/?id=' + i + '">' + val + '</a>';
-                }
-            }
-            tr.append('<td>' + val + '</td>');
+        var theadr = jQuery('<tr class="info"/>');
+        jQuery.each(cols, function(i, col) {
+            theadr.append('<td>' + col + '</td>');
         })
-        tbody.append(tr);
-    })
+        thead.append(theadr);
+
+        jQuery.each(dat, function(i, row) {
+            var tr = jQuery('<tr/>');
+            jQuery.each(cols, function(j, col) {
+                var val = ''
+                if (row[col]) {
+                    val = row[col];
+                    if (j == 0) {
+                        val = '<a href="/classify/?id=' + i + '">' + val + '</a>';
+                    }
+                }
+                tr.append('<td>' + val + '</td>');
+            })
+            tbody.append(tr);
+        })
+
+    } else {
+        jQuery('<p class="lead">No results found in the database!</p>').appendTo(sel);
+    }
 
 }
 

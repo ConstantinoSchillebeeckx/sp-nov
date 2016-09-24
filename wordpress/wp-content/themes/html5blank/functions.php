@@ -702,24 +702,26 @@ function findSpecimen_callback() {
     if (count($ids)) {
         $query = "SELECT ID, meta_key, meta_value FROM $wpdb->posts a LEFT JOIN $wpdb->postmeta b on a.ID = b.post_id WHERE post_type = 'specimen' AND post_status = 'publish' AND post_id in (" . implode(',',$ids) . ")";
         $ids = $wpdb->get_results($query, ARRAY_A);
-    }
     
 
-    # reformat results into table form
-    # where each row is a specimen
-    $data = [];
-    foreach ($ids as $obj) {
-        $id = $obj['ID'];
-        $meta_key = $obj['meta_key'];
-        $meta_value = $obj['meta_value'];
+        # reformat results into table form
+        # where each row is a specimen
+        $data = [];
+        foreach ($ids as $obj) {
+            $id = $obj['ID'];
+            $meta_key = $obj['meta_key'];
+            $meta_value = $obj['meta_value'];
 
-        if (in_array($meta_key, $cols) ) {
-            if ($data[$id]) {
-                $data[$id][$meta_key] = $meta_value;
-            } else {
-                $data[$id] = array($meta_key => $meta_value);
+            if (in_array($meta_key, $cols) ) {
+                if ($data[$id]) {
+                    $data[$id][$meta_key] = $meta_value;
+                } else {
+                    $data[$id] = array($meta_key => $meta_value);
+                }
             }
         }
+    } else {
+        $data = false;
     }
 
     echo json_encode( array('dat' => $data, 'log' => array($wpdb,$rules,$ids,$dat) ) );
@@ -765,11 +767,22 @@ function build_prep_statement($rules) {
             $args = array_merge($rule[1], $recur[1] );
         } else {
             if (!($tmp['field'] == 'status' && $tmp['value'] == 'all')) { // don't generate WHERE filter when requesting all specimens
+
+                $compare = "= '%s'";
+
+                // if selecting samples with issue, need to search inputIssue key
+                // and make query meta_value like '%'
+                if ($tmp['field'] == 'status' && $tmp['value'] == 'issue') { 
+                    $tmp['field'] = 'inputIssue';
+                    $tmp['value'] = '';
+                    $compare = "LIKE '%%'";
+                }
+
                 if ($count) {
-                    $query = $rule[0] . " " . $cond . " (meta_key = '%s' and meta_value = '%s')";
+                    $query = $rule[0] . " " . $cond . " (meta_key = '%s' and meta_value $compare)";
                     $args = array_push($rule[1], $tmp['field'], $tmp['value']);
                 } else {
-                    $query = " (meta_key = '%s' and meta_value = '%s')";
+                    $query = " (meta_key = '%s' and meta_value $compare)";
                     $args = array($tmp['field'], $tmp['value']);
                 }
             }
