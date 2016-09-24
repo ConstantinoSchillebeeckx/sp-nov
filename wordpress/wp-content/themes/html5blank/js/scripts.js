@@ -233,13 +233,13 @@ function searchSpecimen() {
     var rules = jQuery('#builder').queryBuilder('getRules');
     console.log("sent to server:", rules);
 
-    var cols = [];
-    builderOptions.filters.forEach( function(d) { cols.push(d.field); } )
+    var colMap = {};
+    builderOptions.filters.forEach( function(d) { colMap[d.field] = d.label; } )
 
     var data = {
         "action": "findSpecimen", 
         "dat": rules,
-        "cols": cols,
+        "cols": Object.keys(colMap),
     }
 
     // send via AJAX to process with PHP
@@ -250,7 +250,7 @@ function searchSpecimen() {
         dataType: 'json',
         success: function(response) {
             console.log("received from server:", response);
-            generateSearchResultsTable(response.dat, '#searchResults', cols);
+            generateSearchResultsTable(response.dat, '#searchResults', colMap);
         },
         error: function(error) { console.log(error) }
     });
@@ -269,32 +269,33 @@ Parameters:
         pairs for its associated data
 
 */
-function generateSearchResultsTable(dat, sel, cols) {
+function generateSearchResultsTable(dat, sel, colMap) {
 
     jQuery(sel).empty();
 
     if (dat) {
 
-        var table = jQuery('<table class="table table-striped table-responsive" style="font-size:8px">').appendTo(sel);
+        var table = jQuery('<table class="table table-striped table-responsive" style="font-size:10px">').appendTo(sel);
         var thead = jQuery('<thead>').appendTo(table);
         var tbody = jQuery('<tbody>').appendTo(table);
 
 
         var theadr = jQuery('<tr class="info"/>');
-        jQuery.each(cols, function(i, col) {
-            theadr.append('<td>' + col + '</td>');
+        jQuery.each(colMap, function(field, label) {
+            theadr.append('<td><b>' + label + '</b></td>');
         })
         thead.append(theadr);
 
         jQuery.each(dat, function(i, row) {
             var tr = jQuery('<tr/>');
-            jQuery.each(cols, function(j, col) {
-                var val = ''
-                if (row[col]) {
-                    val = row[col];
-                    if (j == 0) {
+            jQuery.each(colMap, function(field, label) {
+                var val = row[field]
+                if (typeof val !== 'undefined') {
+                    if (field == 'status') {
                         val = '<a href="/classify/?id=' + i + '">' + val + '</a>';
                     }
+                } else {
+                    val = '';
                 }
                 tr.append('<td>' + val + '</td>');
             })

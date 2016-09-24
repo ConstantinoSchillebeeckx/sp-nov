@@ -17,7 +17,17 @@ get_header(); ?>
 		<!-- section -->
 		<section>
 
-			<h1><?php the_title(); ?></h1>
+            <div class="row">
+                <div class="col-sm-4">
+                    <h1><?php the_title(); ?></h1>
+                </div>
+                <div class="col-sm-8">
+                    <div class="btn-group pull-right" role="group">
+                        <button style="margin-top:20px" class="btn btn-info" type="button" onclick="searchSpecimen()">Search</button>
+                        <button style="margin-top:20px" class="btn btn-primary" type="button" onclick="downloadSpecimens()" title="Download renamed versions of all finished specimens">Download</button>
+                    </div>
+                </div>
+            </div>
 
         <?php // only show form if a user is logged in
         if ( !is_user_logged_in() ) {
@@ -30,11 +40,8 @@ get_header(); ?>
 			<article>
 
                 <div class="row">
-                    <div class="col-sm-11">
+                    <div class="col-sm-12">
                         <div id="builder"></div>
-                    </div>
-                    <div class="col-sm-1">
-                        <button style="margin-top:4px" class="btn btn-primary pull-right" type="button" onclick="searchSpecimen()">Search</button>
                     </div>
                 </div>
                 <div class="row" style="margin-top:10px">
@@ -45,6 +52,7 @@ get_header(); ?>
                 <script>
                     jQuery('#builder').queryBuilder(builderOptions);
 
+                    // customize tooltip error message
                     // https://github.com/mistic100/jQuery-QueryBuilder/issues/362#issuecomment-249010070
                     jQuery('#builder').on('validationError.queryBuilder', function(e, node, error, value) {
                         console.log(error);

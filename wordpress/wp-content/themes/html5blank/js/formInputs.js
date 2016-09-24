@@ -33,6 +33,7 @@ var builderOptions = {
         },
         {
             id: 'Genus',
+            label: 'Genus',
             type: 'string',
             placeholder: 'Anthurium',
             validation: {
@@ -47,6 +48,7 @@ var builderOptions = {
         },
         {
             id: 'Section',
+            label: 'Section',
             type: 'string',
             placeholder: 'Belolonchium',
             validation: {
@@ -61,6 +63,7 @@ var builderOptions = {
         },
         {
             id: 'Species',
+            label: 'Species',
             type: 'string',
             placeholder: 'longipoda',
             validation: {
@@ -75,6 +78,7 @@ var builderOptions = {
         },
         {
             id: 'Collector',
+            label: 'Collector',
             type: 'string',
             placeholder: 'Betancur',
             validation: {
@@ -89,6 +93,7 @@ var builderOptions = {
         },
         {
             id: 'Number',
+            label: 'Number',
             type: 'integer',
             placeholder: '436',
             validation: {
@@ -103,6 +108,7 @@ var builderOptions = {
         },
         {
             id: 'Determiner',
+            label: 'Determiner',
             type: 'string',
             placeholder: 'Croat',
             validation: {
@@ -117,6 +123,7 @@ var builderOptions = {
         },
         {
             id: 'Herbarium',
+            label: 'Herbarium',
             type: 'string',
             placeholder: 'COL',
             validation: {
@@ -131,6 +138,7 @@ var builderOptions = {
         },
         {
             id: 'Country',
+            label: 'Country',
             type: 'string',
             placeholder: 'Colombia',
             validation: {
@@ -145,6 +153,7 @@ var builderOptions = {
         },
         {
             id: 'Deparment',
+            label: 'Deparment',
             type: 'string',
             placeholder: 'Tolima',
             validation: {
@@ -159,6 +168,7 @@ var builderOptions = {
         },
         {
             id: 'Municipality',
+            label: 'Municipality',
             type: 'string',
             placeholder: 'Icononzo',
             validation: {
@@ -173,6 +183,7 @@ var builderOptions = {
         },
         {
             id: 'Location',
+            label: 'Location',
             type: 'string',
             placeholder: 'el Taladro finca la Esperanza',
             validation: {
@@ -187,6 +198,7 @@ var builderOptions = {
         },
         {
             id: 'Issue',
+            label: 'Issue',
             type: 'string',
             input: 'select',
             values: {
