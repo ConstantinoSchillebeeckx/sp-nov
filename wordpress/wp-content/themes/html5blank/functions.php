@@ -689,16 +689,20 @@ function findSpecimen_callback() {
     $cols = $_GET['cols'];
 
     # generate prepare statement
-    $query = "SELECT ID, meta_key, meta_value FROM $wpdb->posts a LEFT JOIN $wpdb->postmeta b on a.ID = b.post_id WHERE (post_type = 'specimen' AND post_status = 'publish') ";
+    //$query = "SELECT ID, meta_key, meta_value FROM $wpdb->posts a LEFT JOIN $wpdb->postmeta b on a.ID = b.post_id WHERE (post_type = 'specimen' AND post_status = 'publish') ";
+    $query = "SELECT post_id FROM $wpdb->postmeta"; // get initial list of IDs - needed if filtering for finished/unfinished
     $rules = build_prep_statement($dat);
-    if (count($rules) && $rules != '') $query .= "AND " . $rules . "GROUP BY ID";
+    if (count($rules) && $rules != '') $query .= " WHERE" . $rules;
     $args = build_prep_values($dat);
     $prep = $wpdb->prepare($query, $args);
 
-    # run query
-    # will have multiple rows per ID (one for each meta_key)
-    $ids = $wpdb->get_results( $prep, ARRAY_A );
+    # run query - array of $ids
+    $ids = $wpdb->get_col($prep);
 
+    # run second query on joined table, now that we have list of required IDs
+    $query = "SELECT ID, meta_key, meta_value FROM $wpdb->posts a LEFT JOIN $wpdb->postmeta b on a.ID = b.post_id WHERE post_type = 'specimen' AND post_status = 'publish' AND post_id in (" . implode(',',$ids) . ")";
+    $ids = $wpdb->get_results($query, ARRAY_A);
+    
 
     # reformat results into table form
     # where each row is a specimen
@@ -718,7 +722,7 @@ function findSpecimen_callback() {
     }
 
 
-    echo json_encode( array('dat' => $data, 'log' => array($wpdb,$rules) ) );
+    echo json_encode( array('dat' => $data, 'log' => array($wpdb,$rules,$ids,$dat) ) );
 
 
     wp_die();
@@ -758,7 +762,7 @@ function build_prep_statement($rules) {
         if ( isset($tmp['condition'] )) {
             $rule .= " " . $cond . " (" . build_prep_statement($tmp) . ")";
         } else {
-            if (!($tmp['id'] == 'View' && $tmp['value'] == 'all')) { 
+            if (!($tmp['field'] == 'status' && $tmp['value'] == 'all')) { 
                 if ($count) {
                     $rule .= " " . $cond . " (meta_key = '%s' and meta_value = '%s')"; 
                 } else {
@@ -806,7 +810,7 @@ function build_prep_values($rules) {
         if ( isset($tmp['condition'] )) {
             $rule = array_merge($rule, build_prep_values($tmp) );
         } else {
-            if (!($tmp['id'] == 'View' && $tmp['value'] == 'all')) { 
+            if (!($tmp['field'] == 'status' && $tmp['value'] == 'all')) { 
                 array_push($rule, $tmp['field'], $tmp['value']);
             }
         }

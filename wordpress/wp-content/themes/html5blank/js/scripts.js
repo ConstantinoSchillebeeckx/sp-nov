@@ -130,6 +130,7 @@ function doAJAX(data) {
     jQuery('h1').html('<i class="fa fa-spinner fa-spin fa-fw"></i> loading...');
     jQuery('.img-container').attr('style','display: none;'); // hide 
     jQuery("input[type=text]").val(""); 
+    jQuery("input[type=number]").val(""); 
     jQuery("select[name='inputIssue']").val(jQuery("select[name='inputIssue'] option:first").val()); // reset dropdown
     jQuery('.label').remove();
     jQuery('.well').html('');
