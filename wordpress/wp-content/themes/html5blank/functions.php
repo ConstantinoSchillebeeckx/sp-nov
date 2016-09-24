@@ -692,16 +692,17 @@ function findSpecimen_callback() {
     //$query = "SELECT ID, meta_key, meta_value FROM $wpdb->posts a LEFT JOIN $wpdb->postmeta b on a.ID = b.post_id WHERE (post_type = 'specimen' AND post_status = 'publish') ";
     $query = "SELECT post_id FROM $wpdb->postmeta"; // get initial list of IDs - needed if filtering for finished/unfinished
     $rules = build_prep_statement($dat);
-    if (count($rules) && $rules != '') $query .= " WHERE" . $rules;
-    $args = build_prep_values($dat);
-    $prep = $wpdb->prepare($query, $args);
+    if (count($rules[0]) && $rules[0] != '') $query .= " WHERE" . $rules[0];
+    $prep = $wpdb->prepare($query, $rules[1]);
 
     # run query - array of $ids
     $ids = $wpdb->get_col($prep);
 
     # run second query on joined table, now that we have list of required IDs
-    $query = "SELECT ID, meta_key, meta_value FROM $wpdb->posts a LEFT JOIN $wpdb->postmeta b on a.ID = b.post_id WHERE post_type = 'specimen' AND post_status = 'publish' AND post_id in (" . implode(',',$ids) . ")";
-    $ids = $wpdb->get_results($query, ARRAY_A);
+    if (count($ids)) {
+        $query = "SELECT ID, meta_key, meta_value FROM $wpdb->posts a LEFT JOIN $wpdb->postmeta b on a.ID = b.post_id WHERE post_type = 'specimen' AND post_status = 'publish' AND post_id in (" . implode(',',$ids) . ")";
+        $ids = $wpdb->get_results($query, ARRAY_A);
+    }
     
 
     # reformat results into table form
@@ -721,12 +722,9 @@ function findSpecimen_callback() {
         }
     }
 
-
     echo json_encode( array('dat' => $data, 'log' => array($wpdb,$rules,$ids,$dat) ) );
 
-
     wp_die();
-
 }
 
 
@@ -737,7 +735,7 @@ a JSON of rules (http://querybuilder.js.org/demo.html),
 this must be parsed in a recursive manner.
 
 This function will recursively generate
-the SQL part of the prepared statment
+the SQL/args part of the prepared statment
 see https://developer.wordpress.org/reference/classes/wpdb/prepare/
 
 Should be used in conjuction with build_prep_values
@@ -749,57 +747,11 @@ Parameters:
 
 Returns:
 --------
-string formatted for prepared statement
+array where:
+[0]: string formatted for prepared statement
+[1]: build_prep_statement($tmp)
 */
 function build_prep_statement($rules) {
-
-    $cond = $rules['condition'];
-    $rule_arr = $rules['rules'];
-
-    $rule = '';
-    $count = 0;
-    foreach ($rule_arr as $tmp) {
-        if ( isset($tmp['condition'] )) {
-            $rule .= " " . $cond . " (" . build_prep_statement($tmp) . ")";
-        } else {
-            if (!($tmp['field'] == 'status' && $tmp['value'] == 'all')) { 
-                if ($count) {
-                    $rule .= " " . $cond . " (meta_key = '%s' and meta_value = '%s')"; 
-                } else {
-                    $rule .= " (meta_key = '%s' and meta_value = '%s')"; 
-                }
-            }
-        }
-        $count += 1;
-    }
-
-    return $rule;
-
-}
-
-
-/* Recrusive function to generate WHERE clause
-
-The jQuery QueryBuilder script generates
-a JSON of rules (http://querybuilder.js.org/demo.html),
-this must be parsed in a recursive manner.
-
-This function will recursively generate
-the $args part of the prepared statment
-see https://developer.wordpress.org/reference/classes/wpdb/prepare/
-
-Should be used in conjuction with build_prep_statement
-
-Parameters:
------------
-- $rules : obj
-           JSON of rules, http://querybuilder.js.org/demo.html
-
-Returns:
---------
-array of values for the prepared statement
-*/
-function build_prep_values($rules) {
 
     $cond = $rules['condition'];
     $rule_arr = $rules['rules'];
@@ -808,18 +760,29 @@ function build_prep_values($rules) {
     $count = 0;
     foreach ($rule_arr as $tmp) {
         if ( isset($tmp['condition'] )) {
-            $rule = array_merge($rule, build_prep_values($tmp) );
+            $recur = build_prep_statement($tmp);
+            $query = $rule[0] . " " . $cond . " (" . $recur[0] . ")";
+            $args = array_merge($rule[1], $recur[1] );
         } else {
-            if (!($tmp['field'] == 'status' && $tmp['value'] == 'all')) { 
-                array_push($rule, $tmp['field'], $tmp['value']);
+            if (!($tmp['field'] == 'status' && $tmp['value'] == 'all')) { // don't generate WHERE filter when requesting all specimens
+                if ($count) {
+                    $query = $rule[0] . " " . $cond . " (meta_key = '%s' and meta_value = '%s')";
+                    $args = array_push($rule[1], $tmp['field'], $tmp['value']);
+                } else {
+                    $query = " (meta_key = '%s' and meta_value = '%s')";
+                    $args = array($tmp['field'], $tmp['value']);
+                }
             }
         }
+        $rule = array($query, $args); 
         $count += 1;
     }
 
     return $rule;
 
 }
+
+
 
 
 
