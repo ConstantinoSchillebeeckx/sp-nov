@@ -209,6 +209,56 @@ function loadIMG(src) {
 
 
 
+
+
+
+
+/* Download all finished specimens as zip
+
+
+*/
+function downloadSpecimens() {
+
+
+    if (searchResults.length) { // require search results before anything can be downloaded
+
+        var data = {
+            "action": "downloadSpecimens", 
+            "rename": true,
+            "ids": searchResults
+        }
+
+        // send via AJAX to process with PHP
+        jQuery.ajax({
+            url: ajax_object.ajax_url, 
+            type: "GET",
+            data: data, 
+            dataType: 'json',
+            beforeSend: function() {
+                jQuery('#searchResults').empty(); // clear search results
+                jQuery('#searchResults').append('<p class="lead"><i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>Generating download file...</p>')
+            },
+            success: function(response) {
+                if (response.success) {
+                    jQuery('#searchResults').empty(); // clear search results
+                    jQuery('#searchResults').append('<a href="' + response.url + '" class="btn btn-info">Get images</a>');
+                } else {
+                    jQuery('#searchResults').empty(); // clear search results
+                    jQuery('#searchResults').append('<mark class="lead">There was a problem, please try again.</mark>');
+                }
+            },
+            error: function(error) { console.log(error) }
+        });
+    } else {
+        jQuery('#searchResults').empty(); // clear search results
+        jQuery('#searchResults').append('<p class="lead">You must first run a search to download any specimens; all specimens listed in search results will be downloaded.</p>');
+    }
+
+}
+
+
+
+
 /* Called from search page, used to query specimens that match query
 
 AJAX call to query the DB for specimens that meet user
@@ -225,14 +275,14 @@ Returns:
 --------
 response.dat is an object where each key is
 a specimen, the value is an obj with key/val
-pairs for its associated data
+pairs for its associated data. will be false
+if no results are returned
 
 
 */
 function searchSpecimen() {
     var rules = jQuery('#builder').queryBuilder('getRules');
-    console.log("sent to server:", rules);
-
+    console.log(rules);
     var colMap = {};
     builderOptions.filters.forEach( function(d) { colMap[d.field] = d.label; } )
 
@@ -249,7 +299,8 @@ function searchSpecimen() {
         data: data, 
         dataType: 'json',
         success: function(response) {
-            console.log("received from server:", response);
+            console.log(response);
+            searchResults = Object.keys(response.dat); // set to global for use with downloadSpecimens()
             generateSearchResultsTable(response.dat, '#searchResults', colMap);
         },
         error: function(error) { console.log(error) }
@@ -267,7 +318,10 @@ Parameters:
         response.dat is an object where each key is
         a specimen, the value is an obj with key/val
         pairs for its associated data
-
+- sel : str
+        selector for DOM into which to put results
+- colMap : obj
+           key: DB meta_key; value: table col name
 */
 function generateSearchResultsTable(dat, sel, colMap) {
 

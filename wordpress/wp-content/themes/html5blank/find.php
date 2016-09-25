@@ -29,6 +29,7 @@ get_header(); ?>
                 </div>
             </div>
 
+
         <?php // only show form if a user is logged in
         if ( !is_user_logged_in() ) {
             echo sprintf('<p class="lead login-link">You must <a href="%s">sign in</a> to view this page.</p>', wp_login_url( get_permalink() ) );

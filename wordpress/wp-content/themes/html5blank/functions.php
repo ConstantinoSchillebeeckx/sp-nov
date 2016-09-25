@@ -28,10 +28,10 @@ if (function_exists('add_theme_support'))
 
     // Add Thumbnail Theme Support
     add_theme_support('post-thumbnails');
-    add_image_size('large', 700, '', true); // Large Thumbnail
-    add_image_size('medium', 250, '', true); // Medium Thumbnail
-    add_image_size('small', 120, '', true); // Small Thumbnail
-    add_image_size('custom-size', 700, 200, true); // Custom Thumbnail Size call using the_post_thumbnail('custom-size');
+    add_image_size('large', 0, 0, true); // Large Thumbnail
+    add_image_size('medium', 0, 0, true); // Medium Thumbnail
+    add_image_size('small', 0, 0, true); // Small Thumbnail
+    add_image_size('custom-size', 0, 0, true); // Custom Thumbnail Size call using the_post_thumbnail('custom-size');
 
     // Add Support for Custom Backgrounds - Uncomment below if you're going to use
     /*add_theme_support('custom-background', array(
@@ -668,8 +668,93 @@ function autoComplete_callback() {
 
 
 
+
+
+
 /* Function called by AJAX to search for specimens
 
+
+Parameters:
+-----------
+- $_GET['ids'] : array
+                 list of wordpress IDs to download
+- $_GET['rename'] : bool
+                    if true, images will be renamed within zip
+                    (renamed to BoGart guidelines)
+Returns:
+--------
+json_encode with url: link to download
+*/
+add_action( 'wp_ajax_downloadSpecimens', 'downloadSpecimens_callback' );
+function downloadSpecimens_callback() {
+
+    global $wpdb;
+
+    // location of imgs
+    $dir = '~/domains/spnov.com/html/wordpress/wp-content/uploads/';
+
+    // run query for specimen info
+    $query = "SELECT post_id, meta_key, meta_value FROM $wpdb->postmeta WHERE post_id in $ids";
+    $dat = $wpdb->get_results( $query, ARRAY_A ); 
+
+    // reformat query results and get list of imgs
+    // [post_id => array(meta_key => meta_value, ...)]
+    $dat_clean = [];
+    $imgs = []; // list of imgs with full local path
+    foreach ($dat as $row) {
+        $id = $row['post_id'];
+        $meta_key = $row['meta_key'];
+        $meta_value = $row['meta_value'];
+
+        // if on imgs meta_key, add it to the command
+        if ($meta_key == 'imgs') {
+            foreach (explode(',', $meta_key) as $img) {
+                $imgs[] = $dir . str_replace('JPG','jpg', $img);
+            }
+        }
+
+        // store remaining data
+        if (in_array($id, $dat_clean)) {
+            $dat_clean[$id][$meta_key] = $meta_value;
+        } else {
+            $dat_clean[$id] = array($meta_key => $meta_value);
+        }
+    }   
+
+
+    // create bash command to generate zip and symlink
+    $comm = 'zip -r9 -j ~/data/tmp/imgs.zip ' . implode(', ',$imgs) .'; ln -s ~/data/tmp/imgs.zip ~/domains/spnov.com/html/';
+
+
+    // execute command
+    $status = exec($comm);
+
+    $status= true;
+    if ($status) {
+        echo json_encode(array('success' => true, 'url' => '/download.php')); // user can download file by visiting http://spnov.com/download.php
+    } else {
+        echo json_encode(array('success' => false, 'msg' => 'There was a problem generating the zip'));
+    }
+
+    wp_die();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Function called by AJAX to search for specimens
 
 Parameters:
 -----------
@@ -679,14 +764,38 @@ Parameters:
                   array of columns (meta_key) requested
 Returns:
 --------
-
+json_encode of search results stored in 'dat' key
 */
 add_action( 'wp_ajax_findSpecimen', 'findSpecimen_callback' );
 function findSpecimen_callback() {
 
-    global $wpdb;
     $dat = $_GET['dat'];
     $cols = $_GET['cols'];
+
+    echo json_encode( array('dat' => findSpecimens($dat, $cols) ) );
+
+    wp_die();
+}
+
+
+/* Find specimens that meet search criteria
+
+Parameters:
+-----------
+- dat : assoc array
+        see: http://querybuilder.js.org/demo.html
+- cols : array
+         array of columns (meta_key) requested
+Returns:
+--------
+assoc array where each key is a WP specimen ID
+and each value is another assoc array where
+key is meta_key and value is meta_value
+
+*/
+function findSpecimens($dat, $cols) {
+
+    global $wpdb;
 
     # generate prepare statement
     //$query = "SELECT ID, meta_key, meta_value FROM $wpdb->posts a LEFT JOIN $wpdb->postmeta b on a.ID = b.post_id WHERE (post_type = 'specimen' AND post_status = 'publish') ";
@@ -720,14 +829,11 @@ function findSpecimen_callback() {
                 }
             }
         }
-    } else {
-        $data = false;
+        return $data;
     }
-
-    echo json_encode( array('dat' => $data, 'log' => array($wpdb,$rules,$ids,$dat) ) );
-
-    wp_die();
+    return false;
 }
+
 
 
 /* Recrusive function to generate WHERE clause
