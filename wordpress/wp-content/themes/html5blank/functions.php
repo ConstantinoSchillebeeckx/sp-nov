@@ -730,7 +730,7 @@ function downloadSpecimens_callback() {
         }
 
         // store remaining data
-        if (in_array($id, $dat_clean)) {
+        if ($dat_clean[$id]) {
             $dat_clean[$id][$meta_key] = $meta_value;
         } else {
             $dat_clean[$id] = array($meta_key => $meta_value);
@@ -739,10 +739,13 @@ function downloadSpecimens_callback() {
 
     // create bash command to generate zip and symlink
     if (count($imgs)) {
-        $comm = 'zip -r9 -j ~/data/tmp/imgs.zip ' . implode(', ',$imgs) .'; ln -s ~/data/tmp/imgs.zip ~/domains/spnov.com/html/';
 
         // rename files before zipping
-        if ($_GET['rename'] ) {
+        if ( json_decode($_GET['rename']) ) { 
+            $command = rename_specimens($dat_clean, $dir);
+            $comm = 'rm ~/data/tmp/imgs.zip; zip -r9 -j ~/data/tmp/imgs.zip ~/data/tmp/*jpg; rm ~/data/tmp/*jpg; ln -s ~/data/tmp/imgs.zip ~/domains/spnov.com/html/;';
+        } else {
+            $comm = 'rm ~/data/tmp/imgs.zip; zip -r9 -j ~/data/tmp/imgs.zip ' . implode(' ',$imgs) .'; ln -s ~/data/tmp/imgs.zip ~/domains/spnov.com/html/';
         }
 
         // execute command
@@ -758,9 +761,9 @@ function downloadSpecimens_callback() {
 
     // return
     if ($status) {
-        echo json_encode(array('update'=>$update_query, 'success' => true, 'url' => '/download.php', 'ids'=>$ids, 'status'=>$status, 'query'=>$query, 'dat'=>$dat_clean, 'imgs'=>$imgs)); // user can download file by visiting http://spnov.com/download.php
+        echo json_encode(array('update'=>$comm, 'success' => true, 'url' => '/download.php', 'ids'=>$ids, 'status'=>$status, 'query'=>$query, 'dat'=>$dat_clean, 'imgs'=>$imgs)); // user can download file by visiting http://spnov.com/download.php
     } else {
-        echo json_encode(array('success' => false, 'msg' => '<p class="lead">There was a problem generating the zip, please try again.</p>'));
+        echo json_encode(array('success' => false, 'msg' => '<p class="lead">There was a problem generating the zip, please try again.</p>', 'comm'=>$comm, 'out' => $out, 'status' => $status));
     }
 
     wp_die();
@@ -770,6 +773,74 @@ function downloadSpecimens_callback() {
 
 
 
+
+
+
+/* Rename specimen images to BoGart guidelines
+
+Will rename a given specimen JPG with the metadata
+associated with the specimen per the BoGart guidelines.
+Function will then keep original file, but generate a 
+renamed copy in ~/data/tmp/
+
+Function assumes all images in meta_key=imgs are specimens
+except for the last one, which is considered a label
+
+Parameters:
+-----------
+- $dat : assoc arr
+         [wp id => [specimen_key: specimen_value]
+- $dir : str
+         path to location of image (e.g. wp uploads)
+
+*/
+function rename_specimens($dat, $dir) {
+
+    $comms = [];
+    foreach($dat as $id => $obj) {
+        $count = 1;
+        $imgs = explode(',', $obj['imgs']);
+        foreach($imgs as $img) {
+            $source_image = str_replace('JPG','jpg', $img);
+
+            $comma_sep = [];
+            $space_sep = [];
+            if (isset($obj['inputGenus']) && $obj['inputGenus'] != '') $space_sep[] = $obj['inputGenus'];
+            if (isset($obj['inputSection']) && $obj['inputSection'] != '') $space_sep[] = $obj['inputSection'];
+            if (isset($obj['inputSpecies']) && $obj['inputSpecies'] != '') $space_sep[] = $obj['inputSpecies'];
+            if (isset($obj['inputNumber']) && $obj['inputNumber'] != '') $space_sep[] = $obj['inputNumber'];
+            if (isset($obj['inputCollector']) && $obj['inputCollector'] != '') $comma_sep[] = $obj['inputCollector'];
+            if (isset($obj['inputDeterminer']) && $obj['inputDeterminer'] != '') $comma_sep[] = $obj['inputDeterminer'];
+            if (isset($obj['inputHerbarium']) && $obj['inputHerbarium'] != '') $comma_sep[] = $obj['inputHerbarium'];
+            if (isset($obj['inputLocation']) && $obj['inputLocation'] != '') $comma_sep[] = $obj['inputLocation'];
+
+            // generate new name; replace spaces with \
+            if (count($comma_sep)) {
+                $space_part = implode('\ ', $space_sep);
+                if (count($comma_sep)) {
+                    $comma_part = str_replace(' ', '\ ', implode(', ', $comma_sep));
+                    $rename_image = $space_part . '\ ' . $comma_part;
+                } else {
+                    $rename_image = $space_part;
+                }
+
+                if ($count == count($imgs)) {
+                     $rename_image .= '\ label.jpg';
+                } else {
+                     $rename_image .= '\ '. $count . '.jpg';
+                }
+            } else { // if no data available for specimen, keep original name
+                $rename_image = $source_image;
+            }
+
+            $comm = "cp " . $dir . $source_image . " ~/data/tmp/" . $rename_image;
+            exec($comm, $out, $status);
+            $count += 1;
+            $comms[] = $comm;
+        }
+    }
+    return $comms;
+}
 
 
 
@@ -791,7 +862,9 @@ Parameters:
                   array of columns (meta_key) requested
 Returns:
 --------
-json_encode of search results stored in 'dat' key
+assoc array where each key is a WP specimen ID
+and each value is another assoc array where
+key is meta_key and value is meta_value
 */
 add_action( 'wp_ajax_findSpecimen', 'findSpecimen_callback' );
 function findSpecimen_callback() {
@@ -799,33 +872,9 @@ function findSpecimen_callback() {
     $dat = $_GET['dat'];
     $cols = $_GET['cols'];
 
-    echo json_encode( array('dat' => findSpecimens($dat, $cols) ) );
-
-    wp_die();
-}
-
-
-/* Find specimens that meet search criteria
-
-Parameters:
------------
-- dat : assoc array
-        see: http://querybuilder.js.org/demo.html
-- cols : array
-         array of columns (meta_key) requested
-Returns:
---------
-assoc array where each key is a WP specimen ID
-and each value is another assoc array where
-key is meta_key and value is meta_value
-
-*/
-function findSpecimens($dat, $cols) {
-
     global $wpdb;
 
     # generate prepare statement
-    //$query = "SELECT ID, meta_key, meta_value FROM $wpdb->posts a LEFT JOIN $wpdb->postmeta b on a.ID = b.post_id WHERE (post_type = 'specimen' AND post_status = 'publish') ";
     $query = "SELECT post_id FROM $wpdb->postmeta"; // get initial list of IDs - needed if filtering for finished/unfinished
     $rules = build_prep_statement($dat);
     if (count($rules[0]) && $rules[0] != '') $query .= " WHERE" . $rules[0];
@@ -856,11 +905,13 @@ function findSpecimens($dat, $cols) {
                 }
             }
         }
-        return $data;
+        echo json_encode( array('dat' => $data, 'rules' => $rules, 'prep' => $prep , 'wp' => $wpdb) );
+    } else {
+        echo json_encode( array('rules' => $rules, 'prep' => $prep , 'wp' => $wpdb) );
     }
-    return false;
-}
 
+    wp_die();
+}
 
 
 /* Recrusive function to generate WHERE clause
@@ -908,7 +959,7 @@ function build_prep_statement($rules) {
                 if ($tmp['field'] == 'status' && $tmp['value'] == 'issue') { 
                     $tmp['field'] = 'inputIssue';
                     $tmp['value'] = '';
-                    $compare = "LIKE '%%'";
+                    $compare = "!= '%s'";
                 } else if ($tmp['field'] == 'downloaded') {
                     if ($tmp['value'] == "1") { // downloaded specimens
                         $compare = "!= '%s'";
@@ -919,7 +970,7 @@ function build_prep_statement($rules) {
 
                 if ($count) {
                     $query = $rule[0] . " " . $cond . " (meta_key = '%s' and meta_value $compare)";
-                    $args = array_push($rule[1], $tmp['field'], $tmp['value']);
+                    $args = array_merge($rule[1], array($tmp['field'], $tmp['value']));
                 } else {
                     $query = " (meta_key = '%s' and meta_value $compare)";
                     $args = array($tmp['field'], $tmp['value']);

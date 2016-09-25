@@ -21,7 +21,7 @@ var builderOptions = {
                 "unfinished":"Unfinished specimens",
                 "issue":"Specimen with issue"
             },
-            operators: ['equal', 'not_equal'],
+            operators: ['equal'],
             labelTag: {
                 "title": "Title",
                 "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
