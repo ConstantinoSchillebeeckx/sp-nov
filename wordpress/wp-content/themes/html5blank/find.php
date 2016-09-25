@@ -76,7 +76,6 @@ get_header(); ?>
                     // customize tooltip error message
                     // https://github.com/mistic100/jQuery-QueryBuilder/issues/362#issuecomment-249010070
                     jQuery('#builder').on('validationError.queryBuilder', function(e, node, error, value) {
-                        console.log(error);
                         if (error[1] == '/^[a-zA-Z]+$/') {
                             error[0] = "Please enter only letters.";
                         } else if (error[1] == '/^[a-zA-Z1-9]+$/') {

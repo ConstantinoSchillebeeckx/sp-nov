@@ -298,8 +298,10 @@ if no results are returned
 
 */
 function searchSpecimen() {
+
     var rules = jQuery('#builder').queryBuilder('getRules');
-    console.log(rules);
+    var validSearch = jQuery('#builder').queryBuilder('validate'); // true if no error in query search
+
     var colMap = {};
     builderOptions.filters.forEach( function(d) { colMap[d.field] = d.label; } )
 
@@ -309,19 +311,22 @@ function searchSpecimen() {
         "cols": Object.keys(colMap),
     }
 
+
     // send via AJAX to process with PHP
-    jQuery.ajax({
-        url: ajax_object.ajax_url, 
-        type: "GET",
-        data: data, 
-        dataType: 'json',
-        success: function(response) {
-            console.log(response);
-            searchResults = Object.keys(response.dat); // set to global for use with downloadSpecimens()
-            generateSearchResultsTable(response.dat, '#searchResults', colMap);
-        },
-        error: function(error) { console.log(error) }
-    });
+    if (validSearch) {
+        jQuery.ajax({
+            url: ajax_object.ajax_url, 
+            type: "GET",
+            data: data, 
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                searchResults = Object.keys(response.dat); // set to global for use with downloadSpecimens()
+                generateSearchResultsTable(response.dat, '#searchResults', colMap);
+            },
+            error: function(error) { console.log(error) }
+        });
+    }
 }
 
 
