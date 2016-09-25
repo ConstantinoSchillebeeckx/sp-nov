@@ -213,18 +213,34 @@ function loadIMG(src) {
 
 
 
-/* Download all finished specimens as zip
+/* Download images of specimens in results as zip
 
+Provided a search has been made (and the global
+searchResults var is set) function will generate
+a zip filled with the images of the search
+results and will generate a download link for the
+user.
 
+Parameters:
+-----------
+- rename: bool
+          if true, images will be renamed per the BoGart
+          guidelines before being put in zip
+
+Returns:
+--------
+beforeSend - will show loading text
+success - will generate a href with download link
+error - will show error message
 */
-function downloadSpecimens() {
+function downloadSpecimens(rename) {
 
 
     if (searchResults.length) { // require search results before anything can be downloaded
 
         var data = {
             "action": "downloadSpecimens", 
-            "rename": true,
+            "rename": rename,
             "ids": searchResults
         }
 
@@ -241,7 +257,7 @@ function downloadSpecimens() {
             success: function(response) {
                 if (response.success) {
                     jQuery('#searchResults').empty(); // clear search results
-                    jQuery('#searchResults').append('<a href="' + response.url + '" class="btn btn-info">Get images</a>');
+                    jQuery('#searchResults').append('<a href="' + response.url + '" style="text-decoration:none" class="btn btn-info"><i class="fa fa-download" aria-hidden="true"></i> Download images</a>');
                 } else {
                     jQuery('#searchResults').empty(); // clear search results
                     jQuery('#searchResults').append('<mark class="lead">There was a problem, please try again.</mark>');

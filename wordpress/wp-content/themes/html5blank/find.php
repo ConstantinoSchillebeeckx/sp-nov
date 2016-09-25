@@ -24,10 +24,30 @@ get_header(); ?>
                 <div class="col-sm-8">
                     <div class="btn-group pull-right" role="group">
                         <button style="margin-top:20px" class="btn btn-info" type="button" onclick="searchSpecimen()">Search</button>
-                        <button style="margin-top:20px" class="btn btn-primary" type="button" onclick="downloadSpecimens()" title="Download renamed versions of all finished specimens">Download</button>
+                        <div class="btn-group">
+                            <button type="button" style="margin-top:20px" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Download <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu pull-right">
+                                <li><a href="#" id="downloadRename">Renamed filename</a></li>
+                                <li><a href="#" id="downloadOriginal">Original filename</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
+
+        <script>
+            // handle button click for download
+            jQuery("#downloadRename").click(function(e){
+                downloadSpecimens(true);
+                e.preventDefault();
+            });
+            jQuery("#downloadOriginal").click(function(e){
+                downloadSpecimens(false);
+                e.preventDefault();
+            });
+        </script>
 
 
         <?php // only show form if a user is logged in
