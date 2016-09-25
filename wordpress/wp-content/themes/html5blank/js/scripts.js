@@ -247,7 +247,7 @@ function downloadSpecimens(rename) {
             "action": "downloadSpecimens", 
             "rename": rename,
             "ids": searchResults,
-            "onlyNotDownloaded": true,
+            "onlyNotDownloaded": false,
         }
 
         // send via AJAX to process with PHP
