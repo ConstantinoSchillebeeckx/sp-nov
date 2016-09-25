@@ -126,7 +126,8 @@ function doAJAX(data) {
 
     console.log(data);
 
-    // clear things out before doing any AJAX in case connection is slow
+    // we've captured the form data, so now we need to reset it
+    // since the page doesn't reload
     jQuery('h1').html('<i class="fa fa-spinner fa-spin fa-fw"></i> loading...');
     jQuery('.img-container').attr('style','display: none;'); // hide 
     jQuery("input[type=text]").val(""); 
@@ -415,7 +416,7 @@ function populateForm(data, callback) {
         if (dat.type == 'string') {
             if (dat.input == 'select') {
                 var sel = jQuery('<select class="form-control">').appendTo(col);
-                sel.attr("name", dat.name)
+                sel.attr("name", dat.field)
                 sel.attr("onchange", dat.onchange)
                 jQuery.each(dat.values, function(k, v) {
                     sel.append(jQuery("<option>").attr('value',k).text(v));

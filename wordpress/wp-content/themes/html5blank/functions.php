@@ -721,6 +721,9 @@ function downloadSpecimens_callback() {
         }
     }   
 
+    // rename files before zipping
+    if ($_GET['rename'] ) {
+    }
 
     // create bash command to generate zip and symlink
     $comm = 'zip -r9 -j ~/data/tmp/imgs.zip ' . implode(', ',$imgs) .'; ln -s ~/data/tmp/imgs.zip ~/domains/spnov.com/html/';
