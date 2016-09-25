@@ -681,6 +681,10 @@ Parameters:
 - $_GET['rename'] : bool
                     if true, images will be renamed within zip
                     (renamed to BoGart guidelines)
+- $_GET['onlyNotDownloaded'] : bool
+                    if true, allow only download of undownloaded specimens
+                    specimens that have been previously downloaded will have
+                    a date set for the meta_key=downloaded
 Returns:
 --------
 json_encode with url: link to download
@@ -689,13 +693,25 @@ add_action( 'wp_ajax_downloadSpecimens', 'downloadSpecimens_callback' );
 function downloadSpecimens_callback() {
 
     global $wpdb;
+    $ids = implode(',', $_GET['ids']);
+    $only_not_downloaded = json_decode($_GET['onlyNotDownloaded']);
 
     // location of imgs
     $dir = '~/domains/spnov.com/html/wordpress/wp-content/uploads/';
 
     // run query for specimen info
-    $query = "SELECT post_id, meta_key, meta_value FROM $wpdb->postmeta WHERE post_id in $ids";
+    if ($only_not_downloaded) {
+        $query = "SELECT post_id, meta_key, meta_value FROM $wpdb->postmeta WHERE post_id in (SELECT post_id FROM $wpdb->postmeta where meta_key = 'downloaded' and meta_value = '' and post_id in ($ids))";
+    } else {
+        $query = "SELECT post_id, meta_key, meta_value FROM $wpdb->postmeta WHERE post_id in ($ids)";
+    }
     $dat = $wpdb->get_results( $query, ARRAY_A ); 
+
+    if (!count($dat)) {
+        echo json_encode(array('success' => false, 'msg' => '<p class="lead">Nothing to download (only specimens that haven\'t already been downloaded are available for download).</p>', 'dat'=>$only_not_downloaded));
+        wp_die();
+        return;
+    }
 
     // reformat query results and get list of imgs
     // [post_id => array(meta_key => meta_value, ...)]
@@ -708,7 +724,7 @@ function downloadSpecimens_callback() {
 
         // if on imgs meta_key, add it to the command
         if ($meta_key == 'imgs') {
-            foreach (explode(',', $meta_key) as $img) {
+            foreach (explode(',', $meta_value) as $img) {
                 $imgs[] = $dir . str_replace('JPG','jpg', $img);
             }
         }
@@ -721,22 +737,30 @@ function downloadSpecimens_callback() {
         }
     }   
 
-    // rename files before zipping
-    if ($_GET['rename'] ) {
+    // create bash command to generate zip and symlink
+    if (count($imgs)) {
+        $comm = 'zip -r9 -j ~/data/tmp/imgs.zip ' . implode(', ',$imgs) .'; ln -s ~/data/tmp/imgs.zip ~/domains/spnov.com/html/';
+
+        // rename files before zipping
+        if ($_GET['rename'] ) {
+        }
+
+        // execute command
+        exec($comm, $out, $status);
     }
 
-    // create bash command to generate zip and symlink
-    $comm = 'zip -r9 -j ~/data/tmp/imgs.zip ' . implode(', ',$imgs) .'; ln -s ~/data/tmp/imgs.zip ~/domains/spnov.com/html/';
+    // update downloaded meta_key to the current date
+    if (count($ids)) {
+        $date = date("Y-m-d");
+        $update_query = "UPDATE $wpdb->postmeta SET meta_value = '$date' WHERE meta_key = 'downloaded' and post_id in ($ids)";
+        $update = $wpdb->query($update_query);
+    }
 
-
-    // execute command
-    $status = exec($comm);
-
-    $status= true;
+    // return
     if ($status) {
-        echo json_encode(array('success' => true, 'url' => '/download.php')); // user can download file by visiting http://spnov.com/download.php
+        echo json_encode(array('update'=>$update_query, 'success' => true, 'url' => '/download.php', 'ids'=>$ids, 'status'=>$status, 'query'=>$query, 'dat'=>$dat_clean, 'imgs'=>$imgs)); // user can download file by visiting http://spnov.com/download.php
     } else {
-        echo json_encode(array('success' => false, 'msg' => 'There was a problem generating the zip'));
+        echo json_encode(array('success' => false, 'msg' => '<p class="lead">There was a problem generating the zip, please try again.</p>'));
     }
 
     wp_die();
@@ -885,7 +909,13 @@ function build_prep_statement($rules) {
                     $tmp['field'] = 'inputIssue';
                     $tmp['value'] = '';
                     $compare = "LIKE '%%'";
+                } else if ($tmp['field'] == 'downloaded') {
+                    if ($tmp['value'] == "1") { // downloaded specimens
+                        $compare = "!= '%s'";
+                    }
+                    $tmp['value'] = '';
                 }
+
 
                 if ($count) {
                     $query = $rule[0] . " " . $cond . " (meta_key = '%s' and meta_value $compare)";
@@ -941,6 +971,8 @@ function loadSpecimen_callback() {
     $id = intval($_GET['id']);
     $nav = $_GET['nav'];
     $dat_set = $_GET['dat'];
+
+    if ($dat_set['downloaded'] == '') $dat_set['downloaded'] = false;
 
     if ( !in_array( $nav, array('next','previous','current') ) ) return;
 
@@ -1032,11 +1064,7 @@ function spnov_update_specimen( $post_id, $dat ) {
 
         $value = sanitize_text_field($value); // sanitize
 
-        if ( empty( $value ) OR ! $value )
-        {
-            $status = delete_post_meta( $post_id, $field_name );
-        }
-        elseif ( ! get_post_meta( $post_id, $field_name ) )
+        if ( ! get_post_meta( $post_id, $field_name ) )
         {
             $status = add_post_meta( $post_id, $field_name, $value );
         }

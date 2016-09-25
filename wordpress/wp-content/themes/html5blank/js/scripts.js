@@ -159,9 +159,13 @@ function doAJAX(data) {
                     }
 
                     if (response.inputIssue) {
-                        jQuery('.icon').html('<span class="label label-warning">issue</span>')
-                    } else if (response.status == 'finished') {
+                        jQuery('.icon').append('<span class="label label-warning">issue</span>')
+                    }
+                    if (response.status == 'finished') {
                         jQuery('.icon').html('<span class="label label-success">finished</span>')
+                    }
+                    if (response.downloaded) {
+                        jQuery('.icon').append('<span class="label label-info">downloaded</span>')
                     }
 
 
@@ -242,7 +246,8 @@ function downloadSpecimens(rename) {
         var data = {
             "action": "downloadSpecimens", 
             "rename": rename,
-            "ids": searchResults
+            "ids": searchResults,
+            "onlyNotDownloaded": true,
         }
 
         // send via AJAX to process with PHP
@@ -256,12 +261,13 @@ function downloadSpecimens(rename) {
                 jQuery('#searchResults').append('<p class="lead"><i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>Generating download file...</p>')
             },
             success: function(response) {
+                console.log(response)
                 if (response.success) {
                     jQuery('#searchResults').empty(); // clear search results
                     jQuery('#searchResults').append('<a href="' + response.url + '" style="text-decoration:none" class="btn btn-info"><i class="fa fa-download" aria-hidden="true"></i> Download images</a>');
                 } else {
                     jQuery('#searchResults').empty(); // clear search results
-                    jQuery('#searchResults').append('<mark class="lead">There was a problem, please try again.</mark>');
+                    jQuery('#searchResults').append(response.msg);
                 }
             },
             error: function(error) { console.log(error) }
@@ -311,6 +317,7 @@ function searchSpecimen() {
         "cols": Object.keys(colMap),
     }
 
+    console.log(data);
 
     // send via AJAX to process with PHP
     if (validSearch) {
@@ -401,46 +408,46 @@ onthe var builderOptions.filters
 */
 function populateForm(data, callback) {
 
-    console.log(data)
 
     for (var i=0; i<data.length; i++) {
 
         var dat = data[i];
+        if (!dat.hide) {
+            var fg = jQuery('<div class="form-group">').appendTo('#formInputs');
 
-        var fg = jQuery('<div class="form-group">').appendTo('#formInputs');
+            // add label
+            var label = jQuery('<label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" >').text(dat.id).appendTo(fg);
+            if ('labelTag' in dat) {
+                label.attr("title",dat.labelTag.title)
+                label.attr("data-content", dat.labelTag["data-content"])
+            }
 
-        // add label
-        var label = jQuery('<label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" >').text(dat.id).appendTo(fg);
-        if ('labelTag' in dat) {
-            label.attr("title",dat.labelTag.title)
-            label.attr("data-content", dat.labelTag["data-content"])
-        }
-
-        // add input
-        var col = jQuery('<div class="col-sm-9">').appendTo(fg);
-        if (dat.type == 'string') {
-            if (dat.input == 'select') {
-                var sel = jQuery('<select class="form-control">').appendTo(col);
-                sel.attr("name", dat.field)
-                sel.attr("onchange", dat.onchange)
-                jQuery.each(dat.values, function(k, v) {
-                    sel.append(jQuery("<option>").attr('value',k).text(v));
-                });
-            } else {
-                var input = jQuery('<input type="text" class="form-control">').appendTo(col);    
+            // add input
+            var col = jQuery('<div class="col-sm-9">').appendTo(fg);
+            if (dat.type == 'string') {
+                if (dat.input == 'select') {
+                    var sel = jQuery('<select class="form-control">').appendTo(col);
+                    sel.attr("name", dat.field)
+                    sel.attr("onchange", dat.onchange)
+                    jQuery.each(dat.values, function(k, v) {
+                        sel.append(jQuery("<option>").attr('value',k).text(v));
+                    });
+                } else {
+                    var input = jQuery('<input type="text" class="form-control">').appendTo(col);    
+                    input.attr('name', dat.field)
+                    input.attr('title', dat.title)
+                    input.attr('placeholder', dat.placeholder)
+                }
+            } else if (dat.type == 'integer') {
+                var input = jQuery('<input type="number" class="form-control">').appendTo(col);    
                 input.attr('name', dat.field)
                 input.attr('title', dat.title)
                 input.attr('placeholder', dat.placeholder)
             }
-        } else if (dat.type == 'integer') {
-            var input = jQuery('<input type="number" class="form-control">').appendTo(col);    
-            input.attr('name', dat.field)
-            input.attr('title', dat.title)
-            input.attr('placeholder', dat.placeholder)
-        }
 
-        if('extraHTML' in dat) {
-            fg.after(dat.extraHTML);
+            if('extraHTML' in dat) {
+                fg.after(dat.extraHTML);
+            }
         }
     }
 

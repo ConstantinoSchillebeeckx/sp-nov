@@ -214,5 +214,22 @@ var builderOptions = {
             },
             operators: ['equal', 'not_equal']
         },
+        {
+            id: 'Downloaded',
+            label: 'Has been downloaded',
+            type: 'integer',
+            input: 'radio',
+            values: {
+                1: 'Yes',
+                0: 'No'
+            },
+            operators: ['equal'],
+            hide: true,
+            validation: {
+                format: /^[a-zA-Z]+$/
+            },
+            field: 'downloaded',
+            title: "Only letters are allowed" ,
+        },
     ]
 };

@@ -35,6 +35,12 @@
 
                             <?php if (in_array('administrator',  wp_get_current_user()->roles)) { // if admin, show IMG input ?>
                                 <div class="form-group">
+                                    <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Images" data-content="Date on which specimen has been batch downloaded." aria-hidden="true">Downloaded</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="downloaded">
+                                    </div>
+                                </div>
+                                <div class="form-group">
                                     <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Images" data-content="Comma-separated (no spaces or quotes) list of filenames for JPG images associated with a specimen.  Example: DSC09272.JPG,DSC09273.JPG" aria-hidden="true">Imgs</label>
                                     <div class="col-sm-9">
                                         <input type="text" class="form-control" name="imgs">

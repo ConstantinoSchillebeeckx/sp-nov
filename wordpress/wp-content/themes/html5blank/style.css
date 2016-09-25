@@ -315,3 +315,7 @@ body {
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
+.icon span {
+    margin-right: 5px;
+}
