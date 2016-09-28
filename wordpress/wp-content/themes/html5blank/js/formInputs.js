@@ -203,9 +203,10 @@ var builderOptions = {
             input: 'select',
             values: {
                 "":"None",
-                "no_field":"No field present",
+                "no_label":"No label present",
                 "multiple_specimens":"Multiple specimens shown",
-                "problem_field":"Problematic field"
+                "problem_field":"Problematic field",
+                "label_orientation": "Bad label orientatio",
             },
             field: 'inputIssue',
             labelTag: {

@@ -274,7 +274,7 @@ function downloadSpecimens(rename) {
         });
     } else {
         jQuery('#searchResults').empty(); // clear search results
-        jQuery('#searchResults').append('<p class="lead">You must first run a search to download any specimens; all specimens listed in search results will be downloaded.</p>');
+        jQuery('#searchResults').append('<p class="lead">You must first run a search to download any specimens.<br><b>NOTE:</b> only those specimens listed in the search results will be downloaded.</p>');
     }
 
 }
