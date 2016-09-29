@@ -4,10 +4,12 @@ Simple web-app for adding label metadata to a herbarium specimen.
 
 ## Pipeline
 
-1. Upload images through WP backend (must be either Admin or Author role)
-2. Categorize images by use of python script (this generates a .json)
-3. [Upload .json](http://spnov.com/upload/) file which will generate custom post type (Specimen) for each specimen
-4. [Classify](http://spnov.com/classify/) to update each specimen's data
+1. Export images as JPGs @ 50% quality (sRGB)
+2. Upload images through FTP to the server
+3. Use media plugin to add images to Media
+4. Categorize images by use of python script (this generates a .json)
+5. [Upload .json](http://spnov.com/upload/) file which will generate custom post type (Specimen) for each specimen
+6. [Classify](http://spnov.com/classify/) to update each specimen's data
 
 ## Transfer to tropicos
 
