@@ -206,7 +206,9 @@ var builderOptions = {
                 "no_label":"No label present",
                 "multiple_specimens":"Multiple specimens shown",
                 "problem_field":"Problematic field",
-                "label_orientation": "Bad label orientatio",
+                "label_orientation": "Bad label orientation",
+                "duplicate_photos": "Duplicate photos",
+                "other": "Other issue not listed",
             },
             field: 'inputIssue',
             labelTag: {
