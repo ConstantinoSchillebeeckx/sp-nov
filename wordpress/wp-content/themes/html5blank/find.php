@@ -23,17 +23,6 @@ get_header(); ?>
                 </div>
             </div>
 
-        <script>
-            // handle button click for download
-            jQuery("#downloadRename").click(function(e){
-                downloadSpecimens(true);
-                e.preventDefault();
-            });
-            jQuery("#downloadOriginal").click(function(e){
-                downloadSpecimens(false);
-                e.preventDefault();
-            });
-        </script>
 
 
         <?php // only show form if a user is logged in
@@ -48,16 +37,17 @@ get_header(); ?>
 
                 <div class="row">
                     <div class="col-sm-12">
-                            <button class="btn btn-info" type="button" onclick="searchSpecimen()">Search</button>
-                            <div class="btn-group">
+                            <div class="btn-group pull-right">
                                 <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Download <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu pull-right">
-                                    <li><a href="#" id="downloadRename">Rename files</a></li>
+                                    <li><a href="#" id="downloadRename">Renamed filenames</a></li>
                                     <li><a href="#" id="downloadOriginal">Original filenames</a></li>
+                                    <li><a href="#" id="downloadTropicos">Tropicos CSV</a></li>
                                 </ul>
                             </div>
+                            <button style="margin-right:5px" class="btn btn-info pull-right" type="button" onclick="searchSpecimen()">Search</button>
                     </div>
                 </div>
 
@@ -84,6 +74,22 @@ get_header(); ?>
                         } else if (error[1] == '/^[1-9]+$/') {
                             error[0] = "Please enter only numbers.";
                         }
+                    });
+                </script>
+
+                <script>
+                    // handle button click for download
+                    jQuery("#downloadRename").click(function(e){
+                        downloadSpecimens(true);
+                        e.preventDefault();
+                    });
+                    jQuery("#downloadOriginal").click(function(e){
+                        downloadSpecimens(false);
+                        e.preventDefault();
+                    });
+                    jQuery("#downloadTropicos").click(function(e){
+                        downloadTropicosCSV();
+                        e.preventDefault();
                     });
                 </script>
 

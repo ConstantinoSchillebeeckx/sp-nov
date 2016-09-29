@@ -130,6 +130,9 @@ function html5blank_conditional_scripts()
         wp_localize_script( 'spnov_scripts', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) ); // required to do AJAX!
 
         wp_enqueue_script('formInputs', get_template_directory_uri() . '/js/formInputs.js', array('jquery'), '1.0.0');
+        //wp_enqueue_script('requirejs', 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.2/require.min.js');
+        //wp_enqueue_script('json2csv', 'https://cdn.rawgit.com/zemirco/json2csv/master/lib/json2csv.js');
+
 
         wp_register_script('autocomplete', get_template_directory_uri() . '/js/lib/jquery.autocomplete.min.js', array('jquery'), '1.2.26');
         wp_enqueue_script('autocomplete');
@@ -849,6 +852,64 @@ function rename_specimens($dat, $dir) {
 
 
 
+/* Function called by AJAX to download specimen data as CSV
+
+Parameters:
+-----------
+- $_GET['ids'] : array
+                 list of wordpress IDs to download
+- $_GET['colMap'] : assoc array
+                    [inputGenus => Genus, ...]
+
+Returns:
+--------
+assoc array where each key is a WP specimen ID
+and each value is another assoc array where
+key is meta_key and value is meta_value
+*/
+add_action( 'wp_ajax_downloadTropicosCSV', 'downloadTropicosCSV_callback' );
+function downloadTropicosCSV_callback() {
+
+    global $wpdb;
+    $ids = implode(',', $_GET['ids']);
+    $cols = array_keys($_GET['colMap']);
+
+
+    // run query for specimen info
+    $query = "SELECT post_id, meta_key, meta_value FROM $wpdb->postmeta WHERE post_id in ($ids)";
+    $dat = $wpdb->get_results( $query, ARRAY_A ); 
+
+    if (!count($dat)) {
+        echo json_encode(array('success' => false, 'msg' => '<p class="lead">Nothing to download (only specimens that haven\'t already been downloaded are available for download).</p>', 'dat'=>$only_not_downloaded));
+        wp_die();
+        return;
+    }
+
+    // reformat query results
+    // [post_id => array(meta_key => meta_value, ...)]
+    $dat_clean = [];
+    foreach ($dat as $row) {
+        $id = $row['post_id'];
+        $meta_key = $row['meta_key'];
+        $meta_value = $row['meta_value'];
+
+        // store data if it has required column
+        if (in_array($meta_key, $cols) && !in_array($meta_key, array('downloaded','status'))) {
+            if ($dat_clean[$id]) {
+                $dat_clean[$id][$meta_key] = $meta_value;
+            } else {
+                $dat_clean[$id] = array($meta_key => $meta_value);
+            }
+        }
+    }   
+
+    echo json_encode(array('dat' => $dat_clean));
+    wp_die();
+}
+
+
+
+
 
 
 
@@ -907,7 +968,7 @@ function findSpecimen_callback() {
         }
         echo json_encode( array('dat' => $data, 'rules' => $rules, 'prep' => $prep , 'wp' => $wpdb) );
     } else {
-        echo json_encode( array('rules' => $rules, 'prep' => $prep , 'wp' => $wpdb) );
+        echo json_encode( array('rules' => $rules, 'prep' => $prep , 'wp' => $wpdb, 'query' => $query) );
     }
 
     wp_die();
@@ -975,10 +1036,10 @@ function build_prep_statement($rules) {
                     $query = " (meta_key = '%s' and meta_value $compare)";
                     $args = array($tmp['field'], $tmp['value']);
                 }
+                $count += 1;
             }
         }
         $rule = array($query, $args); 
-        $count += 1;
     }
 
     return $rule;

@@ -460,4 +460,141 @@ function populateForm(data, callback) {
 
 
 
+/*
 
+Provided a search has been made (and the global
+searchResults var is set) function will 
+generate/download a CSV will all the available data
+which can be used to insert into Tropicos.
+
+Called from the download dropdown for "Tropicos CSV"
+
+Parameters:
+-----------
+- rename: bool
+          if true, images will be renamed per the BoGart
+          guidelines before being put in zip
+
+Returns:
+--------
+*/
+function downloadTropicosCSV() {
+
+    if (searchResults.length) { // require search results before anything can be downloaded
+
+        var colMap = {}; // {inputGenus: Genus, ...}
+        builderOptions.filters.forEach( function(d) { colMap[d.field] = d.label; } )
+
+        var data = {
+            "action": "downloadTropicosCSV", 
+            "ids": searchResults,
+            "colMap": colMap,
+        }
+
+        console.log(data);
+
+        // send via AJAX to process with PHP
+        jQuery.ajax({
+            url: ajax_object.ajax_url, 
+            type: "GET",
+            data: data, 
+            dataType: 'json',
+            success: function(response) {
+
+                var dat = response.dat;
+
+                // get array of Obj with col values [{inputGenus: Anthurium, ...},...]
+                var data = [];
+                for (var id in dat) {
+                    data.push(dat[id]);
+                }
+                var csvContent = "data:text/csv;charset=utf-8," + toCsv(data, colMap);
+                var encodedUri = encodeURI(csvContent);
+                window.open(encodedUri);
+            },
+            error: function(error) { console.log(error) }
+        });
+    } else {
+        jQuery('#searchResults').empty(); // clear search results
+        jQuery('#searchResults').append('<p class="lead">You must first run a search to download any specimens.<br><b>NOTE:</b> only those specimens listed in the search results will be downloaded.</p>');
+    }
+
+}
+
+
+
+
+
+/**
+* Converts a value to a string appropriate for entry into a CSV table.  E.g., a string value will be surrounded by quotes.
+* @param {string|number|object} theValue
+* @param {string} sDelimiter The string delimiter.  Defaults to a double quote (") if omitted.
+*/
+function toCsvValue(theValue, sDelimiter) {
+    var t = typeof (theValue), output;
+
+    if (typeof (sDelimiter) === "undefined" || sDelimiter === null) {
+        sDelimiter = '"';
+    }
+
+    if (t === "undefined" || t === null) {
+        output = "";
+    } else if (t === "string") {
+        output = sDelimiter + theValue + sDelimiter;
+    } else {
+        output = String(theValue);
+    }
+
+    return output;
+}
+
+/**
+* Converts an array of objects (with identical schemas) into a CSV table.
+* @param {Array} objArray An array of objects.  Each object in the array must have the same property list.
+* @param {string} sDelimiter The string delimiter.  Defaults to a double quote (") if omitted.
+* @param {string} cDelimiter The column delimiter.  Defaults to a comma (,) if omitted.
+* @return {string} The CSV equivalent of objArray.
+*/
+function toCsv(objArray, colMap, sDelimiter, cDelimiter) {
+    var i, l, names = [], name, value, obj, row, output = "", n, nl;
+
+
+    // Initialize default parameters.
+    if (typeof (sDelimiter) === "undefined" || sDelimiter === null) {
+        sDelimiter = '"';
+    }
+    if (typeof (cDelimiter) === "undefined" || cDelimiter === null) {
+        cDelimiter = ",";
+    }
+
+    for (i = 0, l = objArray.length; i < l; i += 1) {
+        // Get the names of the properties.
+        obj = objArray[i];
+        row = "";
+        if (i === 0) {
+            // Loop through the names
+            for (name in obj) {
+                if (obj.hasOwnProperty(name)) {
+                    names.push(name);
+                    row += [sDelimiter, colMap[name], sDelimiter, cDelimiter].join("");
+                }
+            }
+            row = row.substring(0, row.length - 1);
+            output += row;
+        }
+
+        output += "\n";
+        row = "";
+        for (n = 0, nl = names.length; n < nl; n += 1) {
+            name = names[n];
+            value = obj[name];
+            if (n > 0) {
+                row += ","
+            }
+            row += toCsvValue(value, '"');
+        }
+        output += row;
+    }
+
+    return output;
+}
