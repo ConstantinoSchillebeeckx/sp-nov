@@ -29,7 +29,7 @@
                     </div>
                     
                     <div class="col-sm-4"> <!-- div for form -->
-                        <form class="form-horizontal" onsubmit="return false" automplete="off">
+                        <form class="form-horizontal" onsubmit="return false" autocomplete="off">
 
                             <div id="formInputs"></div> <!-- content dynamically rendered by populateForm() function -->
 
@@ -127,5 +127,5 @@
 <?php get_footer(); ?>
 
 <script>
-    jQuery('label').popover({placement:'auto left', container: 'body'})
+    jQuery('label').popover({placement:'auto left', container: 'body', html: true})
 </script>
