@@ -79,6 +79,3 @@ get_header(); ?>
 
 <?php get_footer(); ?>
 
-<script>
-    jQuery('label').popover({placement:'bottom', container: 'body'})
-</script>

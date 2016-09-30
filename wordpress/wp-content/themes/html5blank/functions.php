@@ -537,31 +537,35 @@ function spnov_add_specimen( $dat ) {
             // this will be stored as a comma separated string
             // so that it is visible in the backend as a custom field
             if (!add_post_meta( $post_id, 'imgs', implode(',',$imgs) )) {
-                return false; // if error
+                return 'Set imgs error'; // if error
             }
 
             // set post title as the post ID
             if (!wp_update_post( array('ID' => $post_id, 'post_title' => $post_id) )) {
-                return false; // if error
+                return 'Post title error'; // if error
             }
 
             // set status
             if (!add_post_meta( $post_id, 'status', 'unfinished' )) {
-                return false; // if error
+                return 'Finished status error'; // if error
             }
 
             // set download status
             if (!add_post_meta( $post_id, 'downloaded', false )) {
-                return false; // if error
+                return 'Download status error'; // if error
             }
 
             // set post parent (image "attached to")
             // use title (_wp_attached_file) and postmeta to find post_id
             foreach ($imgs as $img_name) {
                 $tmp_id = get_post_id_from_meta('_wp_attached_file',$img_name);
-                if (!$tmp_id || !wp_update_post( array('ID' => $tmp_id, 'post_parent' => $post_id) ) ) {
-                    return false;
-                }
+                if (!$tmp_id) { // images don't exist in media, remove added specimen
+                    wp_delete_post($post_id, true);
+                } else {
+                    if (!wp_update_post( array('ID' => $tmp_id, 'post_parent' => $post_id) )){
+                        return 'Couldn\'t attach image';
+                    }
+                } 
             }
 
         } else {
@@ -621,10 +625,12 @@ function process_file_upload($dat) {
     // ensure file was json and there was no error
     if ($dat['type'] == 'application/json' && $dat['error'] == 0) {
         $json = json_decode(file_get_contents($dat['tmp_name']), true);
-        if (spnov_add_specimen($json)) {
+        $add_specimen = spnov_add_specimen($json);
+        if ($add_specimen === true) {
             echo sprintf('<p class="lead">Great! %s speciments were properly uploaded.', count($json) );
         } else {
             echo '<p class="lead">Some sort of error occurred when adding a specimen to the databse...</p>';
+            echo $add_specimen;
         }
     } else {
         echo '<p class="lead">Something went wrong, please make sure file is JSON formatted and try again.</p>';
@@ -1083,8 +1089,6 @@ function loadSpecimen_callback() {
     $id = intval($_GET['id']);
     $nav = $_GET['nav'];
     $dat_set = $_GET['dat'];
-
-    if ($dat_set['downloaded'] == '') $dat_set['downloaded'] = false;
 
     if ( !in_array( $nav, array('next','previous','current') ) ) return;
 
