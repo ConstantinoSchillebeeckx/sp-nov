@@ -42,8 +42,8 @@ var builderOptions = {
             field: 'inputGenus',
             title: "Only letters are allowed" ,
             labelTag: {
-                "title": "Title",
-                "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
+                "title": "Genus",
+                "data-content": "A taxonomic category, below family (like Araceae) and above species. It will have a capitalized name.  If Araceae is car, then Genus is Honda. <code>Anthurium</code> and <code>Philodendron</code> are the two most common <code>Araceae</code> Genera (plural of Genus)"
             },
         },
         {
@@ -57,8 +57,8 @@ var builderOptions = {
             field: 'inputSection',
             title: "Only letters are allowed" ,
             labelTag: {
-                "title": "Title",
-                "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
+                "title": "Section",
+                "data-content": "If species is not available, sometimes section or subgenus may be listed. Those are both ways of splitting up the Genus. For our example, think Honda sedans. An example section is <code>Sect. Belolonchium</code>"
             },
         },
         {
@@ -72,8 +72,8 @@ var builderOptions = {
             field: 'inputSpecies',
             title: "Only letters are allowed" ,
             labelTag: {
-                "title": "Title",
-                "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
+                "title": "Species",
+                "data-content": "A species is a group of plants that are capable of breeding. The name is lowercase. Think civic in our example. An example for the genus <code>Philodendron</code> is <code>fragrantissimum</code>; in cases of a new species enter <code>sp. nov</code>"
             },
         },
         {
@@ -87,8 +87,8 @@ var builderOptions = {
             field: 'inputCollector',
             title: "Only letters are allowed" ,
             labelTag: {
-                "title": "Title",
-                "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
+                "title": "Collector",
+                "data-content": "The person who (<em>possibly literally</em>) went out on a limb to get a piece of the plant. We are using just the last name. If there are two people we use the two last names. If there are more than two, we use the first last name followed by et al. For example <code>Smith et al.</code>"
             },
         },
         {
@@ -102,8 +102,8 @@ var builderOptions = {
             field: 'inputNumber',
             title: "Only numbers are allowed" ,
             labelTag: {
-                "title": "Title",
-                "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
+                "title": "Collection number",
+                "data-content": "Each plant that is collected gets it very own number. For our Honda civic, think VIN number."
             },
         },
         {
@@ -133,7 +133,7 @@ var builderOptions = {
             title: "Only letters are allowed" ,
             labelTag: {
                 "title": "Title",
-                "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
+                "data-content": "The Collector brought the specimen back to a herbarium, and had it dried and mounted on a sheet. Each herbarium has its own initials. Sadly, they do not always correlate to the name. If you cannot find the herbarium initials on the label, If you cannot find the herbarium initials on the label, try looking it up on <a href='www.tropicos.org'>www.tropicos.org</a>. Use the pull down tab <b>More</b>, then select <b>Institutions</b>. Enter the country and hit enter. You will have a list of all the herbaria in that country. If it’s too long to eyeball, you can use control-F to search on a keyword. Another option is to look at the entire sheet in another picture and see if there is a stamp on it with the initials. If you don’t find it, email Amy (apredfield@hotmail.com)."
             },
         },
         {
@@ -147,8 +147,8 @@ var builderOptions = {
             field: 'inputCountry',
             title: "Only letters are allowed" ,
             labelTag: {
-                "title": "Title",
-                "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
+                "title": "Country",
+                "data-content": "The country in which the specimen was collected, for example <code>Columbia</code>."
             },
         },
         {
@@ -162,8 +162,8 @@ var builderOptions = {
             field: 'inputDepartment',
             title: "Only letters are allowed" ,
             labelTag: {
-                "title": "Title",
-                "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
+                "title": "Department",
+                "data-content": "The Department, State, or Province the specimen is from."
             },
         },
         {
@@ -177,8 +177,8 @@ var builderOptions = {
             field: 'inputMunicipality',
             title: "Only letters are allowed" ,
             labelTag: {
-                "title": "Title",
-                "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
+                "title": "Municipality",
+                "data-content": "The municipality or town the specimen is from; this will often times be preceeded by the abbreviation <strong>Mun.</strong>."
             },
         },
         {
@@ -192,8 +192,8 @@ var builderOptions = {
             field: 'inputLocation',
             title: "Only letters and numbers are allowed" ,
             labelTag: {
-                "title": "Title",
-                "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
+                "title": "Location",
+                "data-content": "Any additional location information provided on the specimen label"
             },
         },
         {
@@ -212,8 +212,8 @@ var builderOptions = {
             },
             field: 'inputIssue',
             labelTag: {
-                "title": "Title",
-                "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
+                "title": "Issue",
+                "data-content": "If some sort of issue arises with the images or the current specimen, please choose the most appropriate issue type."
             },
             operators: ['equal', 'not_equal']
         },
