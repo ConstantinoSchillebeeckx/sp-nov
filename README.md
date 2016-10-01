@@ -4,7 +4,7 @@ Simple web-app for adding label metadata to a herbarium specimen.
 
 ## Pipeline
 
-1. Export images as JPGs @ 50% quality (sRGB)
+1. Export images as JPGs @ 50% quality (sRGB) - ensure labels are properly oriented
 2. Upload images through FTP to the server
 3. Use media plugin to add images to Media
 4. Categorize images by use of python script (this generates a .json)

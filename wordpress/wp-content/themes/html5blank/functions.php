@@ -1220,6 +1220,133 @@ function spnov_update_history( $id ) {
 
 
 
+/*
+
+Check current images in media against what's
+in the uploads directory, add any new images
+to media
+
+*/
+
+function add_media_from_ftp() {
+
+
+    $upload_dir = wp_upload_dir()['basedir']; // upload server path
+    $upload_url = wp_upload_dir()['url']; // upload URL (e.g. http:/...)
+
+
+    // get current list in media
+    $query_images_args = array(
+        'post_type'      => 'attachment',
+        'post_mime_type' => 'image',
+        'post_status'    => 'inherit',
+        'posts_per_page' => - 1,
+    );
+
+    $query_images = new WP_Query( $query_images_args );
+
+    $media = array(); // list of file names (full path)
+    foreach ( $query_images->posts as $image ) {
+        $tmp = wp_get_attachment_metadata( $image->ID );
+        $media[] = $upload_dir . '/' . $tmp['file']; 
+        foreach( $tmp['sizes'] as $size => $dat ) { // also get resized versions
+            $media[] = $upload_dir . '/' . $dat['file']; 
+        }
+    }
+    //print_r($media);
+
+
+    // get list of images in uploads folder
+    $tmp = scandir($upload_dir);
+    $ftp = array();
+    foreach ( $tmp as $img ) {
+        if (!is_dir($img))  {
+            $ftp[] = $upload_dir . '/' . $img;
+        }
+    }
+
+    // add new images to media
+    $new = array_diff($ftp, $media);
+    echo sprintf("Found %s files in media", count($media));
+    echo sprintf("Found %s files in uploads", count($ftp));
+    echo sprintf("Found %s new files", count($new));
+
+    $added = [];
+    foreach($new as $filename) {
+
+         
+        // Check the type of file. We'll use this as the 'post_mime_type'.
+        $filetype = wp_check_filetype( basename( $filename ), null );
+         
+        // Get the path to the upload directory.
+        $wp_upload_dir = wp_upload_dir();
+         
+        // Prepare an array of post data for the attachment.
+        $attachment = array(
+            'guid'           => $wp_upload_dir['url'] . '/' . basename( $filename ), 
+            'post_mime_type' => $filetype['type'],
+            'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $filename ) ),
+            'post_content'   => '',
+            'post_status'    => 'inherit'
+        );
+         
+        // Insert the attachment.
+        $attach_id = wp_insert_attachment( $attachment, $filename, $parent_post_id );
+         
+        // Make sure that this file is included, as wp_generate_attachment_metadata() depends on it.
+        require_once( ABSPATH . 'wp-admin/includes/image.php' );
+         
+        // Generate the metadata for the attachment, and update the database record.
+        $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
+        wp_update_attachment_metadata( $attach_id, $attach_data );
+
+        $added[] = $filename;
+    }
+
+    echo sprintf("Properly added %s files to media", count($added));
+
+}
+
+
+
+
+
+
+
+
+function create_dashboard() {
+
+    global $wpdb;
+
+    // number of specimens
+    echo "Number of specimens: " . wp_count_posts( 'specimen' )->publish . '<br>';
+
+    // status
+    echo "<ul>";
+    echo "<li>finished - " . $wpdb->get_var("SELECT count(*) from $wpdb->postmeta WHERE meta_key = 'status' AND meta_value = 'finished'") . '</li>';
+    echo "<li>unfinished - " . $wpdb->get_var("SELECT count(*) from $wpdb->postmeta WHERE meta_key = 'status' AND meta_value = 'unfinished'") . '</li>';
+    echo "<li>specimens with an issue: " . $wpdb->get_var("SELECT count(*) from $wpdb->postmeta WHERE meta_key = 'inputIssue' AND meta_value != ''") . '</li>';
+    echo "</ul>";
+
+
+    // number of images
+    echo "Number of images: " . array_sum( (array) wp_count_attachments( 'image' ) );
+
+/* finished
+SELECT * 
+FROM  `vznp_postmeta` 
+where  meta_key = 'status' and meta_value = 'finished'
+
+*/
+
+/* issue
+where  meta_key = 'inputIssue' and meta_value != ''
+*/
+
+}
+
+
+
 
 
 

@@ -106,7 +106,7 @@ var builderOptions = {
                 "data-content": "Each plant that is collected gets it very own number. For our Honda civic, think VIN number."
             },
         },
-        {
+        /*{
             id: 'Determiner',
             label: 'Determiner',
             type: 'string',
@@ -120,7 +120,7 @@ var builderOptions = {
                 "title": "Title",
                 "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
             },
-        },
+        },*/
         {
             id: 'Herbarium',
             label: 'Herbarium',
@@ -181,7 +181,7 @@ var builderOptions = {
                 "data-content": "The municipality or town the specimen is from; this will often times be preceeded by the abbreviation <strong>Mun.</strong>."
             },
         },
-        {
+        /*{
             id: 'Location',
             label: 'Location',
             type: 'string',
@@ -195,7 +195,7 @@ var builderOptions = {
                 "title": "Location",
                 "data-content": "Any additional location information provided on the specimen label"
             },
-        },
+        },*/
         {
             id: 'Issue',
             label: 'Issue',
