@@ -124,7 +124,7 @@ function html5blank_header_scripts()
 // Load HTML5 Blank conditional scripts
 function html5blank_conditional_scripts()
 {
-    if (is_page('classify') || is_page('upload') || is_page('search')) {
+    if (is_page('classify') || is_page('upload') || is_page('search') || is_page('add-media')) {
         // Custom scripts
         wp_enqueue_script('spnov_scripts', get_template_directory_uri() . '/js/scripts.js', array('jquery'), '1.0.0');
         wp_localize_script( 'spnov_scripts', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) ); // required to do AJAX!
@@ -537,35 +537,42 @@ function spnov_add_specimen( $dat ) {
             // this will be stored as a comma separated string
             // so that it is visible in the backend as a custom field
             if (!add_post_meta( $post_id, 'imgs', implode(',',$imgs) )) {
+                wp_delete_post($post_id, true);
                 return 'Set imgs error'; // if error
             }
 
             // set post title as the post ID
             if (!wp_update_post( array('ID' => $post_id, 'post_title' => $post_id) )) {
+                wp_delete_post($post_id, true);
                 return 'Post title error'; // if error
             }
 
             // set status
             if (!add_post_meta( $post_id, 'status', 'unfinished' )) {
+                wp_delete_post($post_id, true);
                 return 'Finished status error'; // if error
             }
 
             // set download status
             if (!add_post_meta( $post_id, 'downloaded', false )) {
+                wp_delete_post($post_id, true);
                 return 'Download status error'; // if error
             }
 
             // set post parent (image "attached to")
             // use title (_wp_attached_file) and postmeta to find post_id
             foreach ($imgs as $img_name) {
-                $tmp_id = get_post_id_from_meta('_wp_attached_file',$img_name);
-                if (!$tmp_id) { // images don't exist in media, remove added specimen
+                $tmp_id = get_post_id_from_meta('_wp_attached_file', sanitize_file_name($img_name));
+                wp_update_post( array('ID' => $tmp_id, 'post_parent' => $post_id) );
+/*
+                if (!$tmp_id || wp_get_post_parent_id($tmp_id) ) { // if image doesn't exist or it has already been attached to a specimen, delete it
                     wp_delete_post($post_id, true);
-                } else {
+                } else if (!wp_get_post_parent_id($tmp_id)) {
                     if (!wp_update_post( array('ID' => $tmp_id, 'post_parent' => $post_id) )){
                         return 'Couldn\'t attach image';
                     }
                 } 
+*/
             }
 
         } else {
@@ -604,6 +611,68 @@ function get_post_id_from_meta($key, $val) {
     return $wpdb->get_var( $query );
 }
 
+
+
+
+
+
+
+
+
+/* function called from Upload template everytime
+ a file is submitted
+
+Parameters:
+-----------
+- $dat : assoc array
+         $_FILES from the upload submit form
+         will have keys: name, type, tmp_name, error, size
+
+*/
+function process_csv_upload($dat) {
+
+    $file = $dat['tmp_name'];
+    if (strpos($dat['name'], 'csv') !== false) {
+        global $wpdb;
+        $csv = array_map('str_getcsv', file($dat['tmp_name']));
+        $header = array_shift($csv);
+        array_shift($header); // remove file
+
+        $count = 0;
+        foreach($csv as $row) { // add data from each row in CSV to the specimen defined by 'File'
+            $file_name = str_replace('.jpg','', array_shift($row) );
+
+            // get specimen ID for jpg file name, skip all other rows if no ID found
+            $specimen_id = $wpdb->get_var( "SELECT ID FROM $wpdb->posts WHERE post_title = '$file_name'" );
+            if ($specimen_id) {
+
+                $collector = '';
+                $number = '';
+                foreach($row as $i => $val) {
+                    $key = $header[$i];
+                    update_post_meta($specimen_id, $key, $val);
+                    if ($key == 'inputCollector') $collector = $val;
+                    if ($key == 'inputNumber') $number = $val;
+                    
+                }
+
+                // set finished status
+                if ( $collector != '' && $number != '' ) {
+                    $status = 'finished';
+                } else if ( $nav != 'current' ) {
+                    $status = 'unfinished';
+                }
+                update_post_meta($specimen_id, 'status', $status);
+
+                $count +=1;
+            }
+        } 
+        echo '<p class="lead">Updated ' . $count . ' specimens!</p>';
+    } else {
+        echo '<p class="lead">File must be a CSV (with a <code>.csv</code> extension)</p>';
+    }
+
+}
 
 
 
@@ -1228,12 +1297,11 @@ to media
 
 */
 
+add_action( 'wp_ajax_add_media_from_ftp', 'add_media_from_ftp' );
 function add_media_from_ftp() {
-
 
     $upload_dir = wp_upload_dir()['basedir']; // upload server path
     $upload_url = wp_upload_dir()['url']; // upload URL (e.g. http:/...)
-
 
     // get current list in media
     $query_images_args = array(
@@ -1246,15 +1314,39 @@ function add_media_from_ftp() {
     $query_images = new WP_Query( $query_images_args );
 
     $media = array(); // list of file names (full path)
+    $media_thumb = array();
+    $duplicates = array();
     foreach ( $query_images->posts as $image ) {
         $tmp = wp_get_attachment_metadata( $image->ID );
-        $media[] = $upload_dir . '/' . $tmp['file']; 
-        foreach( $tmp['sizes'] as $size => $dat ) { // also get resized versions
-            $media[] = $upload_dir . '/' . $dat['file']; 
+        if (isset($tmp['file'])) {
+            $tmpf = $upload_dir . '/' . $tmp['file'];
+            if (in_array($tmpf, $media)) {
+                $duplicates[] = $tmpf;
+            }
+            $media[$image->ID] = $tmpf;
         }
-    }
-    //print_r($media);
+        if (isset($tmp['sizes'])) {
+            foreach( $tmp['sizes'] as $size => $dat ) { // also get resized versions
+                $tmpf = $upload_dir . '/' . $dat['file'];
+                if (in_array($tmpf, $media)) {
+                    $duplicates[] = $tmpf;
+                }
+                $media_thumb[] = $tmpf;
+            }
+        }
 
+        // rename image to match filename
+        $rename = str_replace('.jpg', '', $tmp['file']);
+
+        $my_post = array(
+              'ID'           => $image->ID,
+              'post_title'   => $rename
+          );
+        //wp_update_post( $my_post );
+    }
+
+
+/*
 
     // get list of images in uploads folder
     $tmp = scandir($upload_dir);
@@ -1266,12 +1358,12 @@ function add_media_from_ftp() {
     }
 
     // add new images to media
-    $new = array_diff($ftp, $media);
-    echo sprintf("Found %s files in media", count($media));
-    echo sprintf("Found %s files in uploads", count($ftp));
-    echo sprintf("Found %s new files", count($new));
+    $new = array_diff($ftp, array_merge($media, $media_thumb));
+    $new2 = array_diff($media, $ftp);
 
     $added = [];
+
+    // add new images to media
     foreach($new as $filename) {
 
          
@@ -1303,8 +1395,25 @@ function add_media_from_ftp() {
         $added[] = $filename;
     }
 
-    echo sprintf("Properly added %s files to media", count($added));
 
+    // remove images in media but not server
+    foreach ($media as $id => $tmp) {
+        wp_delete_attachment($id);
+    }
+
+
+
+    echo count($media) . '<br>';
+    echo count($ftp) . '<br>';
+    echo count($new) . '<br>';
+    echo count($new2) . '<br>';
+    echo count($duplicates) . '<br>';
+    print_r($new2);
+    print_r($duplicates);
+    //echo json_encode( array( 'added' => count($added), 'media' => count($media), 'ftp' => count($ftp), 'new' => count($new), 'new2' => $new2, 'dup' => $duplicates));
+
+**/
+    wp_die();
 }
 
 
@@ -1318,30 +1427,21 @@ function create_dashboard() {
 
     global $wpdb;
 
+    // number of images
+    echo "<p class='lead'>";
+    echo "Number of images: <code>" . array_sum( (array) wp_count_attachments( 'image' ) ) . '</code><br><br>';
+
     // number of specimens
-    echo "Number of specimens: " . wp_count_posts( 'specimen' )->publish . '<br>';
+    echo "Number of specimens: <code>" . wp_count_posts( 'specimen' )->publish . '</code><br>';
 
     // status
-    echo "<ul>";
-    echo "<li>finished - " . $wpdb->get_var("SELECT count(*) from $wpdb->postmeta WHERE meta_key = 'status' AND meta_value = 'finished'") . '</li>';
-    echo "<li>unfinished - " . $wpdb->get_var("SELECT count(*) from $wpdb->postmeta WHERE meta_key = 'status' AND meta_value = 'unfinished'") . '</li>';
-    echo "<li>specimens with an issue: " . $wpdb->get_var("SELECT count(*) from $wpdb->postmeta WHERE meta_key = 'inputIssue' AND meta_value != ''") . '</li>';
+    echo "<ul class='lead'>";
+    echo "<li>finished - <code>" . $wpdb->get_var("SELECT count(*) from $wpdb->postmeta WHERE meta_key = 'status' AND meta_value = 'finished'") . '</code></li>';
+    echo "<li>unfinished - <code>" . $wpdb->get_var("SELECT count(*) from $wpdb->postmeta WHERE meta_key = 'status' AND meta_value = 'unfinished'") . '</code></li>';
+    echo "<li>specimens with an issue: <code>" . $wpdb->get_var("SELECT count(*) from $wpdb->postmeta WHERE meta_key = 'inputIssue' AND meta_value != ''") . '</code></li>';
     echo "</ul>";
+    echo "</p>";
 
-
-    // number of images
-    echo "Number of images: " . array_sum( (array) wp_count_attachments( 'image' ) );
-
-/* finished
-SELECT * 
-FROM  `vznp_postmeta` 
-where  meta_key = 'status' and meta_value = 'finished'
-
-*/
-
-/* issue
-where  meta_key = 'inputIssue' and meta_value != ''
-*/
 
 }
 

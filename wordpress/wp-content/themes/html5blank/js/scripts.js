@@ -600,3 +600,28 @@ function toCsv(objArray, colMap, sDelimiter, cDelimiter) {
 }
 
 
+
+// will run PHP add_media_from_ftp function through AJAX
+// will keep refreshing as long as the reponse is a 500 error
+function updateMedia() {
+
+        var data = {
+            "action": "add_media_from_ftp", 
+        }
+
+        // send via AJAX to process with PHP
+        jQuery.ajax({
+            url: ajax_object.ajax_url, 
+            type: "GET",
+            data: data, 
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+            },
+            error: function(error) { 
+                console.log(error)
+                //location.reload(); // keep reloading until no 500 error :(
+            }
+        });
+
+}

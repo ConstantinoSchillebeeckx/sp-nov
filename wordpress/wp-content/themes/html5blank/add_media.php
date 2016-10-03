@@ -22,8 +22,13 @@ get_header(); ?>
             return;
         };
 
+
         add_media_from_ftp();
         ?>
+
+        <script>
+            //updateMedia();
+        </script>
 
 		</section>
 		<!-- /section -->
