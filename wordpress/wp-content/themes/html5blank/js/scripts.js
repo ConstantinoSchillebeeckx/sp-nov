@@ -81,13 +81,14 @@ Parameters:
          specimen status to view, must be one of 'all', 
          'completed','unfinished','issue'
 */
-function loadSpecimen(id, nav, dat) {
+function loadSpecimen(id = 0, nav = 'current', dat) {
 
 
     // id 0 will call the first specimen
     if (id == null) id = 0;
 
     if (nav == null) nav = 'current';
+
 
     var data = {
             "action": "loadSpecimen", 
@@ -181,9 +182,11 @@ function doAJAX(data) {
 
                     // fill inputs
                     jQuery.each(response, function(name, val) {
-                        var el = jQuery('[name="'+name+'"]');
-                        var type = el.attr('type');
-                        el.val(val);
+                        if (name != 'status') {
+                            var el = jQuery('[name="'+name+'"]');
+                            var type = el.attr('type');
+                            el.val(val);
+                        }
                     })
 
                 } else {
@@ -328,8 +331,13 @@ function searchSpecimen() {
             dataType: 'json',
             success: function(response) {
                 console.log(response);
-                searchResults = Object.keys(response.dat); // set to global for use with downloadSpecimens()
-                generateSearchResultsTable(response.dat, '#searchResults', colMap);
+                if (response.dat != null) {
+                    searchResults = Object.keys(response.dat); // set to global for use with downloadSpecimens()
+                    generateSearchResultsTable(response.dat, '#searchResults', colMap);
+                } else {
+                    jQuery('#searchResults').empty();
+                    jQuery('#searchResults').append('<p class="lead">No results!</p>');
+                }
             },
             error: function(error) { console.log(error) }
         });

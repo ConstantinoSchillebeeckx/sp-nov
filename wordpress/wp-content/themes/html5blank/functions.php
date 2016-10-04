@@ -130,8 +130,6 @@ function html5blank_conditional_scripts()
         wp_localize_script( 'spnov_scripts', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) ); // required to do AJAX!
 
         wp_enqueue_script('formInputs', get_template_directory_uri() . '/js/formInputs.js', array('jquery'), '1.0.0');
-        //wp_enqueue_script('requirejs', 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.2/require.min.js');
-        //wp_enqueue_script('json2csv', 'https://cdn.rawgit.com/zemirco/json2csv/master/lib/json2csv.js');
 
 
         wp_register_script('autocomplete', get_template_directory_uri() . '/js/lib/jquery.autocomplete.min.js', array('jquery'), '1.2.26');
@@ -501,7 +499,7 @@ function spnov_create_post_type()
 add_action('init', 'spnov_create_post_type'); // Add our Task Type
 
 
-/* Add a custome post type Specimen to db
+/* Add a custom post type Specimen to db
 
 Parameters:
 ----------
@@ -563,7 +561,7 @@ function spnov_add_specimen( $dat ) {
             // use title (_wp_attached_file) and postmeta to find post_id
             foreach ($imgs as $img_name) {
                 $tmp_id = get_post_id_from_meta('_wp_attached_file', sanitize_file_name($img_name));
-                wp_update_post( array('ID' => $tmp_id, 'post_parent' => $post_id) );
+                if ($tmp_id) wp_update_post( array('ID' => $tmp_id, 'post_parent' => $post_id) );
 /*
                 if (!$tmp_id || wp_get_post_parent_id($tmp_id) ) { // if image doesn't exist or it has already been attached to a specimen, delete it
                     wp_delete_post($post_id, true);
@@ -632,9 +630,9 @@ Parameters:
 function process_csv_upload($dat) {
 
     $file = $dat['tmp_name'];
-    if (strpos($dat['name'], 'csv') !== false) {
+    if (strpos($dat['name'], 'csv') !== false && isset($file) && $file != '') {
         global $wpdb;
-        $csv = array_map('str_getcsv', file($dat['tmp_name']));
+        $csv = array_map('str_getcsv', file($file));
         $header = array_shift($csv);
         array_shift($header); // remove file
 
@@ -643,7 +641,7 @@ function process_csv_upload($dat) {
             $file_name = str_replace('.jpg','', array_shift($row) );
 
             // get specimen ID for jpg file name, skip all other rows if no ID found
-            $specimen_id = $wpdb->get_var( "SELECT ID FROM $wpdb->posts WHERE post_title = '$file_name'" );
+            $specimen_id = $wpdb->get_var( "SELECT post_parent FROM $wpdb->posts WHERE post_title = '$file_name'" );
             if ($specimen_id) {
 
                 $collector = '';
@@ -663,6 +661,7 @@ function process_csv_upload($dat) {
                     $status = 'unfinished';
                 }
                 update_post_meta($specimen_id, 'status', $status);
+                update_post_meta($specimen_id, 'downloaded', false);
 
                 $count +=1;
             }
@@ -1010,6 +1009,27 @@ function findSpecimen_callback() {
 
     global $wpdb;
 
+    $query_head = "SELECT 
+post_id,
+MAX( IF(meta_key = 'status', meta_value, NULL) ) status,
+MAX( IF(meta_key = 'inputGenus', meta_value, NULL) ) inputGenus,
+MAX( IF(meta_key = 'inputSection', meta_value, NULL) ) inputSection,
+MAX( IF(meta_key = 'inputSpecies', meta_value, NULL) ) inputSpecies,
+MAX( IF(meta_key = 'inputCollector', meta_value, NULL) ) inputCollector,
+MAX( IF(meta_key = 'inputNumber', meta_value, NULL) ) inputNumber,
+MAX( IF(meta_key = 'inputHerbarium', meta_value, NULL) ) inputHerbarium,
+MAX( IF(meta_key = 'inputCountry', meta_value, NULL) ) inputCountry,
+MAX( IF(meta_key = 'inputDepartment', meta_value, NULL) ) inputDepartment,
+MAX( IF(meta_key = 'inputMunicipality', meta_value, NULL) ) inputMunicipality,
+MAX( IF(meta_key = 'inputIssue', meta_value, NULL) ) inputIssue
+FROM $wpdb->postmeta
+WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue')
+";
+    $query_tail = "GROUP BY post_id";
+
+
+
+
     # generate prepare statement
     $query = "SELECT post_id FROM $wpdb->postmeta"; // get initial list of IDs - needed if filtering for finished/unfinished
     $rules = build_prep_statement($dat);
@@ -1142,9 +1162,6 @@ Parameters:
 - $_GET['dat'] : obj
                  form data (will be null if on first load of page)
                  used to update specimen defined by 'id'
-- $_GET['view'] : str
-                  specimen status to view, must be one of 'all', 
-                  'finished','unfinished','issue'
 Returns:
 --------
 json encoded array of metadata associated with speciment (if
@@ -1158,6 +1175,7 @@ function loadSpecimen_callback() {
     $id = intval($_GET['id']);
     $nav = $_GET['nav'];
     $dat_set = $_GET['dat'];
+    $status = $_GET['dat']['status'];
 
     if ( !in_array( $nav, array('next','previous','current') ) ) return;
 
@@ -1175,11 +1193,11 @@ function loadSpecimen_callback() {
 
     // filter specimens
     $filter = '';
-    if ($_GET['status'] == 'finished') {
+    if ($status == 'finished') {
         $filter = " AND meta_key = 'status' and meta_value = 'finished'";
-    } elseif ($_GET['status'] == 'issue') {
+    } elseif ($status == 'issue') {
         $filter = " AND meta_key = 'inputIssue'";
-    } elseif ($_GET['status'] == 'unfinished') {
+    } elseif ($status == 'unfinished') {
         $filter = " AND meta_key = 'status' and meta_value = 'unfinished'";
     }
 
@@ -1215,7 +1233,7 @@ function loadSpecimen_callback() {
     if ( count($dat) ){
 
         // reformat data a bit before sending
-        $tmp = array('id' => $id, 'dat_set' => $dat_set);
+        $tmp = array('id' => $id, 'dat_set' => $dat_set, 'get' => $_GET);
         foreach($dat as $key => $val) {
             $tmp[$key] = $val[0];
         }
@@ -1336,14 +1354,25 @@ function add_media_from_ftp() {
         }
 
         // rename image to match filename
-        $rename = str_replace('.jpg', '', $tmp['file']);
+        if ($tmp) {
 
-        $my_post = array(
-              'ID'           => $image->ID,
-              'post_title'   => $rename
-          );
-        //wp_update_post( $my_post );
+            $rename = str_replace('.jpg', '', $tmp['file']);
+
+            $my_post = array(
+                  'ID'           => $image->ID,
+                  'post_title'   => $rename
+              );
+
+            wp_update_post( $my_post );
+        } else {
+            //echo explode('uploads/', $image->guid)[1] . '<br>';
+            //wp_delete_attachment($image->ID, true);
+        }
     }
+    //print_r($image);
+    //include( ABSPATH . 'wp-admin/includes/image.php' );
+    //$dat = wp_generate_attachment_metadata($image->ID, $image->guid);
+    //wp_update_attachment_metadata( $image->ID,  $dat );
 
 
 /*
