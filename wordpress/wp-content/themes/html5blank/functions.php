@@ -87,6 +87,18 @@ function html5blank_nav()
         )
     );
 
+    if (current_user_can('administrator') ) {
+        $menu .= '"<li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="/upload">Associate images</a></li>
+            <li><a href="/upload-annotated/">Upload CSV data</a></li>
+            <li><a href="/rename-media/">Rename images</a></li>
+          </ul>
+        </li>';
+    }
+
+
     // if user is logged in, show a 'log out' menu; otherwise a 'log in' menu
     if (is_user_logged_in()) {
         $menu .= sprintf("<li><a href='%s'>Logout</a></li>", wp_logout_url());
@@ -1333,14 +1345,16 @@ function add_media_from_ftp() {
     global $wpdb;
 
     // get current list in media
-    $query = "SELECT ID FROM $wpdb->posts where post_type = 'attachment' and (post_title like '%DSC%' or post_title like '%IMG%')";
+    $query = "SELECT ID FROM $wpdb->posts where post_type = 'attachment' and post_title not like '%IMG%' and post_title not like '%DSC%'";
 
     $ids = $wpdb->get_col( $query );
 
+    echo "Found " . count($ids);
 
     $media = array(); // list of file names (full path)
     $media_thumb = array();
     $duplicates = array();
+    $renamed = array();
     foreach ( $ids as $id ) {
         $tmp = wp_get_attachment_metadata( $id );
         if (isset($tmp['file'])) {
@@ -1371,84 +1385,15 @@ function add_media_from_ftp() {
               );
 
             wp_update_post( $my_post );
+            $renamed[] = $rename;
         } else {
             //echo explode('uploads/', $image->guid)[1] . '<br>';
             //wp_delete_attachment($image->ID, true);
         }
     }
-    //print_r($image);
-    //include( ABSPATH . 'wp-admin/includes/image.php' );
-    //$dat = wp_generate_attachment_metadata($image->ID, $image->guid);
-    //wp_update_attachment_metadata( $image->ID,  $dat );
 
+    echo "<br>Renamed " . count($renamed);
 
-/*
-
-    // get list of images in uploads folder
-    $tmp = scandir($upload_dir);
-    $ftp = array();
-    foreach ( $tmp as $img ) {
-        if (!is_dir($img))  {
-            $ftp[] = $upload_dir . '/' . $img;
-        }
-    }
-
-    // add new images to media
-    $new = array_diff($ftp, array_merge($media, $media_thumb));
-    $new2 = array_diff($media, $ftp);
-
-    $added = [];
-
-    // add new images to media
-    foreach($new as $filename) {
-
-         
-        // Check the type of file. We'll use this as the 'post_mime_type'.
-        $filetype = wp_check_filetype( basename( $filename ), null );
-         
-        // Get the path to the upload directory.
-        $wp_upload_dir = wp_upload_dir();
-         
-        // Prepare an array of post data for the attachment.
-        $attachment = array(
-            'guid'           => $wp_upload_dir['url'] . '/' . basename( $filename ), 
-            'post_mime_type' => $filetype['type'],
-            'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $filename ) ),
-            'post_content'   => '',
-            'post_status'    => 'inherit'
-        );
-         
-        // Insert the attachment.
-        $attach_id = wp_insert_attachment( $attachment, $filename, $parent_post_id );
-         
-        // Make sure that this file is included, as wp_generate_attachment_metadata() depends on it.
-        require_once( ABSPATH . 'wp-admin/includes/image.php' );
-         
-        // Generate the metadata for the attachment, and update the database record.
-        $attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
-        wp_update_attachment_metadata( $attach_id, $attach_data );
-
-        $added[] = $filename;
-    }
-
-
-    // remove images in media but not server
-    foreach ($media as $id => $tmp) {
-        wp_delete_attachment($id);
-    }
-
-
-
-    echo count($media) . '<br>';
-    echo count($ftp) . '<br>';
-    echo count($new) . '<br>';
-    echo count($new2) . '<br>';
-    echo count($duplicates) . '<br>';
-    print_r($new2);
-    print_r($duplicates);
-    //echo json_encode( array( 'added' => count($added), 'media' => count($media), 'ftp' => count($ftp), 'new' => count($new), 'new2' => $new2, 'dup' => $duplicates));
-
-**/
     wp_die();
 }
 

@@ -37,7 +37,7 @@ get_header(); ?>
 
                 <div class="row">
                     <div class="col-sm-7">
-                        <h3>Process for uploading images to the database</h3>
+                        <h3>Process associating images to specimens</h3>
                         <ol>
                             <li>Run script <code>process_imgs.py</code> (for now this is done locally) to classify images into specimen, rotate them and generate the <mark>results.json</mark> file.</li>
                             <li>Once images are properly rotated, upload them through the WP media back-end.</li>

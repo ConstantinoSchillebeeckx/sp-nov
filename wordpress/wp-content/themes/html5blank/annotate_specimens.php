@@ -39,7 +39,8 @@ get_header(); ?>
                     <div class="col-sm-7">
                         <h3>Process for adding data to specimens in the database</h3>
                         <ol>
-                            <li>Generate CSV of annotated information</li>
+                            <li>Generate CSV of annotated information, the first column must be named <code>File</code> and must contain data for a JPG filename and the remaining columns must contain the input metadata and must be one of the following: <code>inputCollector</code>, <code>inputHerbarium</code>, <code>inputGenus</code>, <code>inputNumber</code>, <code>inputSpecies</code>, <code>inputSection</code>, <code>inputCountry</code>, <code>inputDepartment</code>, <code>inputMunicipality</code></li>
+                            <li>The name listed in the first column (file) will be searched against the name of an image in the Media section. If an exact match is found and a specimen ID (internal WP ID) is associated with the found image, the CSV data for that image will be associated with that specimen.</li>
                         </ol>
                     </div>
                     <div class="col-sm-5">
