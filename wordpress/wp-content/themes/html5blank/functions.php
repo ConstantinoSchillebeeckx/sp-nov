@@ -1021,47 +1021,42 @@ MAX( IF(meta_key = 'inputHerbarium', meta_value, NULL) ) inputHerbarium,
 MAX( IF(meta_key = 'inputCountry', meta_value, NULL) ) inputCountry,
 MAX( IF(meta_key = 'inputDepartment', meta_value, NULL) ) inputDepartment,
 MAX( IF(meta_key = 'inputMunicipality', meta_value, NULL) ) inputMunicipality,
-MAX( IF(meta_key = 'inputIssue', meta_value, NULL) ) inputIssue
+MAX( IF(meta_key = 'inputIssue', meta_value, NULL) ) inputIssue,
+MAX( IF(meta_key = 'downloaded', meta_value, NULL) ) downloaded
 FROM $wpdb->postmeta
-WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue')
-";
-    $query_tail = "GROUP BY post_id";
+WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue', 'downloaded')
+GROUP BY post_id";
 
 
 
 
     # generate prepare statement
-    $query = "SELECT post_id FROM $wpdb->postmeta"; // get initial list of IDs - needed if filtering for finished/unfinished
+    //$query = "SELECT post_id FROM $wpdb->postmeta"; // get initial list of IDs - needed if filtering for finished/unfinished
     $rules = build_prep_statement($dat);
-    if (count($rules[0]) && $rules[0] != '') $query .= " WHERE" . $rules[0];
+    if (count($rules[0]) && $rules[0] != '') {
+        $query = "SELECT * FROM ( " .$query_head . " ) WHERE" . $rules[0];
+    } else {
+        $query = $query_head;
+    }
     $prep = $wpdb->prepare($query, $rules[1]);
 
     # run query - array of $ids
-    $ids = $wpdb->get_col($prep);
+    $dat = $wpdb->get_results($prep, ARRAY_A);
 
-    # run second query on joined table, now that we have list of required IDs
-    if (count($ids)) {
-        $query = "SELECT ID, meta_key, meta_value FROM $wpdb->posts a LEFT JOIN $wpdb->postmeta b on a.ID = b.post_id WHERE post_type = 'specimen' AND post_status = 'publish' AND post_id in (" . implode(',',$ids) . ")";
-        $ids = $wpdb->get_results($query, ARRAY_A);
-    
+    if (count($dat)) {
 
         # reformat results into table form
         # where each row is a specimen
         $data = [];
-        foreach ($ids as $obj) {
-            $id = $obj['ID'];
-            $meta_key = $obj['meta_key'];
-            $meta_value = $obj['meta_value'];
-
-            if (in_array($meta_key, $cols) ) {
-                if ($data[$id]) {
-                    $data[$id][$meta_key] = $meta_value;
-                } else {
-                    $data[$id] = array($meta_key => $meta_value);
-                }
+        foreach ($dat as $obj) {
+            $id = $obj['post_id'];
+            $data[$id] = array();
+            unset($obj['post_id']);
+            foreach ($obj as $key => $val) {
+                $data[$id][$key] = $val == null ? '' : $val;
             }
         }
-        echo json_encode( array('dat' => $data, 'rules' => $rules, 'prep' => $prep , 'wp' => $wpdb) );
+        echo json_encode( array('dat' => $data, 'rules' => $rules, 'prep' => $prep , 'wp' => $wpdb, 'log' => $dat) );
     } else {
         echo json_encode( array('rules' => $rules, 'prep' => $prep , 'wp' => $wpdb, 'query' => $query) );
     }
@@ -1321,27 +1316,25 @@ function add_media_from_ftp() {
     $upload_dir = wp_upload_dir()['basedir']; // upload server path
     $upload_url = wp_upload_dir()['url']; // upload URL (e.g. http:/...)
 
-    // get current list in media
-    $query_images_args = array(
-        'post_type'      => 'attachment',
-        'post_mime_type' => 'image',
-        'post_status'    => 'inherit',
-        'posts_per_page' => - 1,
-    );
+    global $wpdb;
 
-    $query_images = new WP_Query( $query_images_args );
+    // get current list in media
+    $query = "SELECT ID FROM $wpdb->posts where post_type = 'attachment' and (post_title like 'DSC%' or post_title like 'IMG%')";
+
+    $ids = $wpdb->get_col( $query );
+
 
     $media = array(); // list of file names (full path)
     $media_thumb = array();
     $duplicates = array();
-    foreach ( $query_images->posts as $image ) {
-        $tmp = wp_get_attachment_metadata( $image->ID );
+    foreach ( $ids as $id ) {
+        $tmp = wp_get_attachment_metadata( $id );
         if (isset($tmp['file'])) {
             $tmpf = $upload_dir . '/' . $tmp['file'];
             if (in_array($tmpf, $media)) {
                 $duplicates[] = $tmpf;
             }
-            $media[$image->ID] = $tmpf;
+            $media[$id] = $tmpf;
         }
         if (isset($tmp['sizes'])) {
             foreach( $tmp['sizes'] as $size => $dat ) { // also get resized versions
@@ -1359,7 +1352,7 @@ function add_media_from_ftp() {
             $rename = str_replace('.jpg', '', $tmp['file']);
 
             $my_post = array(
-                  'ID'           => $image->ID,
+                  'ID'           => $id,
                   'post_title'   => $rename
               );
 
@@ -1455,19 +1448,23 @@ function add_media_from_ftp() {
 function create_dashboard() {
 
     global $wpdb;
+    $specimen_total = wp_count_posts( 'specimen' )->publish;
+    $finished = $wpdb->get_var("SELECT count(*) from $wpdb->postmeta WHERE meta_key = 'status' AND meta_value = 'finished'");
+    $unfinished = $wpdb->get_var("SELECT count(*) from $wpdb->postmeta WHERE meta_key = 'status' AND meta_value = 'unfinished'");
+    $issue = $wpdb->get_var("SELECT count(*) from $wpdb->postmeta WHERE meta_key = 'inputIssue' AND meta_value != ''");
 
     // number of images
     echo "<p class='lead'>";
     echo "Number of images: <code>" . array_sum( (array) wp_count_attachments( 'image' ) ) . '</code><br><br>';
 
     // number of specimens
-    echo "Number of specimens: <code>" . wp_count_posts( 'specimen' )->publish . '</code><br>';
+    echo "Number of specimens: <code>" . $specimen_total . '</code><br>';
 
     // status
     echo "<ul class='lead'>";
-    echo "<li>finished - <code>" . $wpdb->get_var("SELECT count(*) from $wpdb->postmeta WHERE meta_key = 'status' AND meta_value = 'finished'") . '</code></li>';
-    echo "<li>unfinished - <code>" . $wpdb->get_var("SELECT count(*) from $wpdb->postmeta WHERE meta_key = 'status' AND meta_value = 'unfinished'") . '</code></li>';
-    echo "<li>specimens with an issue: <code>" . $wpdb->get_var("SELECT count(*) from $wpdb->postmeta WHERE meta_key = 'inputIssue' AND meta_value != ''") . '</code></li>';
+    echo sprintf("<li>finished - <code>%s</code> <span class='text-muted'>(%.2f%%)</span></li>", $finished, $finished / $specimen_total);
+    echo sprintf("<li>unfinished - <code>%s</code> <span class='text-muted'>(%.2f%%)</span></li>", $unfinished, $unfinished / $specimen_total);
+    echo sprintf("<li>specimens with an issue: <code>%s</code> <span class='text-muted'>(%.2f%%)</span></li>", $issue, $issue / $specimen_total);
     echo "</ul>";
     echo "</p>";
 
