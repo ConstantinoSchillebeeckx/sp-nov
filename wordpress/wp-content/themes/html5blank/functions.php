@@ -552,9 +552,15 @@ function spnov_add_specimen( $dat ) {
             }
 
             // set download status
-            if (!add_post_meta( $post_id, 'downloaded', false )) {
+            if (!add_post_meta( $post_id, 'downloaded', NULL )) {
                 wp_delete_post($post_id, true);
                 return 'Download status error'; // if error
+            }
+
+            // set issue status
+            if (!add_post_meta( $post_id, 'inputIssue', NULL )) {
+                wp_delete_post($post_id, true);
+                return 'Issue status error'; // if error
             }
 
             // set post parent (image "attached to")
@@ -992,7 +998,7 @@ function downloadTropicosCSV_callback() {
 Parameters:
 -----------
 - $_GET['dat'] : assoc array
-                 see: http://querybuilder.js.org/demo.html
+                 see: http://querybuilder.js.org/demo.html getSQL()
 - $_GET['cols'] : array
                   array of columns (meta_key) requested
 Returns:
@@ -1034,7 +1040,7 @@ GROUP BY post_id";
     //$query = "SELECT post_id FROM $wpdb->postmeta"; // get initial list of IDs - needed if filtering for finished/unfinished
     $rules = build_prep_statement($dat);
     if (count($rules[0]) && $rules[0] != '') {
-        $query = "SELECT * FROM ( " .$query_head . " ) WHERE" . $rules[0];
+        $query = "SELECT * FROM ( " .$query_head . " ) a WHERE " . $rules[0];
     } else {
         $query = $query_head;
     }
@@ -1090,8 +1096,17 @@ array where:
 */
 function build_prep_statement($rules) {
 
-    $cond = $rules['condition'];
-    $rule_arr = $rules['rules'];
+    $sql = str_replace('?', "'%s'", $rules['sql']);
+    $params = $rules['params'];
+
+
+    // if searching for all specimens change sql to status != 'all'
+    if (in_array('all', $params) && strpos($sql, 'status =') !== false) {
+        $sql = str_replace('status =', 'status !=', $sql);
+    }
+
+
+    return array($sql, $params);
 
     $rule = [];
     $count = 0;
@@ -1103,28 +1118,27 @@ function build_prep_statement($rules) {
         } else {
             if (!($tmp['field'] == 'status' && $tmp['value'] == 'all')) { // don't generate WHERE filter when requesting all specimens
 
-                $compare = "= '%s'";
+                $compare = "=";
 
                 // if selecting samples with issue, need to search inputIssue key
                 // and make query meta_value like '%'
                 if ($tmp['field'] == 'status' && $tmp['value'] == 'issue') { 
                     $tmp['field'] = 'inputIssue';
                     $tmp['value'] = '';
-                    $compare = "!= '%s'";
+                    $compare = "!=";
                 } else if ($tmp['field'] == 'downloaded') {
                     if ($tmp['value'] == "1") { // downloaded specimens
-                        $compare = "!= '%s'";
+                        $compare = "!=";
                     }
                     $tmp['value'] = '';
                 }
 
-
                 if ($count) {
-                    $query = $rule[0] . " " . $cond . " (meta_key = '%s' and meta_value $compare)";
-                    $args = array_merge($rule[1], array($tmp['field'], $tmp['value']));
+                    $query = $rule[0] . " " . $cond . " (" . $tmp['field'] . " $compare %s)";
+                    $args = array_merge($rule[1], array($tmp['value']));
                 } else {
-                    $query = " (meta_key = '%s' and meta_value $compare)";
-                    $args = array($tmp['field'], $tmp['value']);
+                    $query = " (" . $tmp['field'] . " $compare '%s')";
+                    $args = array($tmp['value']);
                 }
                 $count += 1;
             }
@@ -1319,7 +1333,7 @@ function add_media_from_ftp() {
     global $wpdb;
 
     // get current list in media
-    $query = "SELECT ID FROM $wpdb->posts where post_type = 'attachment' and (post_title like 'DSC%' or post_title like 'IMG%')";
+    $query = "SELECT ID FROM $wpdb->posts where post_type = 'attachment' and (post_title like '%DSC%' or post_title like '%IMG%')";
 
     $ids = $wpdb->get_col( $query );
 

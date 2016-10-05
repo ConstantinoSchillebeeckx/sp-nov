@@ -215,18 +215,14 @@ var builderOptions = {
                 "title": "Issue",
                 "data-content": "If some sort of issue arises with the images or the current specimen, please choose the most appropriate issue type."
             },
-            operators: ['equal', 'not_equal']
+            operators: ['equal', 'not_equal','is_null','is_not_null']
         },
         {
             id: 'Downloaded',
             label: 'Has been downloaded',
             type: 'integer',
-            input: 'radio',
-            values: {
-                1: 'Yes',
-                0: 'No'
-            },
-            operators: ['equal'],
+            input: 'select',
+            operators: ['is_null','is_not_null'],
             hide: true,
             validation: {
                 format: /^[a-zA-Z]+$/

@@ -308,7 +308,7 @@ if no results are returned
 */
 function searchSpecimen() {
 
-    var rules = jQuery('#builder').queryBuilder('getRules');
+    var rules = jQuery('#builder').queryBuilder('getSQL', 'question_mark');
     var validSearch = jQuery('#builder').queryBuilder('validate'); // true if no error in query search
 
     var colMap = {};
