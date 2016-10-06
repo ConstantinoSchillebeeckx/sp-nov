@@ -329,13 +329,18 @@ function searchSpecimen() {
             type: "GET",
             data: data, 
             dataType: 'json',
+            beforeSend: function() {
+                jQuery("button").prop("disabled",true); // disable all buttons
+                jQuery('#searchResults').append('<p class="lead"><i class="fa fa-spinner fa-spin fa-3x fa-fw"></i> Loading...</p>'); // add spinner
+            },
             success: function(response) {
                 console.log(response);
+                jQuery("button").prop("disabled",false); // enable all buttons
+                jQuery('#searchResults').empty();
                 if (response.dat != null) {
                     searchResults = Object.keys(response.dat); // set to global for use with downloadSpecimens()
                     generateSearchResultsTable(response.dat, '#searchResults', colMap);
                 } else {
-                    jQuery('#searchResults').empty();
                     jQuery('#searchResults').append('<p class="lead">No results!</p>');
                 }
             },
