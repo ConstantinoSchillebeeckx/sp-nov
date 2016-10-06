@@ -74,7 +74,7 @@
 
                 // populate form with inputs
                 // var defined in js/formInputs.js
-                populateForm(builderOptions.filters, firstSpecimen)
+                populateForm(builderOptions.filters, firstSpecimen);
             </script>
 
 

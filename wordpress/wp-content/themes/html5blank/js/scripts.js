@@ -189,6 +189,8 @@ function doAJAX(data) {
                         }
                     })
 
+                    disableInputs(); // in case specimen has defined issue
+
                 } else {
                     jQuery('h1').html('Specimen');
                     jQuery('.well').html('<span class="lead">No data available</span>');
@@ -470,6 +472,32 @@ function populateForm(data, callback) {
     if (callback) callback();
 
 }
+
+
+
+/* Disable form inputs on classify page
+
+This is done when a specimen has a defined issue;
+will disable all inputs except for the "View" and
+"Issue"
+
+*/
+function disableInputs() {
+    
+    console.log('here');
+
+    if (jQuery( "[name='inputIssue'" ).val() != '') {
+        jQuery("input").prop('disabled', true);
+    } else {
+        jQuery("input").prop('disabled', false);
+    }
+
+}
+
+
+
+
+
 
 
 
