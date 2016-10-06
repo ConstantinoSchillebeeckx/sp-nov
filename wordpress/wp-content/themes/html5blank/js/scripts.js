@@ -268,10 +268,8 @@ function downloadSpecimens(rename) {
             success: function(response) {
                 console.log(response)
                 if (response.success) {
-                    jQuery('#searchResults').empty(); // clear search results
                     jQuery('#searchResults').append('<a href="' + response.url + '" style="text-decoration:none" class="btn btn-info"><i class="fa fa-download" aria-hidden="true"></i> Download images</a>');
                 } else {
-                    jQuery('#searchResults').empty(); // clear search results
                     jQuery('#searchResults').append(response.msg);
                 }
             },
@@ -333,6 +331,7 @@ function searchSpecimen() {
             dataType: 'json',
             beforeSend: function() {
                 jQuery("button").prop("disabled",true); // disable all buttons
+                jQuery('#searchResults').empty(); // clear search results
                 jQuery('#searchResults').append('<p class="lead"><i class="fa fa-spinner fa-spin fa-3x fa-fw"></i> Loading...</p>'); // add spinner
             },
             success: function(response) {

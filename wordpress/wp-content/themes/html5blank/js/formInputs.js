@@ -36,6 +36,7 @@ var builderOptions = {
             label: 'Genus',
             type: 'string',
             placeholder: 'Anthurium',
+            operators: ['equal','not_equal','begins_with','not_begins_with','contains','not_contains','ends_with','not_ends_with','is_empty','is_not_empty'],
             validation: {
                 format: '[a-zA-Z]+'
             },
@@ -51,6 +52,7 @@ var builderOptions = {
             label: 'Section',
             type: 'string',
             placeholder: 'Belolonchium',
+            operators: ['equal','not_equal','begins_with','not_begins_with','contains','not_contains','ends_with','not_ends_with','is_empty','is_not_empty'],
             validation: {
                 format: '[a-zA-Z ]+'
             },
@@ -66,6 +68,7 @@ var builderOptions = {
             label: 'Species',
             type: 'string',
             placeholder: 'longipoda',
+            operators: ['equal','not_equal','begins_with','not_begins_with','contains','not_contains','ends_with','not_ends_with','is_empty','is_not_empty'],
             validation: {
                 format: '[a-zA-Z ]+'
             },
@@ -81,6 +84,7 @@ var builderOptions = {
             label: 'Collector',
             type: 'string',
             placeholder: 'Betancur',
+            operators: ['equal','not_equal','begins_with','not_begins_with','contains','not_contains','ends_with','not_ends_with','is_empty','is_not_empty'],
             validation: {
                 format: '[a-zA-Z ]+'
             },
@@ -96,6 +100,7 @@ var builderOptions = {
             label: 'Number',
             type: 'string',
             placeholder: '436',
+            operators: ['equal','not_equal','begins_with','not_begins_with','contains','not_contains','ends_with','not_ends_with','is_empty','is_not_empty'],
             validation: {
                 format: '[0-9a-zA-Z\- ]+'
             },
@@ -126,6 +131,7 @@ var builderOptions = {
             label: 'Herbarium',
             type: 'string',
             placeholder: 'COL',
+            operators: ['equal','not_equal','begins_with','not_begins_with','contains','not_contains','ends_with','not_ends_with','is_empty','is_not_empty'],
             validation: {
                 format: '[A-Z]+'
             },
@@ -141,6 +147,7 @@ var builderOptions = {
             label: 'Country',
             type: 'string',
             placeholder: 'Colombia',
+            operators: ['equal','not_equal','begins_with','not_begins_with','contains','not_contains','ends_with','not_ends_with','is_empty','is_not_empty'],
             validation: {
                 format: '[a-zA-Z]+'
             },
@@ -156,6 +163,7 @@ var builderOptions = {
             label: 'Deparment',
             type: 'string',
             placeholder: 'Tolima',
+            operators: ['equal','not_equal','begins_with','not_begins_with','contains','not_contains','ends_with','not_ends_with','is_empty','is_not_empty'],
             validation: {
                 format: '[a-zA-Z ]+'
             },
@@ -170,6 +178,7 @@ var builderOptions = {
             id: 'Municipality',
             label: 'Municipality',
             type: 'string',
+            operators: ['equal','not_equal','begins_with','not_begins_with','contains','not_contains','ends_with','not_ends_with','is_empty','is_not_empty'],
             placeholder: 'Icononzo',
             validation: {
                 format: '[a-zA-Z ]+'
