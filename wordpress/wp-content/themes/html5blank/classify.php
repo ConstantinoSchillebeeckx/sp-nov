@@ -80,7 +80,7 @@
 
             <!-- autocomplete script -->
             <script>
-                var deferRequestBy = 75;
+                var deferRequestBy = 25;
                 jQuery('input[name="inputGenus"]').devbridgeAutocomplete({
                     serviceUrl: ajax_object.ajax_url, 
                     deferRequestBy: deferRequestBy,
@@ -115,6 +115,24 @@
                     serviceUrl: ajax_object.ajax_url, 
                     deferRequestBy: deferRequestBy,
                     params:{'action':'autoComplete','key':'inputHerbarium'}
+                });
+
+                jQuery('input[name="inputCountry"]').devbridgeAutocomplete({
+                    serviceUrl: ajax_object.ajax_url, 
+                    deferRequestBy: deferRequestBy,
+                    params:{'action':'autoComplete','key':'inputCountry'}
+                });
+
+                jQuery('input[name="inputMunicipality"]').devbridgeAutocomplete({
+                    serviceUrl: ajax_object.ajax_url, 
+                    deferRequestBy: deferRequestBy,
+                    params:{'action':'autoComplete','key':'inputMunicipality'}
+                });
+
+                jQuery('input[name="inputDepartment"]').devbridgeAutocomplete({
+                    serviceUrl: ajax_object.ajax_url, 
+                    deferRequestBy: deferRequestBy,
+                    params:{'action':'autoComplete','key':'inputDepartment'}
                 });
             </script>
 

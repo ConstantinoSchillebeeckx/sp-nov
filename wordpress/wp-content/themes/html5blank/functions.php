@@ -1345,7 +1345,8 @@ function add_media_from_ftp() {
     global $wpdb;
 
     // get current list in media
-    $query = "SELECT ID FROM $wpdb->posts where post_type = 'attachment' and post_title not like '%IMG%' and post_title not like '%DSC%'";
+    $query = "SELECT ID FROM $wpdb->posts where post_type = 'attachment' and (guid not like '%IMG%' and guid not like '%DSC%') OR (post_title = 'SONY DSC')";
+    $query = "SELECT post_id FROM $wpdb->postmeta where meta_key = 'imgs' and meta_value like '%IMG%'";
 
     $ids = $wpdb->get_col( $query );
 
@@ -1387,6 +1388,8 @@ function add_media_from_ftp() {
             wp_update_post( $my_post );
             $renamed[] = $rename;
         } else {
+            echo "$id<br>";
+            //wp_delete_post( $id );
             //echo explode('uploads/', $image->guid)[1] . '<br>';
             //wp_delete_attachment($image->ID, true);
         }
@@ -1421,9 +1424,9 @@ function create_dashboard() {
 
     // status
     echo "<ul class='lead'>";
-    echo sprintf("<li>finished - <code>%s</code> <span class='text-muted'>(%.2f%%)</span></li>", $finished, $finished / $specimen_total);
-    echo sprintf("<li>unfinished - <code>%s</code> <span class='text-muted'>(%.2f%%)</span></li>", $unfinished, $unfinished / $specimen_total);
-    echo sprintf("<li>specimens with an issue: <code>%s</code> <span class='text-muted'>(%.2f%%)</span></li>", $issue, $issue / $specimen_total);
+    echo sprintf("<li>finished - <code>%s</code> <span class='text-muted'>(%.2f%%)</span></li>", $finished, 100 * $finished / $specimen_total);
+    echo sprintf("<li>unfinished - <code>%s</code> <span class='text-muted'>(%.2f%%)</span></li>", $unfinished, 100 * $unfinished / $specimen_total);
+    echo sprintf("<li>specimens with an issue: <code>%s</code> <span class='text-muted'>(%.2f%%)</span></li>", $issue, 100 * $issue / $specimen_total);
     echo "</ul>";
     echo "</p>";
 

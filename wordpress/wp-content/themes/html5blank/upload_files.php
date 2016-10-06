@@ -43,6 +43,7 @@ get_header(); ?>
                             <li>Once images are properly rotated, upload them through the WP media back-end.</li>
                             <li>Upload the resulting <mark>results.json</mark> file on this page.  This will add the specimens to the database and make it accessible for <a href='/classify'>classifying</a> further.</li>
                         </ol>
+                        <b><mark>NOTE:</mark></b> make sure the images have already been uploaded to the backend, this is important since it will "attach" that image to the specimen.
                     </div>
                     <div class="col-sm-5">
                         <h3>Upload JSON</h3>

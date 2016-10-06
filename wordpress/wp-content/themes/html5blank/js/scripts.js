@@ -366,6 +366,7 @@ function generateSearchResultsTable(dat, sel, colMap) {
 
     if (dat) {
 
+        jQuery('<p class="lead"><code>' + Object.keys(dat).length + '</code> specimens found!</p>').appendTo(sel);
         var table = jQuery('<table class="table table-striped table-responsive" style="font-size:10px">').appendTo(sel);
         var thead = jQuery('<thead>').appendTo(table);
         var tbody = jQuery('<tbody>').appendTo(table);
@@ -445,12 +446,14 @@ function populateForm(data, callback) {
                     input.attr('name', dat.field)
                     input.attr('title', dat.title)
                     input.attr('placeholder', dat.placeholder)
+                    input.attr('pattern', dat.validation.format)
                 }
             } else if (dat.type == 'integer') {
                 var input = jQuery('<input type="number" class="form-control">').appendTo(col);    
                 input.attr('name', dat.field)
                 input.attr('title', dat.title)
                 input.attr('placeholder', dat.placeholder)
+                input.attr('pattern', dat.validation.format)
             }
 
             if('extraHTML' in dat) {
