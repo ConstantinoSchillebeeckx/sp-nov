@@ -1034,7 +1034,7 @@ GROUP BY post_id";
     //$query = "SELECT post_id FROM $wpdb->postmeta"; // get initial list of IDs - needed if filtering for finished/unfinished
     $rules = build_prep_statement($dat);
     if (count($rules[0]) && $rules[0] != '') {
-        $query = "SELECT * FROM ( " .$query_head . " ) a WHERE " . $rules[0];
+        $query = "SELECT * FROM ( " .$query_head . " ) a WHERE " . str_replace("\'\'", "''", $rules[0]);
     } else {
         $query = $query_head;
     }
@@ -1100,50 +1100,27 @@ function build_prep_statement($rules) {
     }
 
 
-    return array($sql, $params);
+    // if seaching for specimen with issue, change sql to inputIssue != 'issue'
+    if (in_array('issue', $params) && strpos($sql, 'status =') !== false) {
+        $sql = str_replace("status = '%s'", "inputIssue != ''", $sql);
 
-    $rule = [];
-    $count = 0;
-    foreach ($rule_arr as $tmp) {
-        if ( isset($tmp['condition'] )) {
-            $recur = build_prep_statement($tmp);
-            $query = $rule[0] . " " . $cond . " (" . $recur[0] . ")";
-            $args = array_merge($rule[1], $recur[1] );
-        } else {
-            if (!($tmp['field'] == 'status' && $tmp['value'] == 'all')) { // don't generate WHERE filter when requesting all specimens
-
-                $compare = "=";
-
-                // if selecting samples with issue, need to search inputIssue key
-                // and make query meta_value like '%'
-                if ($tmp['field'] == 'status' && $tmp['value'] == 'issue') { 
-                    $tmp['field'] = 'inputIssue';
-                    $tmp['value'] = '';
-                    $compare = "!=";
-                } else if ($tmp['field'] == 'downloaded') {
-                    if ($tmp['value'] == "1") { // downloaded specimens
-                        $compare = "!=";
-                    }
-                    $tmp['value'] = '';
-                }
-
-                if ($count) {
-                    $query = $rule[0] . " " . $cond . " (" . $tmp['field'] . " $compare %s)";
-                    $args = array_merge($rule[1], array($tmp['value']));
-                } else {
-                    $query = " (" . $tmp['field'] . " $compare '%s')";
-                    $args = array($tmp['value']);
-                }
-                $count += 1;
-            }
-        }
-        $rule = array($query, $args); 
+        // remove the 'status' value
+        unset($params[array_search('status', $params)]);
     }
+    
 
-    return $rule;
+    return array($sql, $params);
 
 }
 
+
+
+// http://stackoverflow.com/questions/8668826/search-and-replace-value-in-php-array
+function array_replace_value(&$arr, $value, $replacement) {
+    array_map(function ($v) use ($value, $replacement) {
+        return $v == $value ? $replacement : $v;
+    }, $arr);
+}
 
 
 

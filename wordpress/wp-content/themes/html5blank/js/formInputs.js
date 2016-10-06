@@ -216,18 +216,15 @@ var builderOptions = {
                 "title": "Issue",
                 "data-content": "If some sort of issue arises with the images or the current specimen, please choose the most appropriate issue type."
             },
-            operators: ['equal', 'not_equal','is_null','is_not_null']
+            operators: ['equal', 'not_equal','is_empty','is_not_empty']
         },
         {
             id: 'Downloaded',
             label: 'Has been downloaded',
             type: 'integer',
             input: 'select',
-            operators: ['is_null','is_not_null','is_empty','is_not_empty'],
+            operators: ['is_empty','is_not_empty'],
             hide: true,
-            validation: {
-                format: '[a-zA-Z]+'
-            },
             field: 'downloaded',
             title: "Only letters are allowed" ,
         },
