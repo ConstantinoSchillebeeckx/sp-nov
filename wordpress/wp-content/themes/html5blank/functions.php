@@ -33,24 +33,6 @@ if (function_exists('add_theme_support'))
     add_image_size('small', 0, 0, true); // Small Thumbnail
     add_image_size('custom-size', 0, 0, true); // Custom Thumbnail Size call using the_post_thumbnail('custom-size');
 
-    // Add Support for Custom Backgrounds - Uncomment below if you're going to use
-    /*add_theme_support('custom-background', array(
-    'default-color' => 'FFF',
-    'default-image' => get_template_directory_uri() . '/img/bg.jpg'
-    ));*/
-
-    // Add Support for Custom Header - Uncomment below if you're going to use
-    /*add_theme_support('custom-header', array(
-    'default-image'          => get_template_directory_uri() . '/img/headers/default.jpg',
-    'header-text'            => false,
-    'default-text-color'     => '000',
-    'width'                  => 1000,
-    'height'                 => 198,
-    'random-default'         => false,
-    'wp-head-callback'       => $wphead_cb,
-    'admin-head-callback'    => $adminhead_cb,
-    'admin-preview-callback' => $adminpreview_cb
-    ));*/
 
     // Enables post and comment RSS feed links to head
     add_theme_support('automatic-feed-links');
@@ -88,7 +70,7 @@ function html5blank_nav()
     );
 
     if (current_user_can('administrator') ) {
-        $menu .= '"<li class="dropdown">
+        $menu .= '<li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li><a href="/upload">Associate images</a></li>
@@ -1029,18 +1011,18 @@ function findSpecimen_callback() {
 
     $query_head = "SELECT 
 post_id,
-MAX( IF(meta_key = 'status', meta_value, NULL) ) status,
-MAX( IF(meta_key = 'inputGenus', meta_value, NULL) ) inputGenus,
-MAX( IF(meta_key = 'inputSection', meta_value, NULL) ) inputSection,
-MAX( IF(meta_key = 'inputSpecies', meta_value, NULL) ) inputSpecies,
-MAX( IF(meta_key = 'inputCollector', meta_value, NULL) ) inputCollector,
-MAX( IF(meta_key = 'inputNumber', meta_value, NULL) ) inputNumber,
-MAX( IF(meta_key = 'inputHerbarium', meta_value, NULL) ) inputHerbarium,
-MAX( IF(meta_key = 'inputCountry', meta_value, NULL) ) inputCountry,
-MAX( IF(meta_key = 'inputDepartment', meta_value, NULL) ) inputDepartment,
-MAX( IF(meta_key = 'inputMunicipality', meta_value, NULL) ) inputMunicipality,
-MAX( IF(meta_key = 'inputIssue', meta_value, NULL) ) inputIssue,
-MAX( IF(meta_key = 'downloaded', meta_value, NULL) ) downloaded
+MAX( IF(meta_key = 'status', meta_value, '') ) status,
+MAX( IF(meta_key = 'inputGenus', meta_value, '') ) inputGenus,
+MAX( IF(meta_key = 'inputSection', meta_value, '') ) inputSection,
+MAX( IF(meta_key = 'inputSpecies', meta_value, '') ) inputSpecies,
+MAX( IF(meta_key = 'inputCollector', meta_value, '') ) inputCollector,
+MAX( IF(meta_key = 'inputNumber', meta_value, '') ) inputNumber,
+MAX( IF(meta_key = 'inputHerbarium', meta_value, '') ) inputHerbarium,
+MAX( IF(meta_key = 'inputCountry', meta_value, '') ) inputCountry,
+MAX( IF(meta_key = 'inputDepartment', meta_value, '') ) inputDepartment,
+MAX( IF(meta_key = 'inputMunicipality', meta_value, '') ) inputMunicipality,
+MAX( IF(meta_key = 'inputIssue', meta_value, '') ) inputIssue,
+MAX( IF(meta_key = 'downloaded', meta_value, '') ) downloaded
 FROM $wpdb->postmeta
 WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue', 'downloaded')
 GROUP BY post_id";
@@ -1285,6 +1267,8 @@ function spnov_update_specimen( $post_id, $dat ) {
     spnov_update_history($post_id);
 
     foreach($dat as $field_name => $value) {
+
+        if ( $value == '' || !isset($value) || empty($value) ) $value = NULL;
 
         $value = sanitize_text_field($value); // sanitize
 

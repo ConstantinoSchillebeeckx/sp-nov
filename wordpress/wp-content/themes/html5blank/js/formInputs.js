@@ -223,7 +223,7 @@ var builderOptions = {
             label: 'Has been downloaded',
             type: 'integer',
             input: 'select',
-            operators: ['is_null','is_not_null'],
+            operators: ['is_null','is_not_null','is_empty','is_not_empty'],
             hide: true,
             validation: {
                 format: '[a-zA-Z]+'

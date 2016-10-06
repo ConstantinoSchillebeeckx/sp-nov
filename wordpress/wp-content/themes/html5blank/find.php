@@ -75,6 +75,10 @@ get_header(); ?>
                             error[0] = "Please enter only numbers.";
                         }
                     });
+
+                    // change the is null option text to is empty because we want to use the is null feature
+                    // but the text will be confusing, so we change it
+                    jQuery('select option:contains("null")').text('empty');
                 </script>
 
                 <script>
