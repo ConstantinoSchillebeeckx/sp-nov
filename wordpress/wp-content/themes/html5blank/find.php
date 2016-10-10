@@ -37,6 +37,7 @@ get_header(); ?>
 
                 <div class="row">
                     <div class="col-sm-12">
+                            <?php if ( current_user_can('upload_files') ) { ?>
                             <div class="btn-group pull-right">
                                 <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Download <span class="caret"></span>
@@ -47,6 +48,7 @@ get_header(); ?>
                                     <li><a href="#" id="downloadTropicos">Tropicos CSV</a></li>
                                 </ul>
                             </div>
+                            <?php } ?>
                             <button style="margin-right:5px" class="btn btn-info pull-right" type="button" onclick="searchSpecimen()">Search</button>
                     </div>
                 </div>
