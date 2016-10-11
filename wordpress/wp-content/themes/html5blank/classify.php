@@ -70,7 +70,7 @@
 
             <script>
                 // load first specimen
-                var firstSpecimen = loadSpecimen(<?php echo isset($_GET['id']) ? $_GET['id']: 0;  ?>);
+                var firstSpecimen = loadSpecimen(<?php echo isset($_GET['id']) ? $_GET['id']: 0;  ?>, null, {"status":"unfinished"});
 
                 // populate form with inputs
                 // var defined in js/formInputs.js

@@ -1174,23 +1174,42 @@ function loadSpecimen_callback() {
     // filter specimens
     $filter = '';
     if ($status == 'finished') {
-        $filter = " AND meta_key = 'status' and meta_value = 'finished'";
+        $filter = " AND status = 'finished'";
     } elseif ($status == 'issue') {
-        $filter = " AND meta_key = 'inputIssue' and meta_value != '' and meta_value is not null";
+        $filter = " AND inputIssue != ''";
     } elseif ($status == 'unfinished') {
-        $filter = " AND meta_key = 'status' and meta_value = 'unfinished'";
+        $filter = " AND status != 'finished' AND (inputIssue is null OR inputISSUE = '')"; // unifinished requires also that there be no issue associated with specimen
     }
 
 
 
     // check max/min specimen ID
-    $row = $wpdb->get_row( "SELECT ID, min(ID) as min, max(ID) as max FROM $wpdb->posts a LEFT JOIN $wpdb->postmeta b on a.ID = b.post_id WHERE post_type = 'specimen' AND post_status = 'publish' $filter ORDER BY ID LIMIT 1" );
-    $min = $row->min; // min specimen ID
-    $max = $row->max; // max specimen ID
+    $query_head = "FROM $wpdb->posts a LEFT JOIN (SELECT 
+post_id,
+MAX( IF(meta_key = 'status', meta_value, '') ) status,
+MAX( IF(meta_key = 'inputGenus', meta_value, '') ) inputGenus,
+MAX( IF(meta_key = 'inputSection', meta_value, '') ) inputSection,
+MAX( IF(meta_key = 'inputSpecies', meta_value, '') ) inputSpecies,
+MAX( IF(meta_key = 'inputCollector', meta_value, '') ) inputCollector,
+MAX( IF(meta_key = 'inputNumber', meta_value, '') ) inputNumber,
+MAX( IF(meta_key = 'inputHerbarium', meta_value, '') ) inputHerbarium,
+MAX( IF(meta_key = 'inputCountry', meta_value, '') ) inputCountry,
+MAX( IF(meta_key = 'inputDepartment', meta_value, '') ) inputDepartment,
+MAX( IF(meta_key = 'inputMunicipality', meta_value, '') ) inputMunicipality,
+MAX( IF(meta_key = 'inputIssue', meta_value, '') ) inputIssue,
+MAX( IF(meta_key = 'downloaded', meta_value, '') ) downloaded
+FROM $wpdb->postmeta
+WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue', 'downloaded')
+GROUP BY post_id) b on a.ID = b.post_ID WHERE post_type = 'specimen' AND post_status = 'publish'";
+
+    $query = "SELECT ID $query_head $filter";
+    $row = $wpdb->get_col( $query );
+    $min = min($row); // min specimen ID
+    $max = max($row); // max specimen ID
 
     // if ID is 0, the first specimen is loaded
     if (!$id) {
-        $id = $row->ID;
+        $id = $row[0];
     }
 
     // look up next/previous ID if needed
@@ -1198,13 +1217,13 @@ function loadSpecimen_callback() {
         if ($id == $min || $min == $max) { // wrap to last ID
             $id = $max;
         } else {
-            $id = $wpdb->get_var( "SELECT ID FROM $wpdb->posts a LEFT JOIN $wpdb->postmeta b on a.ID = b.post_id WHERE post_type = 'specimen' and post_status = 'publish' and ID < $id $filter ORDER BY ID DESC LIMIT 1" );
+            $id = $wpdb->get_var( "SELECT ID $query_head and ID < $id $filter ORDER BY ID DESC LIMIT 1" );
         }
     } elseif ($nav == 'next') {
         if ($id == $max || $min == $max) { // wrap to first ID
             $id = $min;
         } else {
-            $id = $wpdb->get_var( "SELECT ID FROM $wpdb->posts a LEFT JOIN $wpdb->postmeta b on a.ID = b.post_id WHERE post_type = 'specimen' and post_status = 'publish' and ID > $id $filter ORDER BY ID LIMIT 1" );
+            $id = $wpdb->get_var( "SELECT ID $query_head and ID > $id $filter ORDER BY ID LIMIT 1" );
         }
     }
 
@@ -1213,7 +1232,7 @@ function loadSpecimen_callback() {
     if ( count($dat) ){
 
         // reformat data a bit before sending
-        $tmp = array('id' => $id, 'dat_set' => $dat_set, 'get' => $_GET, 'filter' => $filter, 'wp' => $wpdb);
+        $tmp = array('id' => $id, 'dat_set' => $dat_set, 'get' => $_GET, 'filter' => $filter, 'wp' => $wpdb, 'max' => $max, 'min' => $min);
         foreach($dat as $key => $val) {
             $tmp[$key] = $val[0];
         }

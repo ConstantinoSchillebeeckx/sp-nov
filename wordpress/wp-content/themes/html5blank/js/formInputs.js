@@ -16,9 +16,9 @@ var builderOptions = {
             type: 'string',
             input: 'select',
             values: {
-                "all":"All specimens",
-                "finished":"Finished specimens",
                 "unfinished":"Unfinished specimens",
+                "finished":"Finished specimens",
+                "all":"All specimens",
                 "issue":"Specimen with issue"
             },
             operators: ['equal'],
