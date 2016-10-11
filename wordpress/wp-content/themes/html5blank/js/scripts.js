@@ -180,13 +180,13 @@ function doAJAX(data) {
                     }
 
                     if (response.inputIssue) {
-                        jQuery('.icon').append('<span class="label label-warning">issue</span>')
+                        jQuery('.icon').append('<span class="label label-warning">Issue</span>')
                     }
                     if (response.status == 'finished') {
-                        jQuery('.icon').html('<span class="label label-success">finished</span>')
+                        jQuery('.icon').html('<span class="label label-success">Labeled</span>')
                     }
                     if (response.downloaded) {
-                        jQuery('.icon').append('<span class="label label-info">downloaded</span>')
+                        jQuery('.icon').append('<span class="label label-info">Downloaded</span>')
                     }
 
 
