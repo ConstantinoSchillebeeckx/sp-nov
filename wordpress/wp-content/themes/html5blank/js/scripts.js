@@ -25,6 +25,13 @@ function getFormDat() {
 
 }
 
+
+
+
+
+
+
+
 /* Navigate to next specimen and grab data
 
 Will validate the form and if valide, pull
@@ -55,6 +62,23 @@ function prevSpecimen() {
     }
 }
 
+/* Navigate to next specimen
+
+Just like nextSpecimen() but ignores what specimen user is
+currently on.  In this way, there won't be wrapping to next
+ID errors.
+
+
+*/
+function viewChange() {
+
+    event.preventDefault();
+    jQuery('#submit_handle').click(); // needed to validate form
+
+    if (jQuery('form')[0].checkValidity()) { // if valid, load
+        loadSpecimen(null, 'next', getFormDat());
+    }
+}
 
 
 
@@ -77,9 +101,6 @@ Parameters:
         data to be sent to server which represents the data
         for the current specimen.  any data here will be set
         for the specimen
-- view : str
-         specimen status to view, must be one of 'all', 
-         'completed','unfinished','issue'
 */
 function loadSpecimen(id = 0, nav = 'current', dat) {
 
@@ -95,7 +116,6 @@ function loadSpecimen(id = 0, nav = 'current', dat) {
             "id": id, // var set by build_table() in EL.php
             "nav": nav,
             "dat": dat,
-            "view": jQuery("select[name=inputView]").val(),
     }
 
     // send data to server
@@ -194,6 +214,7 @@ function doAJAX(data) {
                 } else {
                     jQuery('h1').html('Specimen');
                     jQuery('.well').html('<span class="lead">No data available</span>');
+                    console.log(response);
                 }
 
             },
@@ -483,8 +504,6 @@ will disable all inputs except for the "View" and
 */
 function disableInputs() {
     
-    console.log('here');
-
     if (jQuery( "[name='inputIssue'" ).val() != '') {
         jQuery("input").prop('disabled', true);
     } else {

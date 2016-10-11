@@ -1176,7 +1176,7 @@ function loadSpecimen_callback() {
     if ($status == 'finished') {
         $filter = " AND meta_key = 'status' and meta_value = 'finished'";
     } elseif ($status == 'issue') {
-        $filter = " AND meta_key = 'inputIssue'";
+        $filter = " AND meta_key = 'inputIssue' and meta_value != '' and meta_value is not null";
     } elseif ($status == 'unfinished') {
         $filter = " AND meta_key = 'status' and meta_value = 'unfinished'";
     }
@@ -1213,14 +1213,14 @@ function loadSpecimen_callback() {
     if ( count($dat) ){
 
         // reformat data a bit before sending
-        $tmp = array('id' => $id, 'dat_set' => $dat_set, 'get' => $_GET);
+        $tmp = array('id' => $id, 'dat_set' => $dat_set, 'get' => $_GET, 'filter' => $filter, 'wp' => $wpdb);
         foreach($dat as $key => $val) {
             $tmp[$key] = $val[0];
         }
 
         echo json_encode( $tmp );
     } else {
-        echo json_encode( false );
+        echo json_encode( array('wp' => $wpdb) );
     }
 
     wp_die(); // this is required to terminate immediately and return a proper response

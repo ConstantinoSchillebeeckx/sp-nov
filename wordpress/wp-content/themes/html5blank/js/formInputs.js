@@ -28,7 +28,7 @@ var builderOptions = {
             },
             field: "status",
             label: "View",
-            onchange: "nextSpecimen()",
+            onchange: "viewChange()",
             extraHTML: "<hr>"
         },
         {
@@ -54,10 +54,10 @@ var builderOptions = {
             placeholder: 'Belolonchium',
             operators: ['equal','not_equal','begins_with','not_begins_with','contains','not_contains','ends_with','not_ends_with','is_empty','is_not_empty'],
             validation: {
-                format: '[a-zA-Z ]+'
+                format: '[a-zA-Z. ]+'
             },
             field: 'inputSection',
-            title: "Only letters and spaces are allowed" ,
+            title: "Only letters, spaces and periods are allowed" ,
             labelTag: {
                 "title": "Section",
                 "data-content": "If species is not available, sometimes section or subgenus may be listed. Those are both ways of splitting up the Genus. For our example, think Honda sedans. An example section is <code>Sect. Belolonchium</code>"
