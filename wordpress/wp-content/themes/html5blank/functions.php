@@ -118,7 +118,7 @@ function html5blank_header_scripts()
 // Load HTML5 Blank conditional scripts
 function html5blank_conditional_scripts()
 {
-    if (is_page('classify') || is_page('upload') || is_page('search') || is_page('add-media')) {
+    if (is_page('label_specimen') || is_page('upload') || is_page('search') || is_page('add-media')) {
         // Custom scripts
         wp_enqueue_script('spnov_scripts', get_template_directory_uri() . '/js/scripts.js', array('jquery'), '1.0.0');
         wp_localize_script( 'spnov_scripts', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) ); // required to do AJAX!
@@ -1260,23 +1260,54 @@ GROUP BY post_id) b on a.ID = b.post_ID WHERE post_type = 'specimen' AND post_st
   */
 function spnov_update_specimen( $post_id, $dat ) {
 
-    spnov_update_history($post_id);
+    // get current specimen data
+    global $wpdb;
+    $query = "SELECT 
+post_id,
+MAX( IF(meta_key = 'status', meta_value, '') ) status,
+MAX( IF(meta_key = 'inputGenus', meta_value, '') ) inputGenus,
+MAX( IF(meta_key = 'inputSection', meta_value, '') ) inputSection,
+MAX( IF(meta_key = 'inputSpecies', meta_value, '') ) inputSpecies,
+MAX( IF(meta_key = 'inputCollector', meta_value, '') ) inputCollector,
+MAX( IF(meta_key = 'inputNumber', meta_value, '') ) inputNumber,
+MAX( IF(meta_key = 'inputHerbarium', meta_value, '') ) inputHerbarium,
+MAX( IF(meta_key = 'inputCountry', meta_value, '') ) inputCountry,
+MAX( IF(meta_key = 'inputDepartment', meta_value, '') ) inputDepartment,
+MAX( IF(meta_key = 'inputMunicipality', meta_value, '') ) inputMunicipality,
+MAX( IF(meta_key = 'inputIssue', meta_value, '') ) inputIssue,
+MAX( IF(meta_key = 'downloaded', meta_value, '') ) downloaded
+FROM $wpdb->postmeta
+WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue', 'downloaded')
+AND post_id = $post_id
+GROUP BY post_id";
+    $current = $wpdb->get_row($query, ARRAY_A);
 
+    $change = false;
     foreach($dat as $field_name => $value) {
 
         if ( $value == '' || !isset($value) || empty($value) ) $value = NULL;
 
         $value = sanitize_text_field($value); // sanitize
 
-        if ( ! get_post_meta( $post_id, $field_name ) )
-        {
-            $status = add_post_meta( $post_id, $field_name, $value );
-        }
-        else
-        {
-            $status = update_post_meta( $post_id, $field_name, $value );
+        if ( $current[$field_name] != $value ) { // if value has been updated
+
+            $change = true;
+
+            if ( ! get_post_meta( $post_id, $field_name ) )
+            {
+                $status = add_post_meta( $post_id, $field_name, $value );
+            }
+            else
+            {
+                $status = update_post_meta( $post_id, $field_name, $value );
+            }
         }
     }
+
+    // update history if something was changed
+    if ($change) spnov_update_history($post_id);
+
+
     return $status;
 }
 
@@ -1296,14 +1327,19 @@ Parameters:
 */
 function spnov_update_history( $id ) {
 
-    $history = unserialize(get_post_meta( $id, 'history' ));
+    $history = get_post_meta( $id, 'history', true);
     if ( !is_array($history) ) {
         $history = array( time() => get_current_user_id() );
+        add_post_meta( $id, 'history', $history );
     } else {
+        // keep only 10 most recent edits
+        if (count($history) > 9) {
+            $history = array_slice($history, -9, 9, true);
+        }
         $history[time()] = get_current_user_id();
+        update_post_meta( $id, 'history', $history );
     }
 
-    update_post_meta( $id, 'history', $history );
 }
 
 
