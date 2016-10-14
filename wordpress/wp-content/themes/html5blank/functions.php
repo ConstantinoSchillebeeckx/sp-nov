@@ -1022,9 +1022,10 @@ MAX( IF(meta_key = 'inputCountry', meta_value, '') ) inputCountry,
 MAX( IF(meta_key = 'inputDepartment', meta_value, '') ) inputDepartment,
 MAX( IF(meta_key = 'inputMunicipality', meta_value, '') ) inputMunicipality,
 MAX( IF(meta_key = 'inputIssue', meta_value, '') ) inputIssue,
+MAX( IF(meta_key = 'issueNotes', meta_value, '') ) issueNotes,
 MAX( IF(meta_key = 'downloaded', meta_value, '') ) downloaded
 FROM $wpdb->postmeta
-WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue', 'downloaded')
+WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue', 'downloaded', 'issueNotes')
 GROUP BY post_id";
 
 
@@ -1197,9 +1198,10 @@ MAX( IF(meta_key = 'inputCountry', meta_value, '') ) inputCountry,
 MAX( IF(meta_key = 'inputDepartment', meta_value, '') ) inputDepartment,
 MAX( IF(meta_key = 'inputMunicipality', meta_value, '') ) inputMunicipality,
 MAX( IF(meta_key = 'inputIssue', meta_value, '') ) inputIssue,
+MAX( IF(meta_key = 'issueNotes', meta_value, '') ) issueNotes,
 MAX( IF(meta_key = 'downloaded', meta_value, '') ) downloaded
 FROM $wpdb->postmeta
-WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue', 'downloaded')
+WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue', 'downloaded', 'issueNotes')
 GROUP BY post_id) b on a.ID = b.post_ID WHERE post_type = 'specimen' AND post_status = 'publish'";
 
     $query = "SELECT ID $query_head $filter";
@@ -1275,9 +1277,10 @@ MAX( IF(meta_key = 'inputCountry', meta_value, '') ) inputCountry,
 MAX( IF(meta_key = 'inputDepartment', meta_value, '') ) inputDepartment,
 MAX( IF(meta_key = 'inputMunicipality', meta_value, '') ) inputMunicipality,
 MAX( IF(meta_key = 'inputIssue', meta_value, '') ) inputIssue,
+MAX( IF(meta_key = 'issueNotes', meta_value, '') ) issueNotes,
 MAX( IF(meta_key = 'downloaded', meta_value, '') ) downloaded
 FROM $wpdb->postmeta
-WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue', 'downloaded')
+WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue', 'downloaded', 'issueNotes')
 AND post_id = $post_id
 GROUP BY post_id";
     $current = $wpdb->get_row($query, ARRAY_A);

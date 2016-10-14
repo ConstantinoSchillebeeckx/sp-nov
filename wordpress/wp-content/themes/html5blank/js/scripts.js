@@ -209,7 +209,8 @@ function doAJAX(data) {
                         }
                     })
 
-                    disableInputs(); // in case specimen has defined issue
+                    notes = response.issueNotes; // global!
+                    onChangeIssue(); // in case specimen has defined issue
 
                 } else {
                     jQuery('h1').html('Specimen');
@@ -495,21 +496,46 @@ function populateForm(data, callback) {
 
 
 
-/* Disable form inputs on classify page
+/* Called when issue select is changed and when specimen is loaded
 
-This is done when a specimen has a defined issue;
-will disable all inputs except for the "View" and
-"Issue"
+Disable form inputs on classify page. This is done when 
+a specimen has a defined issue; will disable all inputs 
+except for the "View" and "Issue".
+
+Will also add an "Issue notes" text input box in cases
+when the selected issue is "Problematic field" or
+"Other issue not listed"
 
 */
-function disableInputs() {
-    
-    if (jQuery( "[name='inputIssue'" ).val() != '') {
-        jQuery("input").prop('disabled', true);
+function onChangeIssue() {
+
+    var sel = jQuery( "[name='inputIssue']" ).val();
+    var issueDOM = '<div id="notes" class="form-group"><label class="col-sm-3 control-label">Notes</label><div class="col-sm-9"><input type="text" class="form-control" title="Only letters, numbers, spaces, commas and periods are allowed" name="issueNotes" pattern="[a-zA-Z0-9 ,.]+" placeholder="Please add any issue notes here" autocomplete="off"></input></div></div>'
+
+    // disable all inputs if select is not 'None'
+    if (sel != '') {
+        jQuery("input").not("[name='issueNotes']").prop('readonly', true);
     } else {
-        jQuery("input").prop('disabled', false);
+        jQuery("input").prop('readonly', false);
     }
 
+    
+    // add input box if issue is one that needs
+    // a notes box
+    var notesIssue = ['problem_field','other']
+    if (jQuery.inArray(sel, notesIssue) > -1) { // add notes input if it doesnt already exist and issue is one of the types that needs it
+
+        if (jQuery('#notes').length === 0) {
+            jQuery("[name='inputIssue']").parent().parent().after(issueDOM);
+            if (notes) jQuery("[name='issueNotes']").val(notes); // fill notes input with response from server [notes is Global]
+        } else { // if DOM already exists
+            jQuery('#notes').show();
+        }
+
+    } else if (jQuery.inArray(sel, notesIssue) == -1) {
+        jQuery('#notes').hide();
+        jQuery('[name="issueNotes"]').val(''); // empty input box
+    }
 }
 
 

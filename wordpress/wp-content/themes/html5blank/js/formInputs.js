@@ -210,7 +210,7 @@ var builderOptions = {
             label: 'Issue',
             type: 'string',
             input: 'select',
-            onchange: "disableInputs()",
+            onchange: "onChangeIssue()",
             values: {
                 "":"None",
                 "no_label":"No label present",
