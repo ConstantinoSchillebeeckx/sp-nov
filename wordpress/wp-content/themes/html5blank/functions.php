@@ -995,8 +995,6 @@ Parameters:
 -----------
 - $_GET['dat'] : assoc array
                  see: http://querybuilder.js.org/demo.html getSQL()
-- $_GET['cols'] : array
-                  array of columns (meta_key) requested
 Returns:
 --------
 assoc array where each key is a WP specimen ID
@@ -1007,7 +1005,6 @@ add_action( 'wp_ajax_findSpecimen', 'findSpecimen_callback' );
 function findSpecimen_callback() {
 
     $dat = $_GET['dat'];
-    $cols = $_GET['cols'];
 
     global $wpdb;
 
@@ -1025,16 +1022,16 @@ MAX( IF(meta_key = 'inputDepartment', meta_value, '') ) inputDepartment,
 MAX( IF(meta_key = 'inputMunicipality', meta_value, '') ) inputMunicipality,
 MAX( IF(meta_key = 'inputIssue', meta_value, '') ) inputIssue,
 MAX( IF(meta_key = 'issueNotes', meta_value, '') ) issueNotes,
-MAX( IF(meta_key = 'downloaded', meta_value, '') ) downloaded
+MAX( IF(meta_key = 'downloaded', meta_value, '') ) downloaded,
+MAX( IF(meta_key = 'history', meta_value, '') ) history
 FROM $wpdb->postmeta
-WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue', 'downloaded', 'issueNotes')
+WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue', 'downloaded', 'issueNotes', 'history')
 GROUP BY post_id";
 
 
 
 
     # generate prepare statement
-    //$query = "SELECT post_id FROM $wpdb->postmeta"; // get initial list of IDs - needed if filtering for finished/unfinished
     $rules = build_prep_statement($dat);
     if (count($rules[0]) && $rules[0] != '') {
         $query = "SELECT * FROM ( " .$query_head . " ) a WHERE " . str_replace("\'\'", "''", $rules[0]);
@@ -1056,7 +1053,16 @@ GROUP BY post_id";
             $data[$id] = array();
             unset($obj['post_id']);
             foreach ($obj as $key => $val) {
-                $data[$id][$key] = $val == null ? '' : $val;
+                if ($val == null) $val = '';
+                if ($key == 'history') { // if history key, return the last array value (this is the user ID)
+                    $user_id = end(maybe_unserialize($val));
+                    if ($user_id) {
+                        $val = get_user_meta( $user_id, 'first_name', true);
+                    } else {
+                        $val = '';
+                    }
+                }
+                $data[$id][$key] = $val;
             }
         }
         echo json_encode( array('dat' => $data, 'rules' => $rules, 'prep' => $prep , 'wp' => $wpdb, 'log' => $dat) );
@@ -1158,6 +1164,7 @@ function loadSpecimen_callback() {
     $id = intval($_GET['id']);
     $nav = $_GET['nav'];
     $dat_set = $_GET['dat'];
+    unset($dat_set['status']);
     $status = $_GET['dat']['status'];
 
     if ( !in_array( $nav, array('next','previous','current') ) ) return;
@@ -1166,12 +1173,14 @@ function loadSpecimen_callback() {
     // check if this 'finishes' the specimen
     if ( $dat_set['inputCollector'] != '' && $dat_set['inputNumber'] != '' && $dat_set['inputIssue'] == '' ) {
         $dat_set['status'] = 'finished';
-    } else if ( $nav != 'current' ) {
+    } else if ($nav == 'next' || $nav == 'previous') {
         $dat_set['status'] = 'unfinished';
     }
 
     // update specimen with incoming data
-    if ($dat_set) spnov_update_specimen($id, $dat_set);
+    if ($nav == 'next' || $nav == 'previous') {
+        if ($dat_set) spnov_update_specimen($id, $dat_set);
+    }
 
 
     // filter specimens

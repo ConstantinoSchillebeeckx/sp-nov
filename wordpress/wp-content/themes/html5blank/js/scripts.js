@@ -336,10 +336,12 @@ function searchSpecimen() {
     var colMap = {};
     builderOptions.filters.forEach( function(d) { colMap[d.field] = d.label; } )
 
+    // manually add history field to search output
+    colMap['history'] = 'Last edit';
+
     var data = {
         "action": "findSpecimen", 
         "dat": rules,
-        "cols": Object.keys(colMap),
     }
 
     console.log(data);

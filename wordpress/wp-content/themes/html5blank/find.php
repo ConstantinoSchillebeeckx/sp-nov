@@ -101,6 +101,7 @@ get_header(); ?>
 
                 <!-- autocomplete script -->
                 <script>
+                    /* TODO
                     var deferRequestBy = 75;
                     jQuery('input[name="inputGenus"]').devbridgeAutocomplete({
                         serviceUrl: ajax_object.ajax_url, 
@@ -137,6 +138,7 @@ get_header(); ?>
                         deferRequestBy: deferRequestBy,
                         params:{'action':'autoComplete','key':'inputHerbarium'}
                     });
+                    */
                 </script>
 
 			</article>
