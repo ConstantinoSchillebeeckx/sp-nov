@@ -190,21 +190,6 @@ var builderOptions = {
                 "data-content": "The municipality or town the specimen is from; this will often times be preceeded by the abbreviation <strong>Mun.</strong>."
             },
         },
-        /*{
-            id: 'Location',
-            label: 'Location',
-            type: 'string',
-            placeholder: 'el Taladro finca la Esperanza',
-            validation: {
-                format: '[a-zA-Z0-9 ]+'
-            },
-            field: 'inputLocation',
-            title: "Only letters and numbers are allowed" ,
-            labelTag: {
-                "title": "Location",
-                "data-content": "Any additional location information provided on the specimen label"
-            },
-        },*/
         {
             id: 'Issue',
             label: 'Issue',
@@ -227,6 +212,18 @@ var builderOptions = {
                 "data-content": "If some sort of issue arises with the images or the current specimen, please choose the most appropriate issue type."
             },
             operators: ['equal', 'not_equal','is_empty','is_not_empty']
+        },
+        {
+            id: 'Notes',
+            label: 'Issue notes',
+            type: 'string',
+            operators: ['is_empty','is_not_empty'],
+            field: 'issueNotes',
+            placeholder: 'Please add any issue notes here',
+            validation: {
+                format: '[a-zA-Z0-9 ,.]+'
+            },
+            title: "Only letters, numbers, spaces, commas and periods are allowed" ,
         },
         {
             id: 'Downloaded',

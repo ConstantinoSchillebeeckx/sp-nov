@@ -85,7 +85,7 @@ function viewChange() {
 
 /* 
 
-fill the classify page with the images and
+fill the "Label" page with the images and
 data for the specified specimen ID
 
 Parameters:
@@ -412,7 +412,7 @@ function generateSearchResultsTable(dat, sel, colMap) {
                 var val = row[field]
                 if (typeof val !== 'undefined') {
                     if (field == 'status') {
-                        val = '<a href="/classify/?id=' + i + '">' + val + '</a>';
+                        val = '<a href="/label_specimen/?id=' + i + '">' + val + '</a>';
                     }
                 } else {
                     val = '';
@@ -510,32 +510,17 @@ when the selected issue is "Problematic field" or
 function onChangeIssue() {
 
     var sel = jQuery( "[name='inputIssue']" ).val();
-    var issueDOM = '<div id="notes" class="form-group"><label class="col-sm-3 control-label">Notes</label><div class="col-sm-9"><input type="text" class="form-control" title="Only letters, numbers, spaces, commas and periods are allowed" name="issueNotes" pattern="[a-zA-Z0-9 ,.]+" placeholder="Please add any issue notes here" autocomplete="off"></input></div></div>'
 
-    // disable all inputs if select is not 'None'
-    if (sel != '') {
+    if (sel != '') { // if issue is set, set all inputs to read only and show the issueNotes field
         jQuery("input").not("[name='issueNotes']").prop('readonly', true);
-    } else {
+        jQuery('[name="issueNotes"]').parent().parent().show();
+        jQuery('[name="issueNotes"]').val(notes);  // notes is Global
+    } else { // if issue is none, hide the notes section and empty it
         jQuery("input").prop('readonly', false);
-    }
-
-    
-    // add input box if issue is one that needs
-    // a notes box
-    var notesIssue = ['problem_field','other']
-    if (jQuery.inArray(sel, notesIssue) > -1) { // add notes input if it doesnt already exist and issue is one of the types that needs it
-
-        if (jQuery('#notes').length === 0) {
-            jQuery("[name='inputIssue']").parent().parent().after(issueDOM);
-            if (notes) jQuery("[name='issueNotes']").val(notes); // fill notes input with response from server [notes is Global]
-        } else { // if DOM already exists
-            jQuery('#notes').show();
-        }
-
-    } else if (jQuery.inArray(sel, notesIssue) == -1) {
-        jQuery('#notes').hide();
+        jQuery('[name="issueNotes"]').parent().parent().hide();
         jQuery('[name="issueNotes"]').val(''); // empty input box
     }
+
 }
 
 

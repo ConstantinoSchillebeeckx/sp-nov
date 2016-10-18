@@ -33,7 +33,10 @@ if (session_status() == PHP_SESSION_NONE) {
             assets: '<?php echo get_template_directory_uri(); ?>',
             tests: {}
         });
-        </script>
+
+        //request the features you need:
+        webshim.polyfill('es5 mediaelement forms');
+    </script>
 
 	</head>
 	<body <?php body_class('container-fluid'); ?>>

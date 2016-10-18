@@ -96,6 +96,8 @@ function html5blank_header_scripts()
 {
     wp_register_script('jquery', 'https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js');
     wp_enqueue_script('jquery');
+    wp_register_script('shim', get_template_directory_uri() . '/js/js-webshim/minified/polyfiller.js');
+    wp_enqueue_script('shim');
 
     wp_register_script('bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js');
     wp_enqueue_script('bootstrap');
