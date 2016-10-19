@@ -1346,9 +1346,9 @@ function spnov_update_history( $id ) {
         $history = array( time() => get_current_user_id() );
         add_post_meta( $id, 'history', $history );
     } else {
-        // keep only 10 most recent edits
-        if (count($history) > 9) {
-            $history = array_slice($history, -9, 9, true);
+        // keep only 50 most recent edits
+        if (count($history) > 49) {
+            $history = array_slice($history, -49, 49, true);
         }
         $history[time()] = get_current_user_id();
         update_post_meta( $id, 'history', $history );
