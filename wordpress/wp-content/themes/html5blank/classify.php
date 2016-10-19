@@ -69,12 +69,14 @@
 			<!-- /article -->
 
             <script>
-                // load first specimen
-                var firstSpecimen = loadSpecimen(<?php echo isset($_GET['id']) ? $_GET['id']: 0;  ?>, null, {"status":"unfinished"});
+                jQuery(document).ready(function() {
+                    // load first specimen
+                    var firstSpecimen = loadSpecimen(<?php echo isset($_GET['id']) ? $_GET['id']: 0;  ?>, null, {"status":"unfinished"});
 
-                // populate form with inputs
-                // var defined in js/formInputs.js
-                populateForm(builderOptions.filters, firstSpecimen);
+                    // populate form with inputs
+                    // var defined in js/formInputs.js
+                    populateForm(builderOptions.filters, firstSpecimen);
+                });
             </script>
 
 
