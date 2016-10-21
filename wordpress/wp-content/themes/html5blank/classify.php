@@ -76,65 +76,63 @@
                     // populate form with inputs
                     // var defined in js/formInputs.js
                     populateForm(builderOptions.filters, firstSpecimen);
-                });
-            </script>
 
 
-            <!-- autocomplete script -->
-            <script>
-                var deferRequestBy = 25;
-                jQuery('input[name="inputGenus"]').devbridgeAutocomplete({
-                    serviceUrl: ajax_object.ajax_url, 
-                    deferRequestBy: deferRequestBy,
-                    params:{'action':'autoComplete','key':'inputGenus'}
-                });
+                    // autocomplete script
+                    var deferRequestBy = 25;
+                    jQuery('input[name="inputGenus"]').devbridgeAutocomplete({
+                        serviceUrl: ajax_object.ajax_url, 
+                        deferRequestBy: deferRequestBy,
+                        params:{'action':'autoComplete','key':'inputGenus'}
+                    });
 
-                jQuery('input[name="inputSpecies"]').devbridgeAutocomplete({
-                    serviceUrl: ajax_object.ajax_url, 
-                    deferRequestBy: deferRequestBy,
-                    params:{'action':'autoComplete','key':'inputSpecies'}
-                });
+                    jQuery('input[name="inputSpecies"]').devbridgeAutocomplete({
+                        serviceUrl: ajax_object.ajax_url, 
+                        deferRequestBy: deferRequestBy,
+                        params:{'action':'autoComplete','key':'inputSpecies'}
+                    });
 
-                jQuery('input[name="inputAuthority"]').devbridgeAutocomplete({
-                    serviceUrl: ajax_object.ajax_url, 
-                    deferRequestBy: deferRequestBy,
-                    params:{'action':'autoComplete','key':'inputAuthority'}
-                });
+                    jQuery('input[name="inputAuthority"]').devbridgeAutocomplete({
+                        serviceUrl: ajax_object.ajax_url, 
+                        deferRequestBy: deferRequestBy,
+                        params:{'action':'autoComplete','key':'inputAuthority'}
+                    });
 
-                jQuery('input[name="inputCollector"]').devbridgeAutocomplete({
-                    serviceUrl: ajax_object.ajax_url, 
-                    deferRequestBy: deferRequestBy,
-                    params:{'action':'autoComplete','key':'inputCollector'}
-                });
+                    jQuery('input[name="inputCollector"]').devbridgeAutocomplete({
+                        serviceUrl: ajax_object.ajax_url, 
+                        deferRequestBy: deferRequestBy,
+                        params:{'action':'autoComplete','key':'inputCollector'}
+                    });
 
-                jQuery('input[name="inputDeterminer"]').devbridgeAutocomplete({
-                    serviceUrl: ajax_object.ajax_url, 
-                    deferRequestBy: deferRequestBy,
-                    params:{'action':'autoComplete','key':'inputDeterminer'}
-                });
+                    jQuery('input[name="inputDeterminer"]').devbridgeAutocomplete({
+                        serviceUrl: ajax_object.ajax_url, 
+                        deferRequestBy: deferRequestBy,
+                        params:{'action':'autoComplete','key':'inputDeterminer'}
+                    });
 
-                jQuery('input[name="inputHerbarium"]').devbridgeAutocomplete({
-                    serviceUrl: ajax_object.ajax_url, 
-                    deferRequestBy: deferRequestBy,
-                    params:{'action':'autoComplete','key':'inputHerbarium'}
-                });
+                    jQuery('input[name="inputHerbarium"]').devbridgeAutocomplete({
+                        serviceUrl: ajax_object.ajax_url, 
+                        deferRequestBy: deferRequestBy,
+                        params:{'action':'autoComplete','key':'inputHerbarium'}
+                    });
 
-                jQuery('input[name="inputCountry"]').devbridgeAutocomplete({
-                    serviceUrl: ajax_object.ajax_url, 
-                    deferRequestBy: deferRequestBy,
-                    params:{'action':'autoComplete','key':'inputCountry'}
-                });
+                    jQuery('input[name="inputCountry"]').devbridgeAutocomplete({
+                        serviceUrl: ajax_object.ajax_url, 
+                        deferRequestBy: deferRequestBy,
+                        params:{'action':'autoComplete','key':'inputCountry'}
+                    });
 
-                jQuery('input[name="inputMunicipality"]').devbridgeAutocomplete({
-                    serviceUrl: ajax_object.ajax_url, 
-                    deferRequestBy: deferRequestBy,
-                    params:{'action':'autoComplete','key':'inputMunicipality'}
-                });
+                    jQuery('input[name="inputMunicipality"]').devbridgeAutocomplete({
+                        serviceUrl: ajax_object.ajax_url, 
+                        deferRequestBy: deferRequestBy,
+                        params:{'action':'autoComplete','key':'inputMunicipality'}
+                    });
 
-                jQuery('input[name="inputDepartment"]').devbridgeAutocomplete({
-                    serviceUrl: ajax_object.ajax_url, 
-                    deferRequestBy: deferRequestBy,
-                    params:{'action':'autoComplete','key':'inputDepartment'}
+                    jQuery('input[name="inputDepartment"]').devbridgeAutocomplete({
+                        serviceUrl: ajax_object.ajax_url, 
+                        deferRequestBy: deferRequestBy,
+                        params:{'action':'autoComplete','key':'inputDepartment'}
+                    });
                 });
             </script>
 

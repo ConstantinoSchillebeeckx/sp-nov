@@ -283,7 +283,7 @@ input[type="search"] {
 }
 
 body {
-    margin-top: 50px;
+    padding-top: 55px;
 }
 
 
@@ -319,3 +319,12 @@ body {
 .icon span {
     margin-right: 5px;
 }
+
+
+a.anchor {
+    display: block;
+    position: relative;
+    top: -55px;
+    visibility: hidden;
+}
+
