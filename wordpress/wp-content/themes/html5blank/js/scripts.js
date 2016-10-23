@@ -102,7 +102,7 @@ Parameters:
         for the current specimen.  any data here will be set
         for the specimen
 */
-function loadSpecimen(id = 0, nav = 'current', dat) {
+function loadSpecimen(id, nav, dat) {
 
 
     // id 0 will call the first specimen
