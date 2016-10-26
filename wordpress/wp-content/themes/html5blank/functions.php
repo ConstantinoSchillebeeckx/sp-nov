@@ -137,6 +137,10 @@ function html5blank_conditional_scripts()
     if (is_page('search')) {
         wp_enqueue_script('query_builder', get_template_directory_uri() . '/js/query-builder.js', array('jquery'));
         wp_enqueue_style('query_builder_css', get_template_directory_uri() . '/css/query-builder.css');
+
+        wp_enqueue_script('data_table', 'https://cdn.datatables.net/v/bs/dt-1.10.12/r-2.1.0/datatables.min.js', array('jquery'));
+        wp_enqueue_style('data_table_css', 'https://cdn.datatables.net/v/bs/dt-1.10.12/r-2.1.0/datatables.min.css');
+
     }
 }
 
