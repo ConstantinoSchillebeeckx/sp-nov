@@ -1100,6 +1100,8 @@ GROUP BY post_id";
                     } else {
                         $val = '';
                     }
+                } else if ($key == 'status') {
+                    $val = "<a href='/label_specimen/?id=$id'>$val</a>";
                 }
                 $tmp[] = $val;
             }
