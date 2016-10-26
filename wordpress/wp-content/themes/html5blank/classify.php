@@ -133,7 +133,11 @@
                         deferRequestBy: deferRequestBy,
                         params:{'action':'autoComplete','key':'inputDepartment'}
                     });
+
+
+                    jQuery('label').popover({placement:'auto left', container: 'body', html: true})
                 });
+
             </script>
 
 		</section>
@@ -145,5 +149,4 @@
 <?php get_footer(); ?>
 
 <script>
-    jQuery('label').popover({placement:'auto left', container: 'body', html: true})
 </script>
