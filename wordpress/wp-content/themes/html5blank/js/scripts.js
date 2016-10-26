@@ -342,36 +342,23 @@ function searchSpecimen() {
     var data = {
         "action": "findSpecimen", 
         "dat": rules,
+        "cols": colMap,
     }
 
-    //console.log(data);
+    generateSearchResultsTable('#searchResults', colMap);
 
-    // send via AJAX to process with PHP
-    if (validSearch) {
-        jQuery.ajax({
-            url: ajax_object.ajax_url, 
-            type: "GET",
-            data: data, 
-            dataType: 'json',
-            beforeSend: function() {
-                jQuery("button").prop("disabled",true); // disable all buttons
-                jQuery('#searchResults').empty(); // clear search results
-                jQuery('#searchResults').append('<p class="lead"><i class="fa fa-spinner fa-spin fa-3x fa-fw"></i> Loading...</p>'); // add spinner
-            },
-            success: function(response) {
-                //console.log(response);
-                jQuery("button").prop("disabled",false); // enable all buttons
-                jQuery('#searchResults').empty();
-                if (response.dat != null) {
-                    searchResults = Object.keys(response.dat); // set to global for use with downloadSpecimens()
-                    generateSearchResultsTable(response.dat, '#searchResults', colMap);
-                } else {
-                    jQuery('#searchResults').append('<p class="lead">No results!</p>');
-                }
-            },
-            error: function(error) { console.log(error) }
-        });
-    }
+    jQuery('#datatable').DataTable( {
+        "retrieve": true,
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            url: ajax_object.ajax_url,
+            data: data,
+        },
+    } );
+
+
+    jQuery('#datatable_filter').remove(); // lazy
 }
 
 
@@ -381,52 +368,26 @@ function searchSpecimen() {
 
 Parameters:
 -----------
-- dat : obj
-        response.dat is an object where each key is
-        a specimen, the value is an obj with key/val
-        pairs for its associated data
 - sel : str
         selector for DOM into which to put results
 - colMap : obj
            key: DB meta_key; value: table col name
 */
-function generateSearchResultsTable(dat, sel, colMap) {
+function generateSearchResultsTable(sel, colMap) {
 
     jQuery(sel).empty();
 
-    if (dat) {
-
-        jQuery('<p class="lead"><code>' + Object.keys(dat).length + '</code> specimens found!</p>').appendTo(sel);
-        var table = jQuery('<table class="table table-striped table-responsive" style="font-size:10px">').appendTo(sel);
-        var thead = jQuery('<thead>').appendTo(table);
-        var tbody = jQuery('<tbody>').appendTo(table);
+    var table = jQuery('<table class="table table-striped table-responsive" style="font-size:10px" id="datatable">').appendTo(sel);
+    var thead = jQuery('<thead>').appendTo(table);
+    var tbody = jQuery('<tbody>').appendTo(table);
 
 
-        var theadr = jQuery('<tr class="info"/>');
-        jQuery.each(colMap, function(field, label) {
-            theadr.append('<td><b>' + label + '</b></td>');
-        })
-        thead.append(theadr);
+    var theadr = jQuery('<tr class="info"/>');
+    jQuery.each(colMap, function(field, label) {
+        theadr.append('<td><b>' + label + '</b></td>');
+    })
+    thead.append(theadr);
 
-        jQuery.each(dat, function(i, row) {
-            var tr = jQuery('<tr/>');
-            jQuery.each(colMap, function(field, label) {
-                var val = row[field]
-                if (typeof val !== 'undefined') {
-                    if (field == 'status') {
-                        val = '<a href="/label_specimen/?id=' + i + '">' + val + '</a>';
-                    }
-                } else {
-                    val = '';
-                }
-                tr.append('<td>' + val + '</td>');
-            })
-            tbody.append(tr);
-        })
-
-    } else {
-        jQuery('<p class="lead">No results found in the database!</p>').appendTo(sel);
-    }
 
 }
 

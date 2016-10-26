@@ -1008,9 +1008,14 @@ key is meta_key and value is meta_value
 add_action( 'wp_ajax_findSpecimen', 'findSpecimen_callback' );
 function findSpecimen_callback() {
 
-    $dat = $_GET['dat'];
-
     global $wpdb;
+
+
+    // Input method (use $_GET, $_POST or $_REQUEST)
+    $input =& $_GET;
+
+    $dat = $input['dat'];
+    $columns = array_keys($input['cols']);
 
     $query_head = "SELECT 
 post_id,
@@ -1034,6 +1039,35 @@ GROUP BY post_id";
 
 
 
+    /**
+     * Paging
+     */
+    $sLimit = "";
+    if ( isset( $input['start'] ) && $input['length'] != '-1' ) {
+        $sLimit = " LIMIT ".intval( $input['start'] ).", ".intval( $input['length'] );
+    }
+
+
+    /**
+     * Ordering
+    $aOrderingRules = array();
+     */
+    if ( isset( $input['order'] ) ) {
+        for ( $i=0 ; $i<count( $input['order'] ); $i++ ) {
+            $colName = $columns[$input['order'][$i]['column']];
+            $sortDir = $input['order'][$i]['dir'];
+            $aOrderingRules[] = "`$colName` $sortDir";
+        }
+    }
+
+    if (!empty($aOrderingRules)) {
+        $sOrder = " ORDER BY ".implode(", ", $aOrderingRules);
+    } else {
+        $sOrder = "";
+    }
+
+
+
 
     # generate prepare statement
     $rules = build_prep_statement($dat);
@@ -1042,6 +1076,7 @@ GROUP BY post_id";
     } else {
         $query = $query_head;
     }
+    $query .= $sOrder . $sLimit;
     $prep = $wpdb->prepare($query, $rules[1]);
 
     # run query - array of $ids
@@ -1054,7 +1089,7 @@ GROUP BY post_id";
         $data = [];
         foreach ($dat as $obj) {
             $id = $obj['post_id'];
-            $data[$id] = array();
+            $tmp = array();
             unset($obj['post_id']);
             foreach ($obj as $key => $val) {
                 if ($val == null) $val = '';
@@ -1066,13 +1101,27 @@ GROUP BY post_id";
                         $val = '';
                     }
                 }
-                $data[$id][$key] = $val;
+                $tmp[] = $val;
             }
+            $data[] = $tmp;
         }
-        echo json_encode( array('dat' => $data, 'rules' => $rules, 'prep' => $prep , 'wp' => $wpdb, 'log' => $dat) );
+        //echo json_encode( array('dat' => $data, 'rules' => $rules, 'prep' => $prep , 'wp' => $wpdb, 'log' => $dat) );
     } else {
-        echo json_encode( array('rules' => $rules, 'prep' => $prep , 'wp' => $wpdb, 'query' => $query) );
+        //ecIho json_encode( array('rules' => $rules, 'prep' => $prep , 'wp' => $wpdb, 'query' => $query) );
     }
+
+    $iTotal = $wpdb->get_var( "SELECT count(*) from $wpdb->posts where post_type = 'specimen' and post_status != 'draft'" );
+
+    $output = array(
+        "sEcho"                => intval($input['sEcho']),
+        "iTotalRecords"        => $iTotal,
+        "iTotalDisplayRecords" => $iTotal, //$iFilteredTotal,
+        "aaData"               => $data,
+        "get" => $input,
+        "log" => $query,
+    );
+
+    echo json_encode( $output );
 
     wp_die();
 }
