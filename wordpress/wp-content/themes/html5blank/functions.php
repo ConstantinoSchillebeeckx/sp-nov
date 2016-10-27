@@ -1076,11 +1076,14 @@ GROUP BY post_id";
     } else {
         $query = $query_head;
     }
-    $query .= $sOrder . $sLimit;
-    $prep = $wpdb->prepare($query, $rules[1]);
+    $query1 =  $query . $sOrder . $sLimit;
+    $query2 = str_replace("SELECT *", "SELECT count(*)", $query); // this query needed to get total results (not limited by paging)
+    $prep1 = $wpdb->prepare($query1, $rules[1]);
+    $prep2 = $wpdb->prepare($query2, $rules[1]);
 
     # run query - array of $ids
-    $dat = $wpdb->get_results($prep, ARRAY_A);
+    $dat = $wpdb->get_results($prep1, ARRAY_A);
+    $total = $wpdb->get_var($prep2);
 
     $data = [];
     if (count($dat)) {
@@ -1114,7 +1117,7 @@ GROUP BY post_id";
     $output = array(
         "sEcho"                => intval($input['sEcho']),
         "iTotalRecords"        => $iTotal,
-        "iTotalDisplayRecords" => $iTotal, //$iFilteredTotal,
+        "iTotalDisplayRecords" => $total, 
         "aaData"               => $data,
         "get" => $input,
         "log" => $sOrder
