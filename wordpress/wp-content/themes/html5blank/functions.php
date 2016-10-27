@@ -1031,10 +1031,10 @@ MAX( IF(meta_key = 'inputDepartment', meta_value, '') ) inputDepartment,
 MAX( IF(meta_key = 'inputMunicipality', meta_value, '') ) inputMunicipality,
 MAX( IF(meta_key = 'inputIssue', meta_value, '') ) inputIssue,
 MAX( IF(meta_key = 'issueNotes', meta_value, '') ) issueNotes,
-MAX( IF(meta_key = 'downloaded', meta_value, '') ) downloaded,
-MAX( IF(meta_key = 'history', meta_value, '') ) history
+MAX( IF(meta_key = 'last_edit', meta_value, '') ) last_edit,
+MAX( IF(meta_key = 'downloaded', meta_value, '') ) downloaded
 FROM $wpdb->postmeta
-WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue', 'downloaded', 'issueNotes', 'history')
+WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue', 'downloaded', 'issueNotes', 'last_edit')
 GROUP BY post_id";
 
 
@@ -1082,27 +1082,22 @@ GROUP BY post_id";
     # run query - array of $ids
     $dat = $wpdb->get_results($prep, ARRAY_A);
 
+    $data = [];
     if (count($dat)) {
 
         # reformat results into table form
         # where each row is a specimen
-        $data = [];
         foreach ($dat as $obj) {
             $id = $obj['post_id'];
             $tmp = array();
             unset($obj['post_id']);
             foreach ($obj as $key => $val) {
-                if ($val == null) $val = '';
-                if ($key == 'history') { // if history key, return the last array value (this is the user ID)
-                    $user_id = end(maybe_unserialize($val));
-                    if ($user_id) {
-                        $val = get_user_meta( $user_id, 'first_name', true);
-                    } else {
-                        $val = '';
-                    }
+                if ($key == 'last_edit') { 
+                    $val = get_user_meta( $val, 'first_name', true);
                 } else if ($key == 'status') {
                     $val = "<a href='/label_specimen/?id=$id'>$val</a>";
                 }
+                if ($val == null || $val == false) $val = '';
                 $tmp[] = $val;
             }
             $data[] = $tmp;
@@ -1114,13 +1109,15 @@ GROUP BY post_id";
 
     $iTotal = $wpdb->get_var( "SELECT count(*) from $wpdb->posts where post_type = 'specimen' and post_status != 'draft'" );
 
+    $tmp = preg_split( "/(AND|OR)/", $input['dat']['sql'] );
+
     $output = array(
         "sEcho"                => intval($input['sEcho']),
         "iTotalRecords"        => $iTotal,
         "iTotalDisplayRecords" => $iTotal, //$iFilteredTotal,
         "aaData"               => $data,
         "get" => $input,
-        "log" => $query,
+        "log" => $sOrder
     );
 
     echo json_encode( $output );
@@ -1129,13 +1126,13 @@ GROUP BY post_id";
 }
 
 
-/* Recrusive function to generate WHERE clause
+/* Function to generate WHERE clause
 
 The jQuery QueryBuilder script generates
 a JSON of rules (http://querybuilder.js.org/demo.html),
 this must be parsed in a recursive manner.
 
-This function will recursively generate
+This function will generate
 the SQL/args part of the prepared statment
 see https://developer.wordpress.org/reference/classes/wpdb/prepare/
 
@@ -1154,9 +1151,22 @@ array where:
 */
 function build_prep_statement($rules) {
 
+    global $wpdb;
+
     $sql = str_replace('?', "'%s'", $rules['sql']);
     $params = $rules['params'];
 
+
+    // if searching for Editor, need to translate name into ID
+    $result_array = preg_split( "/(AND|OR)/", $sql );
+    $ix = array_keys(preg_grep('/last_edit/i', $result_array)); // find position of last_edit string
+    if (count($ix) && strpos($result_array[$ix[0]], '%s') !== false) { // if last_edit was found and the seach criteria is a string
+        $user_id = intval($wpdb->get_var( sprintf("SELECT user_id FROM $wpdb->usermeta where meta_key = 'first_name' and meta_value = '%s' limit 1", $params[$ix[0]]) ));
+        if (!$user_id > 0) { // if no user ID found, set it to something that won't match any users
+            $params[$ix[0]] = 'moo';
+        }
+        $params[$ix[0]] = $user_id;
+    }
 
     // if searching for all specimens change sql to status != 'all'
     if (in_array('all', $params) && strpos($sql, 'status =') !== false) {
@@ -1328,6 +1338,8 @@ GROUP BY post_id) b on a.ID = b.post_ID WHERE post_type = 'specimen' AND post_st
   */
 function spnov_update_specimen( $post_id, $dat ) {
 
+
+
     // get current specimen data
     global $wpdb;
     $query = "SELECT 
@@ -1396,9 +1408,11 @@ Parameters:
 */
 function spnov_update_history( $id ) {
 
+    $user = get_current_user_id();
+    
     $history = get_post_meta( $id, 'history', true);
     if ( !is_array($history) ) {
-        $history = array( time() => get_current_user_id() );
+        $history = array( time() => $user );
         add_post_meta( $id, 'history', $history );
     } else {
         // keep only 50 most recent edits
@@ -1409,6 +1423,12 @@ function spnov_update_history( $id ) {
         update_post_meta( $id, 'history', $history );
     }
 
+    // update last editor
+    if ( ! get_post_meta( $id, 'last_edit' ) ) {
+        add_post_meta( $id, 'last_edit', $user );
+    } else {
+        update_post_meta( $id, 'last_edit', $user );
+    }
 }
 
 
@@ -1424,6 +1444,7 @@ to media
 add_action( 'wp_ajax_add_media_from_ftp', 'add_media_from_ftp' );
 function add_media_from_ftp() {
 
+    return;
     $upload_dir = wp_upload_dir()['basedir']; // upload server path
     $upload_url = wp_upload_dir()['url']; // upload URL (e.g. http:/...)
 
@@ -1432,16 +1453,21 @@ function add_media_from_ftp() {
     // get current list in media
     $query = "SELECT ID FROM $wpdb->posts where post_type = 'attachment' and (guid not like '%IMG%' and guid not like '%DSC%') OR (post_title = 'SONY DSC')";
     $query = "SELECT post_id FROM $wpdb->postmeta where meta_key = 'imgs' and meta_value like '%IMG%'";
+    $query = "SELECT post_id, meta_value FROM $wpdb->postmeta where meta_key = 'history'";
 
-    $ids = $wpdb->get_col( $query );
+    $ids = $wpdb->get_results( $query, ARRAY_A );
 
-    echo "Found " . count($ids);
+    echo "Found " . count($ids) . "<br>";
 
     $media = array(); // list of file names (full path)
     $media_thumb = array();
     $duplicates = array();
     $renamed = array();
     foreach ( $ids as $id ) {
+        $post_id = $id['post_id'];
+        $user = end(maybe_unserialize($id['meta_value']));
+        
+/*
         $tmp = wp_get_attachment_metadata( $id );
         if (isset($tmp['file'])) {
             $tmpf = $upload_dir . '/' . $tmp['file'];
@@ -1459,7 +1485,7 @@ function add_media_from_ftp() {
                 $media_thumb[] = $tmpf;
             }
         }
-
+*/
         // rename image to match filename
         if ($tmp) {
 
@@ -1470,7 +1496,7 @@ function add_media_from_ftp() {
                   'post_title'   => $rename
               );
 
-            wp_update_post( $my_post );
+            //wp_update_post( $my_post );
             $renamed[] = $rename;
         } else {
             echo "$id<br>";

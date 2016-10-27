@@ -227,8 +227,20 @@ var builderOptions = {
             title: "Only letters, numbers, spaces, commas and periods are allowed" ,
         },
         {
+            id: 'Editor',
+            label: 'Editor',
+            type: 'string',
+            operators: ['equal','not_equal','is_empty','is_not_empty'],
+            hide: true,
+            field: 'last_edit',
+            validation: {
+                format: '[a-zA-Z0-9 ]+'
+            },
+            title: "Only letters, numbers are allowed." ,
+        },
+        {
             id: 'Downloaded',
-            label: 'Has been downloaded',
+            label: 'Downloaded',
             type: 'integer',
             input: 'select',
             operators: ['is_empty','is_not_empty'],

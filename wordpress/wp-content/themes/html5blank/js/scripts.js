@@ -336,9 +336,6 @@ function searchSpecimen() {
     var colMap = {};
     builderOptions.filters.forEach( function(d) { colMap[d.field] = d.label; } )
 
-    // manually add history field to search output
-    colMap['history'] = 'Last edit';
-
     var data = {
         "action": "findSpecimen", 
         "dat": rules,
@@ -348,6 +345,7 @@ function searchSpecimen() {
     generateSearchResultsTable('#searchResults', colMap);
 
     jQuery('#datatable').DataTable( {
+        responsive: false,
         "retrieve": true,
         "processing": true,
         "serverSide": true,
