@@ -38,20 +38,22 @@ A custom post type for specimen (named Specimen) is used to store data.  It can 
 
 ## User roles
 
-Subscriber
+Subscriber (to be implemented)
 - can view only non-issue specimens
 - read only access to data
 
 Contributor
-- can view all specimens
-- has access to 'View' dropdown
-- can edit all data except for 'imgs' meta key
+- can view and label all specimens
+- can search specimens
+- can edit all data except for 'imgs' meta key (this meta key won't even be visible)
+- can view dashboard
 
 Author
-- same priviledges as Contributor but can upload images
+- same priviledges as Contributor but can download images from the search screen
 
 Administrator
-- like Author but with added priveledge of editing the 'imgs' key
+- like Author but has access to Admin menu which allows for various tools
+- like Author but with added priveledge of editing the 'imgs' key when labeling specimen
 
 
 ## Notes:
