@@ -9,7 +9,7 @@ Simple web-app for adding label metadata to a herbarium specimen.
 3. Use media plugin to add images to Media
 4. Categorize images by use of python script (this generates a .json)
 5. [Upload .json](http://spnov.com/upload/) file which will generate custom post type (Specimen) for each specimen
-6. [Classify](http://spnov.com/classify/) to update each specimen's data
+6. [Label](http://spnov.com/label_specimen) to update each specimen's data
 
 ## Transfer to tropicos
 
