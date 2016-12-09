@@ -1495,11 +1495,25 @@ to media
 add_action( 'wp_ajax_add_media_from_ftp', 'add_media_from_ftp' );
 function add_media_from_ftp() {
 
+    global $wpdb;
+
+    $hist = $wpdb->get_results( "SELECT post_id, meta_value FROM $wpdb->postmeta where meta_key = 'history'", ARRAY_A );
+
+    foreach ($hist as $row) {
+        $post_id = $row['post_id'];
+        $dat = maybe_unserialize($row['meta_value']);
+        $user_id = intval(end($dat));
+        $time = key($dat);
+
+        $dat = array( $time => $post_id );
+        add_user_meta( $user_id, 'finished', $dat );
+    }
+
+
     return;
     $upload_dir = wp_upload_dir()['basedir']; // upload server path
     $upload_url = wp_upload_dir()['url']; // upload URL (e.g. http:/...)
 
-    global $wpdb;
 
     // get current list in media
     $query = "SELECT ID FROM $wpdb->posts where post_type = 'attachment' and (guid not like '%IMG%' and guid not like '%DSC%') OR (post_title = 'SONY DSC')";
@@ -1606,7 +1620,7 @@ function create_dashboard() {
 
         // tally finishes this month
         if (date('m') == $month) {
-            if (in_array($user_id, $this_month)) {
+            if (array_key_exists($user_id, $this_month)) {
                 $this_month[$user_id] = $this_month[$user_id] + 1;
             } else {
                 $this_month[$user_id] = 1;
@@ -1614,15 +1628,16 @@ function create_dashboard() {
         }
 
         // tally overall finishes
-        if (in_array($user_id, $totals)) {
+        if (array_key_exists($user_id, $totals)) {
             $totals[$user_id] = $totals[$user_id] + 1;
         } else {
             $totals[$user_id] = 1;
         }
     }
 
+    echo "<hr>";
     echo "<div class='row'><div class='col-sm-4'>";
-    echo "<p class='lead'>Specimens labeled (total):</p>";
+    echo "<p class='lead'>Specimens labeled (all time):</p>";
     echo "<table class='table table-striped'>";
     echo "<thead><tr><th>Name</th><th>Count</th></tr></thead>";
     echo "<tbody>";
