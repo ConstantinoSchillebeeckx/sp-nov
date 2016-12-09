@@ -9,7 +9,7 @@ Simple web-app for adding label metadata to a herbarium specimen.
 3. Use media plugin to add images to Media
 4. Categorize images by use of python script (this generates a .json)
 5. [Upload .json](http://spnov.com/upload/) file which will generate custom post type (Specimen) for each specimen
-6. [Classify](http://spnov.com/classify/) to update each specimen's data
+6. [Label](http://spnov.com/label_specimen) to update each specimen's data
 
 ## Transfer to tropicos
 
@@ -38,20 +38,22 @@ A custom post type for specimen (named Specimen) is used to store data.  It can 
 
 ## User roles
 
-Subscriber
+Subscriber (to be implemented)
 - can view only non-issue specimens
 - read only access to data
 
 Contributor
-- can view all specimens
-- has access to 'View' dropdown
-- can edit all data except for 'imgs' meta key
+- can view and label all specimens
+- can search specimens
+- can edit all data except for 'imgs' meta key (this meta key won't even be visible)
+- can view dashboard
 
 Author
-- same priviledges as Contributor but can upload images
+- same priviledges as Contributor but can download images from the search screen
 
 Administrator
-- like Author but with added priveledge of editing the 'imgs' key
+- like Author but has access to Admin menu which allows for various tools
+- like Author but with added priveledge of editing the 'imgs' key when labeling specimen
 
 
 ## Notes:
