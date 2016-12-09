@@ -1237,7 +1237,6 @@ function loadSpecimen_callback() {
 
     if ( !in_array( $nav, array('next','previous','current') ) ) return;
 
-
     // check if this 'finishes' the specimen
     if ( $dat_set['inputCollector'] != '' && $dat_set['inputNumber'] != '' && $dat_set['inputIssue'] == '' ) {
         $dat_set['status'] = 'finished';
@@ -1392,8 +1391,57 @@ GROUP BY post_id";
     if ($change) spnov_update_history($post_id);
 
 
+    // if specimen was finished, add it to the list of specimens
+    // finished by logged-in person
+    // this won't unset data if a finished specimen becomes unset ...
+    if ($current['status'] == 'unfinished' && $dat['status'] == 'finished') {
+        spnov_user_specimen_finish($post_id);
+    }
+
     return $status;
 }
+
+
+
+
+
+
+/* Update list of specimens finished by a user
+
+If user finishes labeling a specimen, this 
+function will add the metadata to the 
+user_meta table.
+
+Data is stored in the meta_key: "finished"
+and will be present for each specimen finished;
+the value is an array: [timestamp => post_id of specimen finished]
+
+Parameters:
+----------
+- $post_id : int
+        WP id associated with specimen
+
+*/
+function spnov_user_specimen_finish($post_id) {
+
+    $dat = array( time() => $post_id );
+    $user_id = get_current_user_id();
+    add_user_meta( $user_id, 'finished', $dat );
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1544,7 +1592,60 @@ function create_dashboard() {
     echo "</ul>";
     echo "</p>";
 
+    $user_finished = $wpdb->get_results("SELECT user_id, meta_value from $wpdb->usermeta WHERE meta_key = 'finished'", ARRAY_A);
 
+    $totals = [];
+    $this_month = [];
+
+    foreach ($user_finished as $row) {
+        $user_id = intval($row['user_id']);
+        $dat = maybe_unserialize( $row['meta_value'] ); // [timestamp => post_id]
+        $time = key($dat);
+        $month = date('m', $time); // [1-12]
+        $post_id = $dat[$time];
+
+        // tally finishes this month
+        if (date('m') == $month) {
+            if (in_array($user_id, $this_month)) {
+                $this_month[$user_id] = $this_month[$user_id] + 1;
+            } else {
+                $this_month[$user_id] = 1;
+            }
+        }
+
+        // tally overall finishes
+        if (in_array($user_id, $totals)) {
+            $totals[$user_id] = $totals[$user_id] + 1;
+        } else {
+            $totals[$user_id] = 1;
+        }
+    }
+
+    echo "<div class='row'><div class='col-sm-4'>";
+    echo "<p class='lead'>Specimens labeled (total):</p>";
+    echo "<table class='table table-striped'>";
+    echo "<thead><tr><th>Name</th><th>Count</th></tr></thead>";
+    echo "<tbody>";
+    foreach ($totals as $user_id => $num) {
+        $user = get_user_by( 'id', $user_id );
+        echo sprintf("<tr><td>%s</td><td>%s</td></tr>", $user->display_name, $num);
+    }
+    echo "</tbody>";
+    echo "</table>";
+    echo "</div>";
+
+    echo "<div class='col-sm-4 col-offset-sm-1'>";
+    echo "<p class='lead'>Specimens labeled (this month):</p>";
+    echo "<table class='table table-striped'>";
+    echo "<thead><tr><th>Name</th><th>Count</th></tr></thead>";
+    echo "<tbody>";
+    foreach ($this_month as $user_id => $num) {
+        $user = get_user_by( 'id', $user_id );
+        echo sprintf("<tr><td>%s</td><td>%s</td></tr>", $user->display_name, $num);
+    }
+    echo "</tbody>";
+    echo "</table>";
+    echo "</div></div>";
 }
 
 

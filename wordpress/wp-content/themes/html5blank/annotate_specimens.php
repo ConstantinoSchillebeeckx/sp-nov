@@ -35,6 +35,8 @@ get_header(); ?>
                     process_csv_upload($_FILES['datafile']);
                 }?>
 
+                <p>This page is used to label multiple specimens in batch form through the use of a CSV.</p>
+
                 <div class="row">
                     <div class="col-sm-7">
                         <h3>Process for adding data to specimens in the database</h3>

@@ -35,6 +35,8 @@ get_header(); ?>
                     process_file_upload($_FILES['datafile']);
                 }?>
 
+                <p>This page is used to associate any uploaded images (on the backend) together into a specimen; the uploaded json file is used to associated images together.</p>
+
                 <div class="row">
                     <div class="col-sm-7">
                         <h3>Process associating images to specimens</h3>
