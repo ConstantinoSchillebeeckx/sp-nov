@@ -79,7 +79,7 @@
 
 
                     // autocomplete script
-                    var deferRequestBy = 25;
+                    var deferRequestBy = 0;
                     jQuery('input[name="inputGenus"]').devbridgeAutocomplete({
                         serviceUrl: ajax_object.ajax_url, 
                         deferRequestBy: deferRequestBy,
