@@ -28,7 +28,7 @@ var builderOptions = {
             },
             field: "status",
             label: "View",
-            onchange: "viewChange()",
+            onchange: "viewChange( event )",
             extraHTML: "<hr>"
         },
         {

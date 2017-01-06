@@ -39,7 +39,7 @@ up that data for the next specimen.  If at
 the last specimen, will wrap around
 
 */
-function nextSpecimen() {
+function nextSpecimen( event ) {
 
     event.preventDefault();
     jQuery('#submit_handle').click(); // needed to validate form
@@ -52,7 +52,7 @@ function nextSpecimen() {
 /* Like nextSpecimen() but in other direction
 
 */
-function prevSpecimen() {
+function prevSpecimen( event ) {
 
     event.preventDefault();
     jQuery('#submit_handle').click(); // needed to validate form
@@ -70,7 +70,7 @@ ID errors.
 
 
 */
-function viewChange() {
+function viewChange( event ) {
 
     event.preventDefault();
     jQuery('#submit_handle').click(); // needed to validate form

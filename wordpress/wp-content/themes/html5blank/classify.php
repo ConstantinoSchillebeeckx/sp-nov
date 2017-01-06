@@ -50,13 +50,13 @@
                             <hr>
                             <div class="row">
                                 <div class="col-sm-3">
-                                    <i class="fa fa-chevron-circle-left fa-4x text-primary navSpecimen" aria-hidden="true" onclick="prevSpecimen()"></i>
+                                    <i class="fa fa-chevron-circle-left fa-4x text-primary navSpecimen" aria-hidden="true" onclick="prevSpecimen( event )"></i>
                                 </div>
                                 <div class="col-sm-6 text-muted" style="padding: 0;">
                                     <small>Changes saved once either nav button is clicked.</small>
                                 </div>
                                 <div class="col-sm-3">
-                                    <i class="fa fa-chevron-circle-right pull-right fa-4x text-primary navSpecimen" aria-hidden="true" onclick="nextSpecimen()"></i>
+                                    <i class="fa fa-chevron-circle-right pull-right fa-4x text-primary navSpecimen" aria-hidden="true" onclick="nextSpecimen( event )"></i>
                                 </div>
                             </div>
                             <input id="submit_handle" type="submit" style="display: none"> <!-- needed for validating form -->
