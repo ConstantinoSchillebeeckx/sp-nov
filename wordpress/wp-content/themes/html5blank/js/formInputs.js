@@ -111,24 +111,25 @@ var builderOptions = {
                 "data-content": "Each plant that is collected gets it very own number. For our Honda civic, think VIN number."
             },
         },
-        /*{
-            id: 'Determiner',
-            label: 'Determiner',
-            type: 'string',
-            placeholder: 'Croat',
-            validation: {
-                format: '[a-zA-Z ]+'
-            },
-            field: 'inputDeterminer',
-            title: "Only letters are allowed" ,
-            labelTag: {
-                "title": "Title",
-                "data-content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus condimentum feugiat sodales. In hac habitasse platea dictumst. Nunc blandit suscipit finibus. Donec sit amet venenatis tortor. Pellentesque vel posuere nunc."
-            },
-        },*/
         {
-            id: 'Herbarium',
-            label: 'Herbarium',
+            id: 'Location',
+            label: 'Location',
+            type: 'string',
+            placeholder: 'COL',
+            operators: ['equal','not_equal','begins_with','not_begins_with','contains','not_contains','ends_with','not_ends_with','is_empty','is_not_empty'],
+            validation: {
+                format: '[A-Z]+'
+            },
+            field: 'inputLocation',
+            title: "Only letters are allowed",
+            labelTag: {
+                "title": "Current Herbarium location",
+                "data-content": "Sometimes specimens will get moved between Herbaria; enter the abbreviation for the Herbarium at which the photo was taken."
+            },
+        },
+        {
+            id: 'Origin',
+            label: 'Origin',
             type: 'string',
             placeholder: 'COL',
             operators: ['equal','not_equal','begins_with','not_begins_with','contains','not_contains','ends_with','not_ends_with','is_empty','is_not_empty'],
@@ -138,8 +139,8 @@ var builderOptions = {
             field: 'inputHerbarium',
             title: "Only uppercase letters are allowed",
             labelTag: {
-                "title": "Title",
-                "data-content": "The Collector brought the specimen back to a herbarium, and had it dried and mounted on a sheet. Each herbarium has its own initials. Sadly, they do not always correlate to the name. If you cannot find the herbarium initials on the label, If you cannot find the herbarium initials on the label, try looking it up on <a href='www.tropicos.org'>www.tropicos.org</a>. Use the pull down tab <b>More</b>, then select <b>Institutions</b>. Enter the country and hit enter. You will have a list of all the herbaria in that country. If it’s too long to eyeball, you can use control-F to search on a keyword. Another option is to look at the entire sheet in another picture and see if there is a stamp on it with the initials. If you don’t find it, email Amy (apredfield@hotmail.com)."
+                "title": "Herbarium of Origin",
+                "data-content": "The Collector brought the specimen back to a herbarium, and had it dried and mounted on a sheet; this field represents the Herbarium in which the specimen was originally brought to.<br><br>Each herbarium has its own initials. Sadly, they do not always correlate to the name. If you cannot find the herbarium initials on the label, If you cannot find the herbarium initials on the label, try looking it up on <a href='www.tropicos.org'>www.tropicos.org</a>. Use the pull down tab <b>More</b>, then select <b>Institutions</b>. Enter the country and hit enter. You will have a list of all the herbaria in that country. If it’s too long to eyeball, you can use control-F to search on a keyword. Another option is to look at the entire sheet in another picture and see if there is a stamp on it with the initials. If you don’t find it, email Amy (apredfield@hotmail.com)."
             },
         },
         {

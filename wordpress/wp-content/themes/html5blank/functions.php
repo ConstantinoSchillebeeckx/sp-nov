@@ -643,12 +643,14 @@ function process_csv_upload($dat) {
         array_shift($header); // remove file
 
         $count = 0;
+        echo '<p class="lead">Found ' . count($csv) . ' rows in CSV</p>';
         foreach($csv as $row) { // add data from each row in CSV to the specimen defined by 'File'
-            $file_name = str_replace('.jpg','', array_shift($row) );
+            $file_name = str_replace('.jpg','', array_shift($row) ); // filename of img in backend
 
             // get specimen ID for jpg file name, skip all other rows if no ID found
-            $specimen_id = $wpdb->get_var( "SELECT post_parent FROM $wpdb->posts WHERE post_title = '$file_name'" );
+            $specimen_id = $wpdb->get_var( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key='imgs' and meta_value like '%$file_name%'" );
             if ($specimen_id) {
+                //echo $specimen_id . " " . $file_name . "<br>";
 
                 $collector = '';
                 $number = '';
@@ -668,7 +670,7 @@ function process_csv_upload($dat) {
                 }
                 update_post_meta($specimen_id, 'status', $status);
                 update_post_meta($specimen_id, 'downloaded', false);
-
+                
                 $count +=1;
             }
         } 
@@ -1497,17 +1499,52 @@ function add_media_from_ftp() {
 
     global $wpdb;
 
-    $hist = $wpdb->get_results( "SELECT post_id, meta_value FROM $wpdb->postmeta where meta_key = 'history'", ARRAY_A );
+    // delete images associated with 'draft' specimens
+    /*
+    $moo = $wpdb->get_results("SELECT meta_value from $wpdb->postmeta where meta_key = 'imgs' and post_id in (SELECT ID from $wpdb->posts where post_status = 'draft')", ARRAY_A);
+    $count = 0;
+    foreach ($moo as $row) {
+        $imgs = explode(',',$row['meta_value']);
+        foreach($imgs as $img) {
+            $img_id = $wpdb->get_var("SELECT * FROM $wpdb->posts where guid like '%$img'");
+            wp_delete_attachment( $img_id, true );
+            $count += 1;
+        }
+        
+    }
+    */
 
+
+    // delete 'finished' item for each user that is duplicated (can't finish same specimen twice)
+    /*
+    $hist = $wpdb->get_results( "SELECT umeta_id, user_id, meta_value from $wpdb->usermeta where meta_key = 'finished' order by user_id", ARRAY_A);
+
+    $current = 1;
+    $finished = [];
     foreach ($hist as $row) {
-        $post_id = $row['post_id'];
         $dat = maybe_unserialize($row['meta_value']);
-        $user_id = intval(end($dat));
+        $user_id = intval($row['user_id']);
+        $post_id = intval(end($dat));
+        $uid = $row['umeta_id'];
         $time = key($dat);
 
-        $dat = array( $time => $post_id );
-        add_user_meta( $user_id, 'finished', $dat );
+        if ($user_id != $current) {
+            $current = $user_id;
+            $finished = [];
+        }
+
+        if (in_array($post_id, $finished)) {
+            echo "$post_id is dup for user $user_id ($uid)<br>";
+            $wpdb->query("DELETE FROM $wpdb->usermeta WHERE umeta_id = $uid");
+        }
+
+        $finished[] = $post_id;
+
+
+        //$dat = array( $time => $post_id );
+        //add_user_meta( $user_id, 'finished', $dat );
     }
+    */
 
 
     return;

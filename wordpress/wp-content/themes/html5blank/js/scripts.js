@@ -482,6 +482,8 @@ function onChangeIssue() {
         jQuery('[name="issueNotes"]').val(''); // empty input box
     }
 
+    jQuery("[name='inputLocation'").prop('readonly', true);
+
 }
 
 
