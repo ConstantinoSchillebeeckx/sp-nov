@@ -644,8 +644,11 @@ function process_csv_upload($dat) {
 
         $count = 0;
         echo '<p class="lead">Found ' . count($csv) . ' rows in CSV</p>';
+
         foreach($csv as $row) { // add data from each row in CSV to the specimen defined by 'File'
             $file_name = str_replace('.jpg','', array_shift($row) ); // filename of img in backend
+        
+
 
             // get specimen ID for jpg file name, skip all other rows if no ID found
             $specimen_id = $wpdb->get_var( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key='imgs' and meta_value like '%$file_name%'" );
@@ -674,6 +677,8 @@ function process_csv_upload($dat) {
                 $count +=1;
             }
         } 
+
+        echo count($updates);
         echo '<p class="lead">Updated ' . $count . ' specimens!</p>';
     } else {
         echo '<p class="lead">File must be a CSV (with a <code>.csv</code> extension)</p>';
@@ -1027,6 +1032,7 @@ MAX( IF(meta_key = 'inputSection', meta_value, '') ) inputSection,
 MAX( IF(meta_key = 'inputSpecies', meta_value, '') ) inputSpecies,
 MAX( IF(meta_key = 'inputCollector', meta_value, '') ) inputCollector,
 MAX( IF(meta_key = 'inputNumber', meta_value, '') ) inputNumber,
+MAX( IF(meta_key = 'inputLocation', meta_value, '') ) inputLocation,
 MAX( IF(meta_key = 'inputHerbarium', meta_value, '') ) inputHerbarium,
 MAX( IF(meta_key = 'inputCountry', meta_value, '') ) inputCountry,
 MAX( IF(meta_key = 'inputDepartment', meta_value, '') ) inputDepartment,
@@ -1036,7 +1042,7 @@ MAX( IF(meta_key = 'issueNotes', meta_value, '') ) issueNotes,
 MAX( IF(meta_key = 'last_edit', meta_value, '') ) last_edit,
 MAX( IF(meta_key = 'downloaded', meta_value, '') ) downloaded
 FROM $wpdb->postmeta
-WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue', 'downloaded', 'issueNotes', 'last_edit')
+WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue', 'downloaded', 'issueNotes', 'last_edit', 'inputLocation')
 GROUP BY post_id";
 
 
@@ -1122,7 +1128,7 @@ GROUP BY post_id";
         "iTotalDisplayRecords" => $total, 
         "aaData"               => $data,
         "get" => $input,
-        "log" => $sOrder
+        "log" => $query1
     );
 
     echo json_encode( $output );

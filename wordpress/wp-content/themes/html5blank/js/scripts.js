@@ -342,6 +342,7 @@ function searchSpecimen() {
         "cols": colMap,
     }
 
+    console.log(data);
     generateSearchResultsTable('#searchResults', colMap);
 
     jQuery('#datatable').DataTable( {
@@ -482,7 +483,7 @@ function onChangeIssue() {
         jQuery('[name="issueNotes"]').val(''); // empty input box
     }
 
-    jQuery("[name='inputLocation'").prop('readonly', true);
+    //jQuery("[name='inputLocation'").prop('readonly', true);
 
 }
 

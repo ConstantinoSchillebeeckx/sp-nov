@@ -86,6 +86,12 @@
                         params:{'action':'autoComplete','key':'inputGenus'}
                     });
 
+                    jQuery('input[name="inputSection"]').devbridgeAutocomplete({
+                        serviceUrl: ajax_object.ajax_url, 
+                        deferRequestBy: deferRequestBy,
+                        params:{'action':'autoComplete','key':'inputSection'}
+                    });
+
                     jQuery('input[name="inputSpecies"]').devbridgeAutocomplete({
                         serviceUrl: ajax_object.ajax_url, 
                         deferRequestBy: deferRequestBy,
@@ -102,6 +108,12 @@
                         serviceUrl: ajax_object.ajax_url, 
                         deferRequestBy: deferRequestBy,
                         params:{'action':'autoComplete','key':'inputCollector'}
+                    });
+
+                    jQuery('input[name="inputLocation"]').devbridgeAutocomplete({
+                        serviceUrl: ajax_object.ajax_url, 
+                        deferRequestBy: deferRequestBy,
+                        params:{'action':'autoComplete','key':'inputLocation'}
                     });
 
                     jQuery('input[name="inputDeterminer"]').devbridgeAutocomplete({
