@@ -86,10 +86,10 @@ var builderOptions = {
             placeholder: 'Betancur',
             operators: ['equal','not_equal','begins_with','not_begins_with','contains','not_contains','ends_with','not_ends_with','is_empty','is_not_empty'],
             validation: {
-                format: '[a-zA-Z\- ]+'
+                format: '[a-zA-Z&\- ]+'
             },
             field: 'inputCollector',
-            title: "Only letters and spaces are allowed" ,
+            title: "Only letters, dashes, ampersands and spaces are allowed" ,
             labelTag: {
                 "title": "Collector",
                 "data-content": "The person who (<em>possibly literally</em>) went out on a limb to get a piece of the plant. We are using just the last name. If there are two people we use the two last names. If there are more than two, we use the first last name followed by et al. For example <code>Smith et al.</code>"
