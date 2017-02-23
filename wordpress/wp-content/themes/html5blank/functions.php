@@ -1216,18 +1216,25 @@ Handles AJAX call to add a new specimen
 add_action( 'wp_ajax_newSpecimen', 'newSpecimen_callback' );
 function newSpecimen_callback() {
 
-    $imgs = $_GET['imgs'];
+    $imgs = explode(';',$_GET['imgs']);
     global $wpdb;    
 
-    $my_post = array(
-        'post_status' => 'publish',
-        'post_type' => 'specimen',
-    );
-    $the_post_id = wp_insert_post( $my_post );
-    wp_update_post( array('ID' => $the_post_id, 'post_title'=> $the_post_id) );
-    add_post_meta( $the_post_id, 'imgs', $imgs );
+    $done = array();
+    foreach ($imgs as $img) {
 
-    echo json_encode( array('id' => $the_post_id) );
+        $my_post = array(
+            'post_status' => 'publish',
+            'post_type' => 'specimen',
+        );
+
+        $the_post_id = wp_insert_post( $my_post ); // add new specimen
+        wp_update_post( array('ID' => $the_post_id, 'post_title'=> $the_post_id) ); // add title to post
+        add_post_meta( $the_post_id, 'imgs', $img ); // add imgs
+
+        $done[] = $the_post_id;
+    }
+
+    echo json_encode( array('id' => implode(',', $done)) );
 
     wp_die(); // this is required to terminate immediately and return a proper response
 
