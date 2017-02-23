@@ -76,6 +76,7 @@ function html5blank_nav()
             <li><a href="/upload">Associate images</a></li>
             <li><a href="/upload-annotated/">Upload CSV data</a></li>
             <li><a href="/rename-media/">Rename images</a></li>
+            <li><a href="/add-new-specimen/">Add new specimen</a></li>
           </ul>
         </li>';
     }
@@ -120,7 +121,7 @@ function html5blank_header_scripts()
 // Load HTML5 Blank conditional scripts
 function html5blank_conditional_scripts()
 {
-    if (is_page('label_specimen') || is_page('upload') || is_page('search') || is_page('add-media')) {
+    if (is_page('label_specimen') || is_page('upload') || is_page('search') || is_page('add-media') || is_page('add-new-specimen')) {
         // Custom scripts
         wp_enqueue_script('spnov_scripts', get_template_directory_uri() . '/js/scripts.js', array('jquery'), '1.0.0');
         wp_localize_script( 'spnov_scripts', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) ); // required to do AJAX!
@@ -1209,6 +1210,29 @@ function array_replace_value(&$arr, $value, $replacement) {
 
 
 
+/* 
+Handles AJAX call to add a new specimen
+*/
+add_action( 'wp_ajax_newSpecimen', 'newSpecimen_callback' );
+function newSpecimen_callback() {
+
+    $imgs = $_GET['imgs'];
+    global $wpdb;    
+
+    $my_post = array(
+        'post_status' => 'publish',
+        'post_type' => 'specimen',
+    );
+    $the_post_id = wp_insert_post( $my_post );
+    wp_update_post( array('ID' => $the_post_id, 'post_title'=> $the_post_id) );
+    add_post_meta( $the_post_id, 'imgs', $imgs );
+
+    echo json_encode( array('id' => $the_post_id) );
+
+    wp_die(); // this is required to terminate immediately and return a proper response
+
+}
+
 
 /* Function called by AJAX to load/update specimen data
 
@@ -1504,6 +1528,16 @@ add_action( 'wp_ajax_add_media_from_ftp', 'add_media_from_ftp' );
 function add_media_from_ftp() {
 
     global $wpdb;
+
+    // select images with issues of 
+    $moo = $wpdb->get_results("SELECT a.post_id, b.meta_value, a.meta_value as issue from $wpdb->postmeta a left join $wpdb->postmeta b on a.post_id = b.post_id where a.meta_key = 'inputIssue' and a.meta_value in  ('multiple_specimens','missing_image') and b.meta_key = 'imgs'", ARRAY_A);
+    $count = 0;
+    foreach ($moo as $row) {
+        echo $row['post_id'] . ';' . $row['meta_value'] . ';' . $row['issue'] . '<br>';
+        //wp_update_post( array('ID' => $row['post_id'], 'post_status'=>'draft') );
+        
+    }
+
 
     // delete images associated with 'draft' specimens
     /*

@@ -124,6 +124,40 @@ function loadSpecimen(id, nav, dat) {
 }
 
 
+/*
+Event handler for form submit to add new specimen
+*/
+
+function addNewSpecimen() {
+
+    var imgs = jQuery("input[id='images']").val();
+
+    var data = {
+            "action": "newSpecimen", 
+            "imgs": imgs
+    }
+
+    // send data to server
+    // send via AJAX to process with PHP
+    jQuery.ajax({
+            url: ajax_object.ajax_url, 
+            type: "GET",
+            data: data, 
+            dataType: 'json',
+            success: function(response) {
+                console.log(response);
+                jQuery('#results').html('<code>The following specimen(s) were created: ' + response.id + '</code>');
+                jQuery("input[id='images']").val('');
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr.responseText);
+            },
+    });
+
+    return false;
+
+}
+
 
 
 /* Send AJAX request to sever
