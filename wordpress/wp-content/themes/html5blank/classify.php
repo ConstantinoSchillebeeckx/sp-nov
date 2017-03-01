@@ -83,66 +83,77 @@
                     jQuery('input[name="inputGenus"]').devbridgeAutocomplete({
                         serviceUrl: ajax_object.ajax_url, 
                         deferRequestBy: deferRequestBy,
+                        triggerSelectOnValidInput: false,
                         params:{'action':'autoComplete','key':'inputGenus'}
                     });
 
                     jQuery('input[name="inputSection"]').devbridgeAutocomplete({
                         serviceUrl: ajax_object.ajax_url, 
                         deferRequestBy: deferRequestBy,
+                        triggerSelectOnValidInput: false,
                         params:{'action':'autoComplete','key':'inputSection'}
                     });
 
                     jQuery('input[name="inputSpecies"]').devbridgeAutocomplete({
                         serviceUrl: ajax_object.ajax_url, 
                         deferRequestBy: deferRequestBy,
-                        params:{'action':'autoComplete','key':'inputSpecies'}
+                        triggerSelectOnValidInput: false,
+                        params:{'action':'autoComplete','key':'inputSpecies',}
                     });
 
                     jQuery('input[name="inputAuthority"]').devbridgeAutocomplete({
                         serviceUrl: ajax_object.ajax_url, 
                         deferRequestBy: deferRequestBy,
+                        triggerSelectOnValidInput: false,
                         params:{'action':'autoComplete','key':'inputAuthority'}
                     });
 
                     jQuery('input[name="inputCollector"]').devbridgeAutocomplete({
                         serviceUrl: ajax_object.ajax_url, 
                         deferRequestBy: deferRequestBy,
+                        triggerSelectOnValidInput: false,
                         params:{'action':'autoComplete','key':'inputCollector'}
                     });
 
                     jQuery('input[name="inputLocation"]').devbridgeAutocomplete({
                         serviceUrl: ajax_object.ajax_url, 
                         deferRequestBy: deferRequestBy,
+                        triggerSelectOnValidInput: false,
                         params:{'action':'autoComplete','key':'inputLocation'}
                     });
 
                     jQuery('input[name="inputDeterminer"]').devbridgeAutocomplete({
                         serviceUrl: ajax_object.ajax_url, 
                         deferRequestBy: deferRequestBy,
+                        triggerSelectOnValidInput: false,
                         params:{'action':'autoComplete','key':'inputDeterminer'}
                     });
 
                     jQuery('input[name="inputHerbarium"]').devbridgeAutocomplete({
                         serviceUrl: ajax_object.ajax_url, 
                         deferRequestBy: deferRequestBy,
+                        triggerSelectOnValidInput: false,
                         params:{'action':'autoComplete','key':'inputHerbarium'}
                     });
 
                     jQuery('input[name="inputCountry"]').devbridgeAutocomplete({
                         serviceUrl: ajax_object.ajax_url, 
                         deferRequestBy: deferRequestBy,
+                        triggerSelectOnValidInput: false,
                         params:{'action':'autoComplete','key':'inputCountry'}
                     });
 
                     jQuery('input[name="inputMunicipality"]').devbridgeAutocomplete({
                         serviceUrl: ajax_object.ajax_url, 
                         deferRequestBy: deferRequestBy,
+                        triggerSelectOnValidInput: false,
                         params:{'action':'autoComplete','key':'inputMunicipality'}
                     });
 
                     jQuery('input[name="inputDepartment"]').devbridgeAutocomplete({
                         serviceUrl: ajax_object.ajax_url, 
                         deferRequestBy: deferRequestBy,
+                        triggerSelectOnValidInput: false,
                         params:{'action':'autoComplete','key':'inputDepartment'}
                     });
 
