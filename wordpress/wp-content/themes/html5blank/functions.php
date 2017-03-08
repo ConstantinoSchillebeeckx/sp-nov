@@ -104,6 +104,7 @@ function html5blank_header_scripts()
     wp_enqueue_script('bootstrap');
     wp_enqueue_style('bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css');
     wp_enqueue_style('font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css');
+    
 
     wp_register_script('conditionizr', get_template_directory_uri() . '/js/lib/conditionizr-4.3.0.min.js', array(), '4.3.0');
     wp_enqueue_script('conditionizr');
@@ -136,11 +137,14 @@ function html5blank_conditional_scripts()
     }
 
     if (is_page('search')) {
-        wp_enqueue_script('query_builder', get_template_directory_uri() . '/js/query-builder.js', array('jquery'));
+        //wp_enqueue_script('query_builder', get_template_directory_uri() . '/js/query-builder.js', array('jquery'));
+        wp_enqueue_script('query_builder', 'https://cdn.jsdelivr.net/jquery.query-builder/2.4.1/js/query-builder.standalone.min.js');
         wp_enqueue_style('query_builder_css', get_template_directory_uri() . '/css/query-builder.css');
 
         wp_enqueue_script('data_table', 'https://cdn.datatables.net/v/bs/dt-1.10.12/r-2.1.0/datatables.min.js', array('jquery'));
-        wp_enqueue_style('data_table_css', 'https://cdn.datatables.net/v/bs/dt-1.10.12/r-2.1.0/datatables.min.css');
+        wp_enqueue_style('data_table', 'https://cdn.datatables.net/v/bs/dt-1.10.12/r-2.1.0/datatables.min.css');
+        wp_enqueue_style('datepick', 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.min.css');
+        wp_enqueue_script('datepick', 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js');
 
     }
 }
@@ -1041,9 +1045,10 @@ MAX( IF(meta_key = 'inputMunicipality', meta_value, '') ) inputMunicipality,
 MAX( IF(meta_key = 'inputIssue', meta_value, '') ) inputIssue,
 MAX( IF(meta_key = 'issueNotes', meta_value, '') ) issueNotes,
 MAX( IF(meta_key = 'last_edit', meta_value, '') ) last_edit,
+MAX( IF(meta_key = 'last_edit_date', meta_value, '') ) date_edit,
 MAX( IF(meta_key = 'downloaded', meta_value, '') ) downloaded
 FROM $wpdb->postmeta
-WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue', 'downloaded', 'issueNotes', 'last_edit', 'inputLocation')
+WHERE meta_key in ('status','inputGenus','inputSection','inputSpecies','inputCollector','inputNumber','inputHerbarium','inputCountry','inputDepartment','inputMunicipality','inputIssue', 'downloaded', 'issueNotes', 'last_edit', 'inputLocation', 'last_edit_date')
 GROUP BY post_id";
 
 
@@ -1519,6 +1524,14 @@ function spnov_update_history( $id ) {
     } else {
         update_post_meta( $id, 'last_edit', $user );
     }
+
+    // update last edit date
+    $date = date("Y/m/d");
+    if ( ! get_post_meta( $id, 'last_edit_date' ) ) {
+        add_post_meta( $id, 'last_edit_date', $date );
+    } else {
+        update_post_meta( $id, 'last_edit_date', $date );
+    }
 }
 
 
@@ -1536,6 +1549,21 @@ function add_media_from_ftp() {
 
     global $wpdb;
 
+    // select images with history
+    $moo = $wpdb->get_results("SELECT * from $wpdb->postmeta where meta_key ='history' and meta_value is not null", ARRAY_A);
+    $count = 0;
+    foreach ($moo as $row) {
+        $hist = maybe_unserialize($row['meta_value']);
+        $post_id = $row['post_id'];
+        $times = array_keys($hist);
+        $date = date('Y/m/d', end($times));
+        echo $post_id. ';'. date('Y/m/d', end($times)). '<br>';
+        //update_post_meta($post_id, 'last_edit_date', $date);
+        //wp_update_post( array('ID' => $row['post_id'], 'post_status'=>'draft') );
+        
+    }
+
+/*
     // select images with issues of 
     $moo = $wpdb->get_results("SELECT a.post_id, b.meta_value, a.meta_value as issue from $wpdb->postmeta a left join $wpdb->postmeta b on a.post_id = b.post_id where a.meta_key = 'inputIssue' and a.meta_value in  ('multiple_specimens','missing_image') and b.meta_key = 'imgs'", ARRAY_A);
     $count = 0;
@@ -1544,7 +1572,7 @@ function add_media_from_ftp() {
         //wp_update_post( array('ID' => $row['post_id'], 'post_status'=>'draft') );
         
     }
-
+*/
 
     // delete images associated with 'draft' specimens
     /*

@@ -240,6 +240,21 @@ var builderOptions = {
             title: "Only letters, numbers are allowed." ,
         },
         {
+            id: 'DateEdited',
+            label: 'Last edited',
+            type: 'date',
+            hide: true,
+            field: 'date_edit',
+            operators: ['equal', 'not_equal', 'between','less','greater'],
+            plugin: 'datepicker',
+            plugin_config: {
+                format: 'yyyy/mm/dd',
+                todayBtn: 'linked',
+                todayHighlight: true,
+                autoclose: true
+            }
+        },
+        {
             id: 'Downloaded',
             label: 'Downloaded',
             type: 'integer',
