@@ -43,7 +43,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Images" data-content="Comma-separated (no spaces or quotes) list of filenames for JPG images associated with a specimen.<br>Example: DSC09272.JPG,DSC09273.JPG<br><br>Field only visible to Admin." aria-hidden="true">Imgs</label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="imgs">
+                                        <textarea class="form-control" name="imgs" rows=6></textarea>
                                     </div>
                                 </div>
                             <?php } ?>
