@@ -41,7 +41,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Images" data-content="Comma-separated (no spaces or quotes) list of filenames for JPG images associated with a specimen.<br>Example: DSC09272.JPG,DSC09273.JPG<br><br>Field only visible to Admin." aria-hidden="true">Imgs</label>
+                                    <label class="col-sm-3 control-label" data-toggle="popover" data-trigger="hover" title="Images" data-content="Comma-separated (no spaces or quotes) list of filenames for JPG images associated with a specimen.<br>Example: <code>DSC09272.JPG,DSC09273.JPG</code><br><br><strong>Note:</strong> if multiple specimens are currently shown, you can modify the list of images by separating the specimens by a semi-colon (;), this will automatically generate the proper number of specimens and update this current one. For example, if two specimens are actually shown, you can edit this field like <code>123.jpg;321.jpg,89321.jpg</code><hr>Field only visible to Admin." aria-hidden="true">Imgs</label>
                                     <div class="col-sm-9">
                                         <textarea class="form-control" name="imgs" rows=6></textarea>
                                     </div>

@@ -1215,11 +1215,17 @@ function array_replace_value(&$arr, $value, $replacement) {
 
 
 
-/* 
-Handles AJAX call to add a new specimen
+/*
+ * given a list of comma separated image file names (no spaces)
+ * create a new specimen with the given images.
+ *
+ * note that multiple specimens can be created by separating the images
+ * with a semi-colon. e.g. the following will create two specimens
+ * 123.jpg;8321.jpg,98213.jpg
+ *
 */
-add_action( 'wp_ajax_newSpecimen', 'newSpecimen_callback' );
-function newSpecimen_callback() {
+
+function add_new_specimen() {
 
     $imgs = explode(';',$_GET['imgs']);
     global $wpdb;    
@@ -1239,7 +1245,18 @@ function newSpecimen_callback() {
         $done[] = $the_post_id;
     }
 
-    echo json_encode( array('id' => implode(',', $done)) );
+    return json_encode( array('id' => implode(',', $done)) );
+
+}
+
+
+/* 
+Handles AJAX call to add a new specimen
+*/
+add_action( 'wp_ajax_newSpecimen', 'newSpecimen_callback' );
+function newSpecimen_callback() {
+
+    echo add_new_specimen($_GET['imgs']);
 
     wp_die(); // this is required to terminate immediately and return a proper response
 
@@ -1416,17 +1433,26 @@ GROUP BY post_id";
 
         $value = sanitize_text_field($value); // sanitize
 
+        // check if on imgs meta value and if it contains a ; delimiter (create multiple specimens)
+        if ($field_name == 'imgs' && strpos($value, ';') !== false) {
+            $parts = explode(';', $value); 
+            $value = $parts[0]; // store list of images for this specimen
+            array_shift($parts); // the remaining elements in the array each generate a new specimen
+            $result = add_new_specimen(implode(';',$parts));
+        }
+
         if ( $current[$field_name] != $value ) { // if value has been updated
 
             $change = true;
 
-            if ( ! get_post_meta( $post_id, $field_name ) )
-            {
-                $status = add_post_meta( $post_id, $field_name, $value );
-            }
-            else
-            {
-                $status = update_post_meta( $post_id, $field_name, $value );
+            if ( ! get_post_meta( $post_id, $field_name ) ) {
+                if ($value != null) $status = add_post_meta( $post_id, $field_name, $value );
+            } else {
+                if ($value == NULL) { // if value is empty, delete the meta_key
+                    $status = delete_post_meta( $post_id, $field_name );
+                } else {
+                    $status = update_post_meta( $post_id, $field_name, $value );
+                }
             }
         }
     }

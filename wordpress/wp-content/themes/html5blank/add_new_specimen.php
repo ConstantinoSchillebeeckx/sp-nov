@@ -26,7 +26,7 @@ get_header(); ?>
         };
         ?>
 
-        <p>Will add a new specimen with the given images.</p>
+        <p>Will add a new specimen with the comma separated images given below.<br>Note that you can specimen multiple specimens at once by separating with a ';' instead. For example, this will create two specimens: <code>123.jpg,321.jpg;8321.jpg,801.jpg</code>.</p>
 
         <div id="results"></div> <!-- automatically filled by ajax response -->
 
