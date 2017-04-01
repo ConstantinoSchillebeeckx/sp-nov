@@ -1318,7 +1318,7 @@ function loadSpecimen_callback() {
     } elseif ($status == 'issue') {
         $filter = " AND inputIssue != ''";
     } elseif ($status == 'unfinished') {
-        $filter = " AND status != 'finished' AND (inputIssue is null OR inputISSUE = '')"; // unifinished requires also that there be no issue associated with specimen
+        $filter = " AND (status = 'unfinished' OR status is null) AND (inputIssue is null OR inputISSUE = '')"; // unifinished requires also that there be no issue associated with specimen
     }
 
 
