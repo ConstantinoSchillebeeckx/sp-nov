@@ -519,6 +519,7 @@ Parameters:
 function spnov_add_specimen( $dat ) {
 
     $current_user = wp_get_current_user();
+    $done = array();
 
     // create a new custom post type (Specimen) for each specimen in JSON
     foreach ($dat as $id => $imgs) {
@@ -535,6 +536,8 @@ function spnov_add_specimen( $dat ) {
         // Insert the post into the database
         $post_id = wp_insert_post( $my_post );
         if ($post_id != 0) { // if successfully added specimen, update the metadata
+
+            $done[] = $post_id;
 
             // add array of associated images to specimen
             // this will be stored as a comma separated string
@@ -590,7 +593,7 @@ function spnov_add_specimen( $dat ) {
 
     }
 
-    return true;
+    return $done;
 
 }
 
@@ -712,7 +715,7 @@ function process_file_upload($dat) {
     if ($dat['type'] == 'application/json' && $dat['error'] == 0) {
         $json = json_decode(file_get_contents($dat['tmp_name']), true);
         $add_specimen = spnov_add_specimen($json);
-        if ($add_specimen === true) {
+        if (is_array($add_specimen) && count($add_specimen) > 0) {
             echo sprintf('<p class="lead">Great! %s speciments were properly uploaded.', count($json) );
         } else {
             echo '<p class="lead">Some sort of error occurred when adding a specimen to the databse...</p>';
@@ -1225,14 +1228,21 @@ function array_replace_value(&$arr, $value, $replacement) {
  *
 */
 
-function add_new_specimen() {
+function add_new_specimen($dat=null) {
 
-    $imgs = explode(';',$_GET['imgs']);
+    if ($dat == null) {
+        $imgs = explode(';',$_GET['imgs']);
+    } else {
+        $imgs = explode(';', $dat);
+    }
     global $wpdb;    
 
-    $done = array();
+    $todo = array();
     foreach ($imgs as $img) {
 
+        $todo[] = explode(',', $img);
+
+/*
         $my_post = array(
             'post_status' => 'publish',
             'post_type' => 'specimen',
@@ -1241,9 +1251,11 @@ function add_new_specimen() {
         $the_post_id = wp_insert_post( $my_post ); // add new specimen
         wp_update_post( array('ID' => $the_post_id, 'post_title'=> $the_post_id) ); // add title to post
         add_post_meta( $the_post_id, 'imgs', $img ); // add imgs
-
         $done[] = $the_post_id;
+*/
     }
+
+    $done = spnov_add_specimen( $todo );
 
     return json_encode( array('id' => implode(',', $done)) );
 
@@ -1307,7 +1319,7 @@ function loadSpecimen_callback() {
 
     // update specimen with incoming data
     if ($nav == 'next' || $nav == 'previous') {
-        if ($dat_set) spnov_update_specimen($id, $dat_set);
+        if ($dat_set) $stat = spnov_update_specimen($id, $dat_set);
     }
 
 
@@ -1316,7 +1328,7 @@ function loadSpecimen_callback() {
     if ($status == 'finished') {
         $filter = " AND status = 'finished'";
     } elseif ($status == 'issue') {
-        $filter = " AND inputIssue != ''";
+        $filter = " AND inputIssue = 'multiple_specimens'"; // load only mltiple speciemsn for the time being XXX
     } elseif ($status == 'unfinished') {
         $filter = " AND (status = 'unfinished' OR status is null) AND (inputIssue is null OR inputISSUE = '')"; // unifinished requires also that there be no issue associated with specimen
     }
@@ -1373,7 +1385,7 @@ GROUP BY post_id) b on a.ID = b.post_ID WHERE post_type = 'specimen' AND post_st
     if ( count($dat) ){
 
         // reformat data a bit before sending
-        $tmp = array('id' => $id, 'dat_set' => $dat_set, 'get' => $_GET, 'filter' => $filter, 'wp' => $wpdb, 'max' => $max, 'min' => $min);
+        $tmp = array('id' => $id, 'dat_set' => $dat_set, 'get' => $_GET, 'filter' => $filter, 'wp' => $wpdb, 'max' => $max, 'min' => $min, 'stat'=> $stat);
         foreach($dat as $key => $val) {
             $tmp[$key] = $val[0];
         }
@@ -1726,8 +1738,8 @@ function create_dashboard() {
     global $wpdb;
     $specimen_total = wp_count_posts( 'specimen' )->publish;
     $finished = $wpdb->get_var("SELECT count(*) from $wpdb->postmeta WHERE meta_key = 'status' AND meta_value = 'finished'");
-    $unfinished = $wpdb->get_var("SELECT count(*) from $wpdb->postmeta WHERE meta_key = 'status' AND meta_value = 'unfinished'");
     $issue = $wpdb->get_var("SELECT count(*) from $wpdb->postmeta WHERE meta_key = 'inputIssue' AND meta_value != ''");
+    $unfinished = $specimen_total - $finished - $issue;
 
     // number of images
     echo "<p class='lead'>";
@@ -1739,7 +1751,7 @@ function create_dashboard() {
     // status
     echo "<ul class='lead'>";
     echo sprintf("<li>finished - <code>%s</code> <span class='text-muted'>(%.2f%%)</span></li>", $finished, 100 * $finished / $specimen_total);
-    echo sprintf("<li>unfinished - <code>%s</code> <span class='text-muted'>(%.2f%%)</span></li>", $unfinished, 100 * $unfinished / $specimen_total);
+    echo sprintf("<li>unfinished (excludes specimens with an issue) - <code>%s</code> <span class='text-muted'>(%.2f%%)</span></li>", $unfinished, 100 * $unfinished / $specimen_total);
     echo sprintf("<li>specimens with an issue: <code>%s</code> <span class='text-muted'>(%.2f%%)</span></li>", $issue, 100 * $issue / $specimen_total);
     echo "</ul>";
     echo "</p>";
