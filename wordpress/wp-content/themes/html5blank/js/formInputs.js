@@ -150,7 +150,7 @@ var builderOptions = {
             placeholder: 'Colombia',
             operators: ['equal','not_equal','begins_with','not_begins_with','contains','not_contains','ends_with','not_ends_with','is_empty','is_not_empty'],
             validation: {
-                format: '[a-zA-Z]+'
+                format: '[a-zA-Z ]+'
             },
             field: 'inputCountry',
             title: "Only letters are allowed" ,

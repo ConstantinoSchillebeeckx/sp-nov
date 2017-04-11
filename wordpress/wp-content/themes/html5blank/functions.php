@@ -1328,7 +1328,7 @@ function loadSpecimen_callback() {
     if ($status == 'finished') {
         $filter = " AND status = 'finished'";
     } elseif ($status == 'issue') {
-        $filter = " AND inputIssue = 'multiple_specimens'"; // load only mltiple speciemsn for the time being XXX
+        $filter = " AND inputIssue != ''";
     } elseif ($status == 'unfinished') {
         $filter = " AND (status = 'unfinished' OR status is null) AND (inputIssue is null OR inputISSUE = '')"; // unifinished requires also that there be no issue associated with specimen
     }
@@ -1587,6 +1587,16 @@ function add_media_from_ftp() {
 
     global $wpdb;
 
+    // select specimens with multiple_specimens issue
+    $moo = $wpdb->get_results("SELECT * from $wpdb->postmeta where meta_key = 'inputIssue' and meta_value = 'multiple_specimens'", ARRAY_A);
+    foreach ($moo as $row) {
+        $post_id = $row['post_id'];
+        //wp_delete_post( $post_id );
+        echo $post_id . '<br>';
+    }
+
+/*
+
     // select images with history
     $moo = $wpdb->get_results("SELECT * from $wpdb->postmeta where meta_key ='history' and meta_value is not null", ARRAY_A);
     $count = 0;
@@ -1600,7 +1610,7 @@ function add_media_from_ftp() {
         //wp_update_post( array('ID' => $row['post_id'], 'post_status'=>'draft') );
         
     }
-
+*/
 /*
     // select images with issues of 
     $moo = $wpdb->get_results("SELECT a.post_id, b.meta_value, a.meta_value as issue from $wpdb->postmeta a left join $wpdb->postmeta b on a.post_id = b.post_id where a.meta_key = 'inputIssue' and a.meta_value in  ('multiple_specimens','missing_image') and b.meta_key = 'imgs'", ARRAY_A);
