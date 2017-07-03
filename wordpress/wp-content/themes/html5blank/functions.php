@@ -841,9 +841,9 @@ function downloadSpecimens_callback() {
         // rename files before zipping
         if ( json_decode($_GET['rename']) ) { 
             $command = rename_specimens($dat_clean, $dir);
-            $comm = 'rm ~/data/tmp/imgs.zip; zip -r9 -j ~/data/tmp/imgs.zip ~/data/tmp/*jpg; rm ~/data/tmp/*jpg; ln -s ~/data/tmp/imgs.zip ~/domains/spnov.com/html/;';
+            $comm = 'rm -f ~/data/tmp/imgs.zip; zip -r9 -j ~/data/tmp/imgs.zip ~/data/tmp/*jpg; rm ~/data/tmp/*jpg; ln -s ~/data/tmp/imgs.zip ~/domains/spnov.com/html/;';
         } else {
-            $comm = 'rm ~/data/tmp/imgs.zip; zip -r9 -j ~/data/tmp/imgs.zip ' . implode(' ',$imgs) .'; ln -s ~/data/tmp/imgs.zip ~/domains/spnov.com/html/';
+            $comm = 'rm -f ~/data/tmp/imgs.zip; zip -r9 -j ~/data/tmp/imgs.zip ' . implode(' ',$imgs) .'; ln -s ~/data/tmp/imgs.zip ~/domains/spnov.com/html/';
         }
 
         // execute command
@@ -899,37 +899,8 @@ function rename_specimens($dat, $dir) {
         $count = 1;
         $imgs = explode(',', $obj['imgs']);
         foreach($imgs as $img) {
-            $source_image = str_replace('JPG','jpg', $img);
 
-            $comma_sep = [];
-            $space_sep = [];
-            if (isset($obj['inputGenus']) && $obj['inputGenus'] != '') $space_sep[] = $obj['inputGenus'];
-            if (isset($obj['inputSection']) && $obj['inputSection'] != '') $space_sep[] = $obj['inputSection'];
-            if (isset($obj['inputSpecies']) && $obj['inputSpecies'] != '') $space_sep[] = $obj['inputSpecies'];
-            if (isset($obj['inputNumber']) && $obj['inputNumber'] != '') $space_sep[] = $obj['inputNumber'];
-            if (isset($obj['inputCollector']) && $obj['inputCollector'] != '') $comma_sep[] = $obj['inputCollector'];
-            if (isset($obj['inputDeterminer']) && $obj['inputDeterminer'] != '') $comma_sep[] = $obj['inputDeterminer'];
-            if (isset($obj['inputHerbarium']) && $obj['inputHerbarium'] != '') $comma_sep[] = $obj['inputHerbarium'];
-            if (isset($obj['inputLocation']) && $obj['inputLocation'] != '') $comma_sep[] = $obj['inputLocation'];
-
-            // generate new name; replace spaces with \
-            if (count($comma_sep)) {
-                $space_part = implode('\ ', $space_sep);
-                if (count($comma_sep)) {
-                    $comma_part = str_replace(' ', '\ ', implode(', ', $comma_sep));
-                    $rename_image = $space_part . '\ ' . $comma_part;
-                } else {
-                    $rename_image = $space_part;
-                }
-
-                if ($count == count($imgs)) {
-                     $rename_image .= '\ label.jpg';
-                } else {
-                     $rename_image .= '\ '. $count . '.jpg';
-                }
-            } else { // if no data available for specimen, keep original name
-                $rename_image = $source_image;
-            }
+            $rename_imgs = generate_name($img, $obj, $imgs);
 
             $comm = "cp " . $dir . $source_image . " ~/data/tmp/" . $rename_image;
             exec($comm, $out, $status);
@@ -940,6 +911,43 @@ function rename_specimens($dat, $dir) {
     return $comms;
 }
 
+
+
+function generate_name($img, $obj, $imgs) {
+
+    $source_image = str_replace('JPG','jpg', $img);
+
+    $comma_sep = [];
+    $space_sep = [];
+    if (isset($obj['inputGenus']) && $obj['inputGenus'] != '') $space_sep[] = $obj['inputGenus'];
+    if (isset($obj['inputSection']) && $obj['inputSection'] != '') $space_sep[] = $obj['inputSection'];
+    if (isset($obj['inputSpecies']) && $obj['inputSpecies'] != '') $space_sep[] = $obj['inputSpecies'];
+    if (isset($obj['inputNumber']) && $obj['inputNumber'] != '') $space_sep[] = $obj['inputNumber'];
+    if (isset($obj['inputCollector']) && $obj['inputCollector'] != '') $comma_sep[] = $obj['inputCollector'];
+    if (isset($obj['inputDeterminer']) && $obj['inputDeterminer'] != '') $comma_sep[] = $obj['inputDeterminer'];
+    if (isset($obj['inputHerbarium']) && $obj['inputHerbarium'] != '') $comma_sep[] = $obj['inputHerbarium'];
+    if (isset($obj['inputLocation']) && $obj['inputLocation'] != '') $comma_sep[] = $obj['inputLocation'];
+
+    // generate new name; replace spaces with \
+    if (count($comma_sep)) {
+        $space_part = implode('\ ', $space_sep);
+        if (count($comma_sep)) {
+            $comma_part = str_replace(' ', '\ ', implode(', ', $comma_sep));
+            $rename_image = $space_part . '\ ' . $comma_part;
+        } else {
+            $rename_image = $space_part;
+        }
+
+        if ($count == count($imgs)) {
+             $rename_image .= '\ label.jpg';
+        } else {
+             $rename_image .= '\ '. $count . '.jpg';
+        }
+    } else { // if no data available for specimen, keep original name
+        $rename_image = $source_image;
+    }
+
+}
 
 
 
@@ -966,8 +974,11 @@ add_action( 'wp_ajax_downloadTropicosCSV', 'downloadTropicosCSV_callback' );
 function downloadTropicosCSV_callback() {
 
     global $wpdb;
+    $colMap = $_GET['colMap'];
+    $colMap['imgs'] = 'images'; # manually add so that we can get img names
+
     $ids = implode(',', $_GET['ids']);
-    $cols = array_keys($_GET['colMap']);
+    $cols = array_keys($colMap);
 
 
     // run query for specimen info
@@ -989,7 +1000,7 @@ function downloadTropicosCSV_callback() {
         $meta_value = $row['meta_value'];
 
         // store data if it has required column
-        if (in_array($meta_key, $cols) && !in_array($meta_key, array('downloaded','status'))) {
+        if (in_array($meta_key, $cols) && !in_array($meta_key, array('downloaded','status','issueNotes','inputIssue','last_edit'))) {
             if ($dat_clean[$id]) {
                 $dat_clean[$id][$meta_key] = $meta_value;
             } else {

@@ -282,7 +282,7 @@ function loadIMG(src) {
 /* Download images of specimens in results as zip
 
 Provided a search has been made (and the global
-searchResults var is set) function will generate
+queryResults var is set) function will generate
 a zip filled with the images of the search
 results and will generate a download link for the
 user.
@@ -302,12 +302,14 @@ error - will show error message
 function downloadSpecimens(rename) {
 
 
-    if (searchResults.length) { // require search results before anything can be downloaded
+    if (parseInt(queryResults.get.length) > 0) { // require search results before anything can be downloaded
+
+        var ids = queryResults.aaData.map(function(d) { return parseInt(d[0].split('id=')[1].split("'>")[0]) }) // this assumes the first columns is formatted as e.g. "<a href='/label_specimen/?id=33365'>unfinished</a>"
 
         var data = {
             "action": "downloadSpecimens", 
             "rename": rename,
-            "ids": searchResults,
+            "ids": ids,
             "onlyNotDownloaded": false,
         }
 
@@ -325,6 +327,7 @@ function downloadSpecimens(rename) {
                 console.log(response)
                 if (response.success) {
                     jQuery('#searchResults').append('<a href="' + response.url + '" style="text-decoration:none" class="btn btn-info"><i class="fa fa-download" aria-hidden="true"></i> Download images</a>');
+                    jQuery('.fa-spinner').parent().remove();
                 } else {
                     jQuery('#searchResults').append(response.msg);
                 }
@@ -387,6 +390,9 @@ function searchSpecimen() {
         "ajax": {
             url: ajax_object.ajax_url,
             data: data,
+            complete: function(event, xhr, settings) {
+                queryResults = JSON.parse(event.responseText); // set response to a global for latter checking (e.g. for download action)
+            }
         },
     } );
 
@@ -534,7 +540,7 @@ function onChangeIssue() {
 /*
 
 Provided a search has been made (and the global
-searchResults var is set) function will 
+queryResults var is set) function will 
 generate/download a CSV will all the available data
 which can be used to insert into Tropicos.
 
@@ -551,14 +557,16 @@ Returns:
 */
 function downloadTropicosCSV() {
 
-    if (searchResults.length) { // require search results before anything can be downloaded
+    if (parseInt(queryResults.get.length) > 0) { // require search results before anything can be downloaded
 
         var colMap = {}; // {inputGenus: Genus, ...}
         builderOptions.filters.forEach( function(d) { colMap[d.field] = d.label; } )
 
+        var ids = queryResults.aaData.map(function(d) { return parseInt(d[0].split('id=')[1].split("'>")[0]) }) // this assumes the first columns is formatted as e.g. "<a href='/label_specimen/?id=33365'>unfinished</a>"
+
         var data = {
             "action": "downloadTropicosCSV", 
-            "ids": searchResults,
+            "ids": ids,
             "colMap": colMap,
         }
 
@@ -570,20 +578,23 @@ function downloadTropicosCSV() {
             type: "GET",
             data: data, 
             dataType: 'json',
-            success: function(response) {
+            complete: function(response) {
 
-                var dat = response.dat;
+                var dat = JSON.parse(response.responseText).dat;
 
                 // get array of Obj with col values [{inputGenus: Anthurium, ...},...]
                 var data = [];
                 for (var id in dat) {
                     data.push(dat[id]);
                 }
-                var csvContent = "data:text/csv;charset=utf-8," + toCsv(data, colMap);
+                console.log(data, dat, response);
+                var csvContent = "data:text/csv;charset=utf-8," + toCsv(convertForTropicos(data, colMap));
                 var encodedUri = encodeURI(csvContent);
-                window.open(encodedUri);
+                console.log(encodedUri)
+                jQuery('#searchResults').empty(); // clear search results
+                jQuery('#searchResults').append('<a href="' + encodedUri + '" style="text-decoration:none" class="btn btn-info"><i class="fa fa-download" aria-hidden="true"></i> Download CSV</a>');
             },
-            error: function(error) { console.log(error) }
+            error: function(error) { console.log(error) },
         });
     } else {
         jQuery('#searchResults').empty(); // clear search results
@@ -592,8 +603,48 @@ function downloadTropicosCSV() {
 
 }
 
+// reformat CSV data for use with tropicos
+function convertForTropicos(dat, colMap) {
+    /*
+    to add:
+    FileName (assumes it's been renamed with the rename functionality in the download button)
+    ImageKindID (3)
+    NameID ??
+    Photographer
+    LongDescription
+
+    */
 
 
+    var reformat = [];
+    for (var id in dat) {
+        var tmp = {
+            ImageKindID: 3, 
+            Photographer: 'Dr. Thomas Croat', 
+            Note: "Metadata for the specimen associated with this image has been added to the attribute 'longDescription' delimited with '|'; not all attributes are guaranteed as blank ones are not included.",
+            NameID: '?' // TODO
+        };
+        var meta = dat[id];
+        console.log(meta);
+        var longDescription = '';
+        var FileName = ''; // TODO
+        for (var col in meta) {
+            if (typeof meta[col] !== 'undefined' && meta[col] != '' && col != 'imgs') {
+                if (typeof colMap[col] !== 'undefined') {
+                    longDescription += colMap[col] + '=' + meta[col] + '|';
+                } else {
+                    longDescription += col + '=' + meta[col] + '|';
+                }
+            }
+        }
+        tmp.longDescription = longDescription.substring(0, longDescription.length - 1);
+
+        reformat.push(tmp);
+    }
+
+
+    return reformat;
+}
 
 
 /**
@@ -626,7 +677,7 @@ function toCsvValue(theValue, sDelimiter) {
 * @param {string} cDelimiter The column delimiter.  Defaults to a comma (,) if omitted.
 * @return {string} The CSV equivalent of objArray.
 */
-function toCsv(objArray, colMap, sDelimiter, cDelimiter) {
+function toCsv(objArray, sDelimiter, cDelimiter) {
     var i, l, names = [], name, value, obj, row, output = "", n, nl;
 
 
@@ -647,7 +698,7 @@ function toCsv(objArray, colMap, sDelimiter, cDelimiter) {
             for (name in obj) {
                 if (obj.hasOwnProperty(name)) {
                     names.push(name);
-                    row += [sDelimiter, colMap[name], sDelimiter, cDelimiter].join("");
+                    row += [sDelimiter, name, sDelimiter, cDelimiter].join("");
                 }
             }
             row = row.substring(0, row.length - 1);
