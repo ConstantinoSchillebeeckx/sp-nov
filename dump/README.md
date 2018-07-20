@@ -1,0 +1,1 @@
+Manual dumps of the database for the posts and postmeta tables.
